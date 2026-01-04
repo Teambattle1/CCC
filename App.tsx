@@ -101,7 +101,7 @@ const App: React.FC = () => {
     if (link.title === 'ACTIVITIES') changeView('activities');
     else if (link.title === 'ECONOMY') changeView('economy');
     else if (link.title === 'CODING') changeView('coding');
-    else if (link.title === 'TASKS') changeView('task_control');
+    else if (link.title === 'ADMIN') changeView('task_control');
     else if (link.title === 'TOOLS') changeView('tools');
     else if (link.title === 'OFFICE') changeView('office');
     else if (link.title === 'TEAMCHALLENGE') changeView('team_challenge');
@@ -148,7 +148,7 @@ const App: React.FC = () => {
       break;
     case 'task_control':
       currentLinks = TASK_CONTROL_LINKS;
-      viewTitle = 'TASKS';
+      viewTitle = 'ADMIN';
       viewSubtitle = 'Admin & Operations';
       ViewIcon = ClipboardList;
       break;
@@ -190,7 +190,8 @@ const App: React.FC = () => {
   let gridClass = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-12 justify-items-center max-w-7xl mx-auto";
   
   if (currentView === 'activities') {
-    gridClass = "grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 md:gap-x-10 md:gap-y-12 justify-items-center max-w-4xl mx-auto";
+    // 4x4 Grid layout (4 columns)
+    gridClass = "grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-12 justify-items-center max-w-5xl mx-auto";
   } else if (currentView === 'economy' || currentView === 'coding' || currentView === 'tools' || currentView === 'team_challenge') {
     gridClass = "grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8 md:gap-x-10 md:gap-y-12 justify-items-center max-w-2xl mx-auto";
   } else if (currentView === 'task_control' || currentView === 'office') {

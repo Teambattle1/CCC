@@ -161,7 +161,7 @@ export const OFFICE_LINKS: HubLink[] = [
 export const HUB_LINKS: HubLink[] = [
   {
     id: 'cat1',
-    title: 'TASKS',
+    title: 'ADMIN',
     url: '#task_control',
     icon: ClipboardList,
     description: 'Admin & Ops'
@@ -201,6 +201,7 @@ export const ACTIVITY_LINKS: HubLink[] = [
   // Group 1
   { id: 'a1', title: 'TEAMPLAY', url: 'https://play.eventday.dk', icon: Users, description: 'Cooperation', badge: 'ACTIVE' },
   { id: 'a2', title: 'TEAMCHALLENGE', url: '#team_challenge', icon: Trophy, description: 'Competition', badge: 'ACTIVE' },
+  { id: 'a2_2', title: 'TEAMCHALLENGE 2', url: 'https://teamaction.netlify.app/', icon: Trophy, description: 'Competition', badge: 'ACTIVE' },
   { id: 'a3', title: 'TEAMTASTE', url: 'https://taste.eventday.dk', icon: Utensils, description: 'Culinary', badge: 'ACTIVE' },
   
   // Group 2
