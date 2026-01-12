@@ -84,10 +84,24 @@ const HubButton: React.FC<HubButtonProps> = ({
         {/* Icon */}
         <div className={`
           relative z-10 transition-all duration-300
-          ${isHovered ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-battle-orange'}
+          ${isHovered ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' :
+            link.color === 'orange' ? 'text-battle-orange' :
+            link.color === 'blue' ? 'text-blue-500' :
+            link.color === 'lightblue' ? 'text-sky-400' :
+            link.color === 'green' ? 'text-green-700' :
+            link.color === 'lightgreen' ? 'text-green-400' :
+            link.color === 'red' ? 'text-red-800' :
+            link.color === 'gold' ? 'text-yellow-500' :
+            link.color === 'yellow' ? 'text-yellow-400' :
+            link.color === 'purple' ? 'text-purple-500' :
+            link.color === 'white' ? 'text-white' :
+            link.color === 'darkblue' ? 'text-blue-900' :
+            link.color === 'gray' ? 'text-gray-400' :
+            link.color === 'hotpink' ? 'text-pink-500' :
+            'text-battle-orange'}
         `}>
-          <link.icon 
-            size={isHovered ? 48 : 40} 
+          <link.icon
+            size={isHovered ? 48 : 40}
             strokeWidth={1.5}
           />
         </div>
@@ -102,7 +116,14 @@ const HubButton: React.FC<HubButtonProps> = ({
           text-sm md:text-base font-bold uppercase tracking-wider
           ${isHovered ? 'text-battle-orange drop-shadow-[0_0_5px_rgba(255,102,0,0.8)]' : 'text-gray-400'}
         `}>
-          {link.title}
+          {link.title.startsWith('TEAM') ? (
+            <>
+              <span className="text-white">TEAM</span>
+              <span>{link.title.slice(4)}</span>
+            </>
+          ) : (
+            link.title
+          )}
         </h3>
         <p className={`
           text-xs text-gray-500 mt-1 h-4 transition-opacity duration-300

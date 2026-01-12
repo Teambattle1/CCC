@@ -1,52 +1,88 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  HUB_LINKS, 
-  ACTIVITY_LINKS, 
-  ECONOMY_LINKS, 
-  CODING_LINKS, 
+import {
+  HUB_LINKS,
+  ACTIVITY_LINKS,
+  ECONOMY_LINKS,
   TASK_CONTROL_LINKS,
   TOOLS_LINKS,
+  CODE_LINKS,
   OFFICE_LINKS,
-  TEAM_CHALLENGE_LINKS
+  TEAM_CHALLENGE_LINKS,
+  LOQUIZ_LINKS,
+  TEAMACTION_LINKS,
+  TEAMLAZER_LINKS,
+  TEAMLAZER_FEJLSOGNING_LINKS,
+  TEAMROBIN_LINKS,
+  TEAMCONNECT_LINKS,
+  TEAMBOX_LINKS,
+  TEAMSEGWAY_LINKS,
+  TEAMCONTROL_LINKS,
+  TEAMCONSTRUCT_LINKS,
+  TEAMROBIN_PACKING_LINKS,
+  TEAMLAZER_VIDEO_INDEX
 } from './constants';
 import HubButton from './components/HubButton';
 import Clock from './components/Clock';
 import CalendarModal from './components/CalendarModal';
 import DistanceTool from './components/DistanceTool';
-import { 
-  ShieldCheck, 
-  House, 
-  Calendar, 
-  Wallet, 
+import ClaudeDevModal from './components/ClaudeDevModal';
+import LoginScreen from './components/LoginScreen';
+import UsersManagement from './components/UsersManagement';
+import ClaudeAssistant from './components/ClaudeAssistant';
+import PackingList, { TEAMROBIN_PACKING_BEFORE, TEAMROBIN_PACKING_AFTER } from './components/PackingList';
+import VideoPlayer from './components/VideoPlayer';
+import TeamLazerPackingList from './components/TeamLazerPackingList';
+import TeamSegwayPackingList from './components/TeamSegwayPackingList';
+import LazerPointScoreboard from './components/LazerPointScoreboard';
+import { useAuth } from './contexts/AuthContext';
+import {
+  ShieldCheck,
+  House,
+  Calendar,
+  Wallet,
   Code,
   ClipboardList,
   Wrench,
   Briefcase,
   Trophy,
-  Navigation
+  Navigation,
+  Swords,
+  MapPin,
+  Zap,
+  Target,
+  CircleDot,
+  LogOut,
+  User,
+  Gamepad2,
+  Hammer,
+  Bot,
+  Ruler,
+  Package,
+  ListChecks
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'coding' | 'task_control' | 'tools' | 'office' | 'team_challenge' | 'distance_tool';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamcontrol_video' | 'teambox_video' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard';
 
 const App: React.FC = () => {
+  const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
   const [currentView, setCurrentView] = useState<ViewState>('main');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  
-  // Drag and Drop State
+  const [isClaudeDevOpen, setIsClaudeDevOpen] = useState(false);
+  const [isUsersOpen, setIsUsersOpen] = useState(false);
+  const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
+
+  // Drag and Drop State - MUST be before any early returns to satisfy React hooks rules
   const [hubLinks, setHubLinks] = useState<HubLink[]>(() => {
     try {
       const saved = localStorage.getItem('hubLinksOrder');
       if (saved) {
         const savedIds = JSON.parse(saved);
         if (Array.isArray(savedIds)) {
-          // Reconstruct order based on saved IDs
           const orderedLinks = savedIds
             .map((id: string) => HUB_LINKS.find(l => l.id === id))
             .filter((l): l is HubLink => !!l);
-            
-          // Add any new links that aren't in local storage yet
           const missingLinks = HUB_LINKS.filter(l => !savedIds.includes(l.id));
           return [...orderedLinks, ...missingLinks];
         }
@@ -58,6 +94,27 @@ const App: React.FC = () => {
   });
 
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+
+  // Log page visits
+  useEffect(() => {
+    if (isAuthenticated && currentView) {
+      logPageVisit(currentView);
+    }
+  }, [currentView, isAuthenticated]);
+
+  // Show loading screen
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full bg-battle-black flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-battle-orange/30 border-t-battle-orange rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <LoginScreen />;
+  }
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedItemIndex(index);
@@ -100,12 +157,39 @@ const App: React.FC = () => {
   const handleLinkClick = (link: HubLink) => {
     if (link.title === 'ACTIVITIES') changeView('activities');
     else if (link.title === 'ECONOMY') changeView('economy');
-    else if (link.title === 'CODING') changeView('coding');
     else if (link.title === 'ADMIN') changeView('task_control');
     else if (link.title === 'TOOLS') changeView('tools');
     else if (link.title === 'OFFICE') changeView('office');
     else if (link.title === 'TEAMCHALLENGE') changeView('team_challenge');
+    else if (link.title === 'LOQUIZ') changeView('loquiz');
+    else if (link.title === 'TEAMACTION') changeView('teamaction');
+    else if (link.title === 'TEAMLAZER') changeView('teamlazer');
+    else if (link.title === 'TEAMROBIN') changeView('teamrobin');
+    else if (link.title === 'TEAMCONNECT') changeView('teamconnect');
+    else if (link.title === 'TEAMBOX') changeView('teambox');
+    else if (link.title === 'TEAMSEGWAY') changeView('teamsegway');
+    else if (link.title === 'TEAMCONTROL') changeView('teamcontrol');
+    else if (link.title === 'TEAMCONSTRUCT') changeView('teamconstruct');
     else if (link.title === 'DISTANCE') changeView('distance_tool');
+    else if (link.title === 'PAKKELISTER') changeView('teamrobin_packing');
+    else if (link.title === 'FØR OPGAVEN') changeView('teamrobin_packing_before');
+    else if (link.title === 'EFTER OPGAVEN') changeView('teamrobin_packing_after');
+    else if (link.title === 'JUSTERING') changeView('teamlazer_justering');
+    else if (link.url === '#teamrobin_video') changeView('teamrobin_video');
+    else if (link.url === '#teamchallenge_video') changeView('teamchallenge_video');
+    else if (link.url === '#teamaction_video') changeView('teamaction_video');
+    else if (link.url === '#teamsegway_video') changeView('teamsegway_video');
+    else if (link.url === '#teamconstruct_video') changeView('teamconstruct_video');
+    else if (link.url === '#teamcontrol_video') changeView('teamcontrol_video');
+    else if (link.url === '#teambox_video') changeView('teambox_video');
+    else if (link.url === '#teamlazer_video') changeView('teamlazer_video');
+    else if (link.url === '#teamlazer_packing') changeView('teamlazer_packing');
+    else if (link.url === '#teamsegway_packing') changeView('teamsegway_packing');
+    else if (link.url === '#teamlazer_scorecard') changeView('teamlazer_scorecard');
+    else if (link.url === '#teamlazer_fejlsogning') changeView('teamlazer_fejlsogning');
+    else if (link.url === '#code') changeView('code');
+    else if (link.title === 'CLAUDE') setIsClaudeDevOpen(true);
+    else if (link.title === 'USERS') setIsUsersOpen(true);
   };
 
   const handleBackClick = () => {
@@ -114,8 +198,58 @@ const App: React.FC = () => {
       changeView('office');
     } else if (currentView === 'team_challenge') {
       changeView('activities');
+    } else if (currentView === 'loquiz') {
+      changeView('team_challenge');
+    } else if (currentView === 'teamaction') {
+      changeView('activities');
+    } else if (currentView === 'teamlazer') {
+      changeView('activities');
+    } else if (currentView === 'teamrobin') {
+      changeView('activities');
+    } else if (currentView === 'teamconnect') {
+      changeView('activities');
+    } else if (currentView === 'teambox') {
+      changeView('activities');
+    } else if (currentView === 'teamsegway') {
+      changeView('activities');
+    } else if (currentView === 'teamcontrol') {
+      changeView('activities');
+    } else if (currentView === 'teamconstruct') {
+      changeView('activities');
     } else if (currentView === 'distance_tool') {
       changeView('tools');
+    } else if (currentView === 'code') {
+      changeView('tools');
+    } else if (currentView === 'teamrobin_packing') {
+      changeView('teamrobin');
+    } else if (currentView === 'teamrobin_packing_before' || currentView === 'teamrobin_packing_after') {
+      changeView('teamrobin_packing');
+    } else if (currentView === 'teamlazer_justering') {
+      changeView('teamlazer_fejlsogning');
+    } else if (currentView === 'teamlazer_fejlsogning') {
+      changeView('teamlazer');
+    } else if (currentView === 'teamrobin_video') {
+      changeView('teamrobin');
+    } else if (currentView === 'teamchallenge_video') {
+      changeView('team_challenge');
+    } else if (currentView === 'teamaction_video') {
+      changeView('teamaction');
+    } else if (currentView === 'teamsegway_video') {
+      changeView('teamsegway');
+    } else if (currentView === 'teamconstruct_video') {
+      changeView('teamconstruct');
+    } else if (currentView === 'teamcontrol_video') {
+      changeView('teamcontrol');
+    } else if (currentView === 'teambox_video') {
+      changeView('teambox');
+    } else if (currentView === 'teamlazer_video') {
+      changeView('teamlazer');
+    } else if (currentView === 'teamlazer_packing') {
+      changeView('teamlazer');
+    } else if (currentView === 'teamsegway_packing') {
+      changeView('teamsegway');
+    } else if (currentView === 'teamlazer_scorecard') {
+      changeView('teamlazer');
     } else {
       changeView('main');
     }
@@ -131,7 +265,7 @@ const App: React.FC = () => {
     case 'activities':
       currentLinks = ACTIVITY_LINKS;
       viewTitle = 'ACTIVITIES';
-      viewSubtitle = 'Activity Protocols';
+      viewSubtitle = '';
       ViewIcon = ShieldCheck;
       break;
     case 'economy':
@@ -139,12 +273,6 @@ const App: React.FC = () => {
       viewTitle = 'ECONOMY';
       viewSubtitle = 'Financial Systems';
       ViewIcon = Wallet;
-      break;
-    case 'coding':
-      currentLinks = CODING_LINKS;
-      viewTitle = 'CODING';
-      viewSubtitle = 'Development Tools';
-      ViewIcon = Code;
       break;
     case 'task_control':
       currentLinks = TASK_CONTROL_LINKS;
@@ -158,23 +286,179 @@ const App: React.FC = () => {
       viewSubtitle = 'Utility Functions';
       ViewIcon = Wrench;
       break;
+    case 'code':
+      currentLinks = CODE_LINKS;
+      viewTitle = 'CODE';
+      viewSubtitle = 'Development Tools';
+      ViewIcon = Code;
+      break;
     case 'office':
       currentLinks = OFFICE_LINKS;
       viewTitle = 'OFFICE';
-      viewSubtitle = 'Corporate Suite';
+      viewSubtitle = '';
       ViewIcon = Briefcase;
       break;
     case 'team_challenge':
       currentLinks = TEAM_CHALLENGE_LINKS;
-      viewTitle = 'CHALLENGE';
-      viewSubtitle = 'Competition Control';
+      viewTitle = 'TEAMCHALLENGE';
+      viewSubtitle = '';
       ViewIcon = Trophy;
+      break;
+    case 'loquiz':
+      currentLinks = LOQUIZ_LINKS;
+      viewTitle = 'LOQUIZ';
+      viewSubtitle = '';
+      ViewIcon = MapPin;
+      break;
+    case 'teamaction':
+      currentLinks = TEAMACTION_LINKS;
+      viewTitle = 'TEAMACTION';
+      viewSubtitle = '';
+      ViewIcon = Swords;
+      break;
+    case 'teamlazer':
+      currentLinks = TEAMLAZER_LINKS;
+      viewTitle = 'TEAMLAZER';
+      viewSubtitle = '';
+      ViewIcon = Zap;
+      break;
+    case 'teamrobin':
+      currentLinks = TEAMROBIN_LINKS;
+      viewTitle = 'TEAMROBIN';
+      viewSubtitle = '';
+      ViewIcon = Target;
+      break;
+    case 'teamconnect':
+      currentLinks = TEAMCONNECT_LINKS;
+      viewTitle = 'TEAMCONNECT';
+      viewSubtitle = '';
+      ViewIcon = CircleDot;
+      break;
+    case 'teambox':
+      currentLinks = TEAMBOX_LINKS;
+      viewTitle = 'TEAMBOX';
+      viewSubtitle = '';
+      ViewIcon = Briefcase;
+      break;
+    case 'teamsegway':
+      currentLinks = TEAMSEGWAY_LINKS;
+      viewTitle = 'TEAMSEGWAY';
+      viewSubtitle = '';
+      ViewIcon = Navigation;
+      break;
+    case 'teamcontrol':
+      currentLinks = TEAMCONTROL_LINKS;
+      viewTitle = 'TEAMCONTROL';
+      viewSubtitle = '';
+      ViewIcon = Gamepad2;
+      break;
+    case 'teamconstruct':
+      currentLinks = TEAMCONSTRUCT_LINKS;
+      viewTitle = 'TEAMCONSTRUCT';
+      viewSubtitle = '';
+      ViewIcon = Hammer;
       break;
     case 'distance_tool':
       currentLinks = []; // No links grid for this view
       viewTitle = 'DISTANCE';
       viewSubtitle = 'Travel Calculator';
       ViewIcon = Navigation;
+      break;
+    case 'teamrobin_packing':
+      currentLinks = TEAMROBIN_PACKING_LINKS;
+      viewTitle = 'PAKKELISTER';
+      viewSubtitle = 'TeamRobin';
+      ViewIcon = Package;
+      break;
+    case 'teamrobin_packing_before':
+      currentLinks = []; // No links grid for this view - shows PackingList component
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamrobin_packing_after':
+      currentLinks = []; // No links grid for this view - shows PackingList component
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
+      break;
+    case 'teamlazer_justering':
+      currentLinks = []; // No links grid for this view - shows VideoPlayer component
+      viewTitle = 'JUSTERING';
+      viewSubtitle = 'Video Guide';
+      ViewIcon = Zap;
+      break;
+    case 'teamlazer_fejlsogning':
+      currentLinks = TEAMLAZER_FEJLSOGNING_LINKS;
+      viewTitle = 'FEJLSØGNING';
+      viewSubtitle = 'TeamLazer';
+      ViewIcon = Wrench;
+      break;
+    case 'teamrobin_video':
+      currentLinks = []; // No links grid for this view - shows VideoPlayer component
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamRobin Guides';
+      ViewIcon = Target;
+      break;
+    case 'teamchallenge_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamChallenge Guides';
+      ViewIcon = Trophy;
+      break;
+    case 'teamaction_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamAction Guides';
+      ViewIcon = Swords;
+      break;
+    case 'teamsegway_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamSegway Guides';
+      ViewIcon = Navigation;
+      break;
+    case 'teamconstruct_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamConstruct Guides';
+      ViewIcon = Hammer;
+      break;
+    case 'teamcontrol_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamControl Guides';
+      ViewIcon = Gamepad2;
+      break;
+    case 'teambox_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamBox Guides';
+      ViewIcon = Briefcase;
+      break;
+    case 'teamlazer_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamLazer Guides';
+      ViewIcon = Zap;
+      break;
+    case 'teamlazer_packing':
+      currentLinks = [];
+      viewTitle = 'PAKKELISTER';
+      viewSubtitle = 'TeamLazer';
+      ViewIcon = Package;
+      break;
+    case 'teamsegway_packing':
+      currentLinks = [];
+      viewTitle = 'PAKKELISTER';
+      viewSubtitle = 'TeamSegway';
+      ViewIcon = Package;
+      break;
+    case 'teamlazer_scorecard':
+      currentLinks = [];
+      viewTitle = 'SCORECARD';
+      viewSubtitle = 'TeamLazer Point';
+      ViewIcon = ListChecks;
       break;
     case 'main':
     default:
@@ -186,18 +470,11 @@ const App: React.FC = () => {
       break;
   }
 
-  // Grid layout logic
-  let gridClass = "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-12 justify-items-center max-w-7xl mx-auto";
-  
-  if (currentView === 'activities') {
-    // 4x4 Grid layout (4 columns)
-    gridClass = "grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-12 justify-items-center max-w-5xl mx-auto";
-  } else if (currentView === 'economy' || currentView === 'coding' || currentView === 'tools' || currentView === 'team_challenge') {
-    gridClass = "grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8 md:gap-x-10 md:gap-y-12 justify-items-center max-w-2xl mx-auto";
-  } else if (currentView === 'task_control' || currentView === 'office') {
-    gridClass = "grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 md:gap-x-10 md:gap-y-12 justify-items-center max-w-4xl mx-auto";
-  } else if (currentView === 'main') {
-    // 5 items, centered nicely
+  // Grid layout logic - 4x2 grid on desktop for all subpages
+  let gridClass = "grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-12 justify-items-center max-w-5xl mx-auto";
+
+  if (currentView === 'main') {
+    // Main view: centered flex layout
     gridClass = "flex flex-wrap justify-center gap-8 md:gap-12 max-w-6xl mx-auto";
   }
 
@@ -239,9 +516,52 @@ const App: React.FC = () => {
         <Clock />
       </div>
 
-      {/* Top Right Calendar Button */}
-      <div className="absolute top-4 right-4 md:top-8 md:right-8 z-50">
-        <button 
+      {/* Top Right User Info and Calendar */}
+      <div className="absolute top-4 right-4 md:top-8 md:right-8 z-50 flex items-center gap-3">
+        {/* Claude AI Button - Admin Only */}
+        {profile?.role === 'ADMIN' && (
+          <button
+            onClick={() => setIsClaudeAssistantOpen(true)}
+            className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-orange-500/20 to-amber-600/20 hover:from-orange-500/40 hover:to-amber-600/40 border border-orange-500/30 hover:border-orange-500 text-white rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(255,140,0,0.2)] hover:shadow-[0_0_25px_rgba(255,140,0,0.4)]"
+            title="Claude AI Assistant"
+          >
+            <Bot className="w-6 h-6 md:w-7 md:h-7 text-orange-400 group-hover:text-orange-300 transition-colors" />
+          </button>
+        )}
+
+        {/* User Info */}
+        <div className="hidden md:flex items-center gap-2 bg-battle-grey/50 border border-white/10 rounded-full px-4 py-2">
+          <User className="w-4 h-4 text-gray-400" />
+          <span className="text-sm text-gray-300">{profile?.name || profile?.email}</span>
+          <span className={`text-xs px-2 py-0.5 rounded-full ${
+            profile?.role === 'ADMIN' ? 'bg-red-500/20 text-red-400' :
+            profile?.role === 'GAMEMASTER' ? 'bg-purple-500/20 text-purple-400' :
+            'bg-blue-500/20 text-blue-400'
+          }`}>
+            {profile?.role}
+          </span>
+        </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={signOut}
+          className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-red-500/20 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-300"
+          title="Log ud"
+        >
+          <LogOut className="w-6 h-6 md:w-7 md:h-7 group-hover:text-red-500 transition-colors" />
+        </button>
+
+        {/* Distance Button */}
+        <button
+          onClick={() => changeView('distance_tool')}
+          className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-blue-500/20 border border-white/10 hover:border-blue-500 text-white rounded-full transition-all duration-300"
+          title="Afstandsberegner"
+        >
+          <Ruler className="w-6 h-6 md:w-7 md:h-7 group-hover:text-blue-400 transition-colors" />
+        </button>
+
+        {/* Calendar Button */}
+        <button
           onClick={() => setIsCalendarOpen(true)}
           className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-300"
         >
@@ -250,6 +570,9 @@ const App: React.FC = () => {
       </div>
 
       <CalendarModal isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} />
+      <ClaudeDevModal isOpen={isClaudeDevOpen} onClose={() => setIsClaudeDevOpen(false)} />
+      <UsersManagement isOpen={isUsersOpen} onClose={() => setIsUsersOpen(false)} />
+      <ClaudeAssistant isOpen={isClaudeAssistantOpen} onClose={() => setIsClaudeAssistantOpen(false)} />
 
       {/* Main Content Container - Reduced padding top to move things up */}
       <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-20 px-4">
@@ -266,8 +589,17 @@ const App: React.FC = () => {
                  <ViewIcon className="w-10 h-10 md:w-14 md:h-14" />
                </div>
 
-               <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase text-battle-orange">
-                {viewTitle}
+               <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase">
+                {viewTitle.startsWith('TEAM') ? (
+                  <>
+                    <span className="text-white">TEAM</span>
+                    <span className="text-battle-orange">{viewTitle.slice(4)}</span>
+                  </>
+                ) : viewTitle === 'OFFICE' ? (
+                  <span className="text-white">{viewTitle}</span>
+                ) : (
+                  <span className="text-battle-orange">{viewTitle}</span>
+                )}
               </h1>
             </div>
             
@@ -282,12 +614,76 @@ const App: React.FC = () => {
         <div className={`w-full max-w-6xl mx-auto transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           {currentView === 'distance_tool' ? (
             <DistanceTool />
+          ) : currentView === 'teamrobin_packing_before' ? (
+            <PackingList
+              title="Før Opgaven - Afgang"
+              storageKey="teamrobin_packing_before"
+              items={TEAMROBIN_PACKING_BEFORE}
+            />
+          ) : currentView === 'teamrobin_packing_after' ? (
+            <PackingList
+              title="Efter Opgaven - Hjemkomst"
+              storageKey="teamrobin_packing_after"
+              items={TEAMROBIN_PACKING_AFTER}
+            />
+          ) : currentView === 'teamlazer_justering' ? (
+            <VideoPlayer
+              title="TeamLazer Justering"
+              videoId="ZkkqiV-uRRg"
+            />
+          ) : currentView === 'teamrobin_video' ? (
+            <VideoPlayer
+              title="TeamRobin Video Guides"
+              playlistId="PLq4wXYwkH9QaWwF-HmOgfUc_ubty9BOub"
+            />
+          ) : currentView === 'teamchallenge_video' ? (
+            <VideoPlayer
+              title="TeamChallenge Video Guides"
+              playlistId="PLq4wXYwkH9QYW4rRwBBM8xUUf_9yg6l6Z"
+            />
+          ) : currentView === 'teamaction_video' ? (
+            <VideoPlayer
+              title="TeamAction Video Guides"
+              playlistId="PLq4wXYwkH9QY14CVT_nnytn_HMX_BTnyR"
+            />
+          ) : currentView === 'teamsegway_video' ? (
+            <VideoPlayer
+              title="TeamSegway Video Guides"
+              playlistId="PLq4wXYwkH9QZE47RWiYV6XAy48RSt83mR"
+            />
+          ) : currentView === 'teamconstruct_video' ? (
+            <VideoPlayer
+              title="TeamConstruct Video Guides"
+              playlistId="PLq4wXYwkH9QaJWSzrKmj7NCWdPgJD0_zd"
+            />
+          ) : currentView === 'teamcontrol_video' ? (
+            <VideoPlayer
+              title="TeamControl Video Guides"
+              playlistId="PLq4wXYwkH9QaTPd62RD_rf3YSCw3eMdzr"
+            />
+          ) : currentView === 'teambox_video' ? (
+            <VideoPlayer
+              title="TeamBox Video Guides"
+              playlistId="PLq4wXYwkH9QYNeIb2OD85T-zLjIkp6MIc"
+            />
+          ) : currentView === 'teamlazer_video' ? (
+            <VideoPlayer
+              title="TeamLazer Video Guides"
+              playlistId="PLq4wXYwkH9QbWM9SurCo-EWPJlCO03-vk"
+              videoIndex={TEAMLAZER_VIDEO_INDEX}
+            />
+          ) : currentView === 'teamlazer_packing' ? (
+            <TeamLazerPackingList />
+          ) : currentView === 'teamsegway_packing' ? (
+            <TeamSegwayPackingList />
+          ) : currentView === 'teamlazer_scorecard' ? (
+            <LazerPointScoreboard />
           ) : (
             <div className={gridClass}>
               {currentLinks.map((link, index) => (
-                <HubButton 
-                  key={link.id} 
-                  link={link} 
+                <HubButton
+                  key={link.id}
+                  link={link}
                   index={index}
                   onClick={handleLinkClick}
                   draggable={currentView === 'main'}
