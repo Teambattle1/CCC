@@ -554,7 +554,7 @@ const PackingListEditor: React.FC = () => {
                       type="text"
                       value={editText}
                       onChange={(e) => setEditText(e.target.value)}
-                      className="w-full bg-battle-black/50 border border-white/20 rounded-lg p-2 text-white focus:outline-none focus:border-green-500"
+                      className="w-full bg-battle-black/50 border border-white/20 rounded-lg p-2 text-white uppercase focus:outline-none focus:border-green-500"
                       placeholder="Item tekst"
                       autoFocus
                     />
@@ -562,7 +562,7 @@ const PackingListEditor: React.FC = () => {
                       type="text"
                       value={editSubtext}
                       onChange={(e) => setEditSubtext(e.target.value)}
-                      className="w-full bg-battle-black/50 border border-white/20 rounded-lg p-2 text-white text-sm focus:outline-none focus:border-green-500"
+                      className="w-full bg-battle-black/50 border border-white/20 rounded-lg p-2 text-white text-sm uppercase focus:outline-none focus:border-green-500"
                       placeholder="Undertekst (valgfrit)"
                     />
                     <div className="flex gap-2">
@@ -613,9 +613,9 @@ const PackingListEditor: React.FC = () => {
                           </div>
                         ) : (
                           <>
-                            <div className="text-white">{item.text}</div>
+                            <div className="text-white uppercase">{item.text}</div>
                             {item.subtext && (
-                              <div className="text-xs text-gray-500">{item.subtext}</div>
+                              <div className="text-xs text-gray-500 uppercase">{item.subtext}</div>
                             )}
                             {item.imageUrl && (
                               <div className="mt-2 relative">
