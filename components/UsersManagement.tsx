@@ -349,7 +349,14 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
       setShowAddUser(false);
       loadData();
     } else {
-      setError(result.error || 'Failed to create user');
+      // Translate error messages to Danish
+      let errorMessage = result.error || 'Kunne ikke oprette bruger';
+      if (result.error === 'EMAIL_EXISTS' || result.error?.includes('duplicate key')) {
+        errorMessage = 'En bruger med denne email eksisterer allerede';
+      } else if (result.error?.includes('User already registered')) {
+        errorMessage = 'En bruger med denne email eksisterer allerede';
+      }
+      setError(errorMessage);
     }
   };
 

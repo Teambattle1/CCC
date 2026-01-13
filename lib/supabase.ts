@@ -177,6 +177,10 @@ export const createUser = async (
       });
 
     if (profileError) {
+      // Check for duplicate key error
+      if (profileError.message.includes('duplicate key') || profileError.code === '23505') {
+        return { success: false, error: 'EMAIL_EXISTS' };
+      }
       return { success: false, error: profileError.message };
     }
 
