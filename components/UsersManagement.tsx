@@ -12,7 +12,8 @@ import {
   Activity,
   ChevronDown,
   KeyRound,
-  Pencil
+  Pencil,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -38,7 +39,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
   const [users, setUsers] = useState<OCCUser[]>([]);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'users' | 'logs'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'logs' | 'permissions'>('users');
   const [showAddUser, setShowAddUser] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -330,6 +331,17 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
             Brugere ({users.length})
           </button>
           <button
+            onClick={() => setActiveTab('permissions')}
+            className={`flex-1 flex items-center justify-center gap-2 py-4 font-medium transition-colors ${
+              activeTab === 'permissions'
+                ? 'text-battle-orange border-b-2 border-battle-orange'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Lock className="w-4 h-4" />
+            Adgangsstyring
+          </button>
+          <button
             onClick={() => setActiveTab('logs')}
             className={`flex-1 flex items-center justify-center gap-2 py-4 font-medium transition-colors ${
               activeTab === 'logs'
@@ -583,6 +595,111 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                 {users.length === 0 && (
                   <p className="text-center text-gray-500 py-8">Ingen brugere fundet</p>
                 )}
+              </div>
+            </div>
+          ) : activeTab === 'permissions' ? (
+            /* Permissions Matrix */
+            <div className="space-y-4">
+              <div className="bg-battle-black rounded-xl p-4">
+                <h3 className="text-lg font-bold text-white mb-4">Adgangsrettigheder pr. rolle</h3>
+                <p className="text-sm text-gray-400 mb-6">Oversigt over hvilke sektioner hver brugerrolle har adgang til.</p>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-white/10">
+                        <th className="text-left py-3 px-4 text-gray-400 font-medium">Sektion</th>
+                        <th className="text-center py-3 px-4 text-blue-400 font-medium">Instructor</th>
+                        <th className="text-center py-3 px-4 text-purple-400 font-medium">Gamemaster</th>
+                        <th className="text-center py-3 px-4 text-red-400 font-medium">Admin</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Landing Page */}
+                      <tr className="border-b border-white/5 bg-white/5">
+                        <td colSpan={4} className="py-2 px-4 text-battle-orange font-bold text-sm">FORSIDE</td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white">ControlCenter</td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white">Office</td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white">Activities</td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white">Admin</td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+
+                      {/* Office Section */}
+                      <tr className="border-b border-white/5 bg-white/5">
+                        <td colSpan={4} className="py-2 px-4 text-battle-orange font-bold text-sm">OFFICE</td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">Economy (E-conomics, Bank)</td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">Google Tools</td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+
+                      {/* Admin Section */}
+                      <tr className="border-b border-white/5 bg-white/5">
+                        <td colSpan={4} className="py-2 px-4 text-battle-orange font-bold text-sm">ADMIN</td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">CODE (Development)</td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">USERS (Brugerstyring)</td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+
+                      {/* Activities */}
+                      <tr className="border-b border-white/5 bg-white/5">
+                        <td colSpan={4} className="py-2 px-4 text-battle-orange font-bold text-sm">ACTIVITIES</td>
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">Alle aktiviteter</td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-6 p-4 bg-battle-grey/50 rounded-lg">
+                  <h4 className="font-medium text-white mb-2">Rollebeskrivelser:</h4>
+                  <div className="space-y-2 text-sm">
+                    <p><span className="text-blue-400 font-medium">Instructor:</span> <span className="text-gray-400">Basis adgang til aktiviteter og ControlCenter</span></p>
+                    <p><span className="text-purple-400 font-medium">Gamemaster:</span> <span className="text-gray-400">Udvidet adgang inkl. Office funktioner</span></p>
+                    <p><span className="text-red-400 font-medium">Admin:</span> <span className="text-gray-400">Fuld adgang til alle funktioner inkl. brugerstyring</span></p>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (

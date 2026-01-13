@@ -93,6 +93,38 @@ const App: React.FC = () => {
     return HUB_LINKS;
   });
 
+  // Role-based access control - filter links based on user role
+  const filterLinksByRole = (links: HubLink[]): HubLink[] => {
+    if (!profile) return links;
+
+    return links.filter(link => {
+      // ADMIN menu - ADMIN only
+      if (link.title === 'ADMIN') {
+        return profile.role === 'ADMIN';
+      }
+      // OFFICE menu - GAMEMASTER and ADMIN only
+      if (link.title === 'OFFICE') {
+        return profile.role === 'GAMEMASTER' || profile.role === 'ADMIN';
+      }
+      // All other links are available to everyone
+      return true;
+    });
+  };
+
+  // Filter OFFICE sections by role
+  const filterOfficeSectionsByRole = (links: HubLink[]): HubLink[] => {
+    if (!profile) return links;
+
+    return links.filter(link => {
+      // Economy section - ADMIN only
+      if (link.section === 'Economy') {
+        return profile.role === 'ADMIN';
+      }
+      // All other sections available to everyone with OFFICE access
+      return true;
+    });
+  };
+
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
   // Log page visits
@@ -293,7 +325,7 @@ const App: React.FC = () => {
       ViewIcon = Code;
       break;
     case 'office':
-      currentLinks = OFFICE_LINKS;
+      currentLinks = filterOfficeSectionsByRole(OFFICE_LINKS);
       viewTitle = 'OFFICE';
       viewSubtitle = '';
       ViewIcon = Briefcase;
@@ -462,8 +494,8 @@ const App: React.FC = () => {
       break;
     case 'main':
     default:
-      // Use the state for main view to reflect drag and drop order
-      currentLinks = hubLinks; 
+      // Use the state for main view to reflect drag and drop order, filtered by role
+      currentLinks = filterLinksByRole(hubLinks);
       viewTitle = 'TEAMBATTLE';
       viewSubtitle = 'Operational Command Center';
       ViewIcon = ShieldCheck;
@@ -698,6 +730,8 @@ const App: React.FC = () => {
                   { name: 'Google Tools', color: 'blue', borderColor: 'border-blue-500', bgColor: 'bg-blue-500/10', titleColor: 'text-blue-400' }
                 ].map((section) => {
                   const sectionLinks = currentLinks.filter(l => l.section === section.name);
+                  // Hide sections with no links (e.g., Economy for non-admins)
+                  if (sectionLinks.length === 0) return null;
                   return (
                     <div
                       key={section.name}
