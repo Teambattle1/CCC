@@ -27,7 +27,7 @@ import CalendarModal from './components/CalendarModal';
 import DistanceTool from './components/DistanceTool';
 import ClaudeDevModal from './components/ClaudeDevModal';
 import LoginScreen from './components/LoginScreen';
-import UsersManagement from './components/UsersManagement';
+import UsersManagement, { getPermissions, PermissionsConfig } from './components/UsersManagement';
 import ClaudeAssistant from './components/ClaudeAssistant';
 import PackingList, { TEAMROBIN_PACKING_BEFORE, TEAMROBIN_PACKING_AFTER } from './components/PackingList';
 import VideoPlayer from './components/VideoPlayer';
@@ -93,20 +93,29 @@ const App: React.FC = () => {
     return HUB_LINKS;
   });
 
-  // Role-based access control - filter links based on user role
+  // Load permissions from localStorage
+  const [permissions, setPermissions] = useState<PermissionsConfig>(getPermissions);
+
+  // Refresh permissions when UsersManagement modal closes
+  useEffect(() => {
+    if (!isUsersOpen) {
+      setPermissions(getPermissions());
+    }
+  }, [isUsersOpen]);
+
+  // Role-based access control - filter links based on user role and permissions
   const filterLinksByRole = (links: HubLink[]): HubLink[] => {
     if (!profile) return links;
 
+    const rolePerms = permissions[profile.role as keyof PermissionsConfig];
+    if (!rolePerms) return links;
+
     return links.filter(link => {
-      // ADMIN menu - ADMIN only
-      if (link.title === 'ADMIN') {
-        return profile.role === 'ADMIN';
-      }
-      // OFFICE menu - GAMEMASTER and ADMIN only
-      if (link.title === 'OFFICE') {
-        return profile.role === 'GAMEMASTER' || profile.role === 'ADMIN';
-      }
-      // All other links are available to everyone
+      // Landing page items
+      if (link.title === 'ADMIN') return rolePerms.landing_admin;
+      if (link.title === 'OFFICE') return rolePerms.landing_office;
+      if (link.title === 'ACTIVITIES') return rolePerms.landing_activities;
+      if (link.title === 'ControlCenter') return rolePerms.landing_controlcenter;
       return true;
     });
   };
@@ -115,12 +124,38 @@ const App: React.FC = () => {
   const filterOfficeSectionsByRole = (links: HubLink[]): HubLink[] => {
     if (!profile) return links;
 
+    const rolePerms = permissions[profile.role as keyof PermissionsConfig];
+    if (!rolePerms) return links;
+
     return links.filter(link => {
-      // Economy section - ADMIN only
-      if (link.section === 'Economy') {
-        return profile.role === 'ADMIN';
-      }
-      // All other sections available to everyone with OFFICE access
+      if (link.section === 'Economy') return rolePerms.office_economy;
+      if (link.section === 'Google Tools') return rolePerms.office_googletools;
+      if (link.section === 'CrewControlCenter') return rolePerms.office_crewcontrolcenter;
+      if (link.section === 'Office') return rolePerms.office_office;
+      return true;
+    });
+  };
+
+  // Filter ACTIVITY links by role
+  const filterActivitiesByRole = (links: HubLink[]): HubLink[] => {
+    if (!profile) return links;
+
+    const rolePerms = permissions[profile.role as keyof PermissionsConfig];
+    if (!rolePerms) return links;
+
+    return links.filter(link => {
+      const titleLower = link.title.toLowerCase();
+      if (titleLower === 'teamplay') return rolePerms.activity_teamplay;
+      if (titleLower === 'teamchallenge') return rolePerms.activity_teamchallenge;
+      if (titleLower === 'teamtaste') return rolePerms.activity_teamtaste;
+      if (titleLower === 'teamlazer') return rolePerms.activity_teamlazer;
+      if (titleLower === 'teamrobin') return rolePerms.activity_teamrobin;
+      if (titleLower === 'teamsegway') return rolePerms.activity_teamsegway;
+      if (titleLower === 'teamconnect') return rolePerms.activity_teamconnect;
+      if (titleLower === 'teambox') return rolePerms.activity_teambox;
+      if (titleLower === 'teamcontrol') return rolePerms.activity_teamcontrol;
+      if (titleLower === 'teamaction') return rolePerms.activity_teamaction;
+      if (titleLower === 'teamconstruct') return rolePerms.activity_teamconstruct;
       return true;
     });
   };
@@ -295,7 +330,7 @@ const App: React.FC = () => {
   // Determine content based on view
   switch (currentView) {
     case 'activities':
-      currentLinks = ACTIVITY_LINKS;
+      currentLinks = filterActivitiesByRole(ACTIVITY_LINKS);
       viewTitle = 'ACTIVITIES';
       viewSubtitle = '';
       ViewIcon = ShieldCheck;

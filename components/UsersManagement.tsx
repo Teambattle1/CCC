@@ -34,6 +34,124 @@ interface UsersManagementProps {
   onClose: () => void;
 }
 
+// Permission types
+type PermissionKey =
+  | 'landing_controlcenter' | 'landing_office' | 'landing_activities' | 'landing_admin'
+  | 'office_economy' | 'office_googletools' | 'office_crewcontrolcenter' | 'office_office'
+  | 'admin_code' | 'admin_users'
+  | 'activity_teamplay' | 'activity_teamchallenge' | 'activity_teamtaste'
+  | 'activity_teamlazer' | 'activity_teamrobin' | 'activity_teamsegway'
+  | 'activity_teamconnect' | 'activity_teambox' | 'activity_teamcontrol'
+  | 'activity_teamaction' | 'activity_teamconstruct';
+
+type RolePermissions = {
+  [key in PermissionKey]: boolean;
+};
+
+export type PermissionsConfig = {
+  INSTRUCTOR: RolePermissions;
+  GAMEMASTER: RolePermissions;
+  ADMIN: RolePermissions;
+};
+
+// Default permissions
+const DEFAULT_PERMISSIONS: PermissionsConfig = {
+  INSTRUCTOR: {
+    landing_controlcenter: true,
+    landing_office: false,
+    landing_activities: true,
+    landing_admin: false,
+    office_economy: false,
+    office_googletools: true,
+    office_crewcontrolcenter: true,
+    office_office: true,
+    admin_code: false,
+    admin_users: false,
+    activity_teamplay: true,
+    activity_teamchallenge: true,
+    activity_teamtaste: true,
+    activity_teamlazer: true,
+    activity_teamrobin: true,
+    activity_teamsegway: true,
+    activity_teamconnect: true,
+    activity_teambox: true,
+    activity_teamcontrol: true,
+    activity_teamaction: true,
+    activity_teamconstruct: true
+  },
+  GAMEMASTER: {
+    landing_controlcenter: true,
+    landing_office: true,
+    landing_activities: true,
+    landing_admin: false,
+    office_economy: false,
+    office_googletools: true,
+    office_crewcontrolcenter: true,
+    office_office: true,
+    admin_code: false,
+    admin_users: false,
+    activity_teamplay: true,
+    activity_teamchallenge: true,
+    activity_teamtaste: true,
+    activity_teamlazer: true,
+    activity_teamrobin: true,
+    activity_teamsegway: true,
+    activity_teamconnect: true,
+    activity_teambox: true,
+    activity_teamcontrol: true,
+    activity_teamaction: true,
+    activity_teamconstruct: true
+  },
+  ADMIN: {
+    landing_controlcenter: true,
+    landing_office: true,
+    landing_activities: true,
+    landing_admin: true,
+    office_economy: true,
+    office_googletools: true,
+    office_crewcontrolcenter: true,
+    office_office: true,
+    admin_code: true,
+    admin_users: true,
+    activity_teamplay: true,
+    activity_teamchallenge: true,
+    activity_teamtaste: true,
+    activity_teamlazer: true,
+    activity_teamrobin: true,
+    activity_teamsegway: true,
+    activity_teamconnect: true,
+    activity_teambox: true,
+    activity_teamcontrol: true,
+    activity_teamaction: true,
+    activity_teamconstruct: true
+  }
+};
+
+// Load permissions from localStorage
+const loadPermissions = (): PermissionsConfig => {
+  try {
+    const saved = localStorage.getItem('occ_permissions');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Failed to load permissions:', e);
+  }
+  return DEFAULT_PERMISSIONS;
+};
+
+// Save permissions to localStorage
+const savePermissions = (permissions: PermissionsConfig) => {
+  try {
+    localStorage.setItem('occ_permissions', JSON.stringify(permissions));
+  } catch (e) {
+    console.error('Failed to save permissions:', e);
+  }
+};
+
+// Export for use in App.tsx
+export const getPermissions = loadPermissions;
+
 const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) => {
   const { hasPermission, logAction } = useAuth();
   const [users, setUsers] = useState<OCCUser[]>([]);
@@ -43,6 +161,59 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
   const [showAddUser, setShowAddUser] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Permissions state
+  const [permissions, setPermissions] = useState<PermissionsConfig>(loadPermissions);
+
+  // Toggle permission
+  const togglePermission = (role: keyof PermissionsConfig, key: PermissionKey) => {
+    // Don't allow removing Admin's own access to admin functions
+    if (role === 'ADMIN' && (key === 'landing_admin' || key === 'admin_users')) {
+      return;
+    }
+
+    const newPermissions = {
+      ...permissions,
+      [role]: {
+        ...permissions[role],
+        [key]: !permissions[role][key]
+      }
+    };
+    setPermissions(newPermissions);
+    savePermissions(newPermissions);
+    logAction('UPDATE_PERMISSIONS', `Changed ${role} permission for ${key}`);
+  };
+
+  // Render permission cell
+  const PermissionCell: React.FC<{
+    role: keyof PermissionsConfig;
+    permKey: PermissionKey;
+    locked?: boolean;
+  }> = ({ role, permKey, locked }) => {
+    const hasAccess = permissions[role][permKey];
+    const isLocked = locked || (role === 'ADMIN' && (permKey === 'landing_admin' || permKey === 'admin_users'));
+
+    return (
+      <td className="text-center py-2 px-4">
+        <button
+          onClick={() => !isLocked && togglePermission(role, permKey)}
+          disabled={isLocked}
+          className={`p-1 rounded transition-all ${
+            isLocked
+              ? 'cursor-not-allowed opacity-50'
+              : 'cursor-pointer hover:bg-white/10 hover:scale-110'
+          }`}
+          title={isLocked ? 'Kan ikke ændres' : 'Klik for at ændre'}
+        >
+          {hasAccess ? (
+            <Check className="w-5 h-5 text-green-500 mx-auto" />
+          ) : (
+            <X className="w-5 h-5 text-red-500/50 mx-auto" />
+          )}
+        </button>
+      </td>
+    );
+  };
 
   // New user form state
   const [newUserEmail, setNewUserEmail] = useState('');
@@ -601,8 +772,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
             /* Permissions Matrix */
             <div className="space-y-4">
               <div className="bg-battle-black rounded-xl p-4">
-                <h3 className="text-lg font-bold text-white mb-4">Adgangsrettigheder pr. rolle</h3>
-                <p className="text-sm text-gray-400 mb-6">Oversigt over hvilke sektioner hver brugerrolle har adgang til.</p>
+                <h3 className="text-lg font-bold text-white mb-2">Adgangsrettigheder pr. rolle</h3>
+                <p className="text-sm text-gray-400 mb-4">Klik på ikonerne for at ændre adgang.</p>
 
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -621,27 +792,27 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white">ControlCenter</td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="landing_controlcenter" />
+                        <PermissionCell role="GAMEMASTER" permKey="landing_controlcenter" />
+                        <PermissionCell role="ADMIN" permKey="landing_controlcenter" />
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white">Office</td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="landing_office" />
+                        <PermissionCell role="GAMEMASTER" permKey="landing_office" />
+                        <PermissionCell role="ADMIN" permKey="landing_office" />
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white">Activities</td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="landing_activities" />
+                        <PermissionCell role="GAMEMASTER" permKey="landing_activities" />
+                        <PermissionCell role="ADMIN" permKey="landing_activities" />
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white">Admin</td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="landing_admin" />
+                        <PermissionCell role="GAMEMASTER" permKey="landing_admin" />
+                        <PermissionCell role="ADMIN" permKey="landing_admin" locked />
                       </tr>
 
                       {/* Office Section */}
@@ -649,16 +820,28 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                         <td colSpan={4} className="py-2 px-4 text-battle-orange font-bold text-sm">OFFICE</td>
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">CrewControlCenter</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="office_crewcontrolcenter" />
+                        <PermissionCell role="GAMEMASTER" permKey="office_crewcontrolcenter" />
+                        <PermissionCell role="ADMIN" permKey="office_crewcontrolcenter" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">Office Tools</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="office_office" />
+                        <PermissionCell role="GAMEMASTER" permKey="office_office" />
+                        <PermissionCell role="ADMIN" permKey="office_office" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white pl-8">Economy (E-conomics, Bank)</td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="office_economy" />
+                        <PermissionCell role="GAMEMASTER" permKey="office_economy" />
+                        <PermissionCell role="ADMIN" permKey="office_economy" />
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white pl-8">Google Tools</td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="office_googletools" />
+                        <PermissionCell role="GAMEMASTER" permKey="office_googletools" />
+                        <PermissionCell role="ADMIN" permKey="office_googletools" />
                       </tr>
 
                       {/* Admin Section */}
@@ -667,15 +850,15 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white pl-8">CODE (Development)</td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="admin_code" />
+                        <PermissionCell role="GAMEMASTER" permKey="admin_code" />
+                        <PermissionCell role="ADMIN" permKey="admin_code" />
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
                         <td className="py-2 px-4 text-white pl-8">USERS (Brugerstyring)</td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><X className="w-5 h-5 text-red-500/50 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <PermissionCell role="INSTRUCTOR" permKey="admin_users" />
+                        <PermissionCell role="GAMEMASTER" permKey="admin_users" />
+                        <PermissionCell role="ADMIN" permKey="admin_users" locked />
                       </tr>
 
                       {/* Activities */}
@@ -683,10 +866,70 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                         <td colSpan={4} className="py-2 px-4 text-battle-orange font-bold text-sm">ACTIVITIES</td>
                       </tr>
                       <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">Alle aktiviteter</td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                        <td className="text-center py-2 px-4"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
+                        <td className="py-2 px-4 text-white pl-8">TeamPlay</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamplay" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamplay" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamplay" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamChallenge</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamchallenge" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamchallenge" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamchallenge" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamTaste</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamtaste" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamtaste" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamtaste" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamLazer</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamlazer" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamlazer" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamlazer" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamRobin</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamrobin" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamrobin" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamrobin" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamSegway</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamsegway" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamsegway" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamsegway" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamConnect</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamconnect" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamconnect" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamconnect" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamBox</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teambox" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teambox" />
+                        <PermissionCell role="ADMIN" permKey="activity_teambox" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamControl</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamcontrol" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamcontrol" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamcontrol" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamAction</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamaction" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamaction" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamaction" />
+                      </tr>
+                      <tr className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-2 px-4 text-white pl-8">TeamConstruct</td>
+                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamconstruct" />
+                        <PermissionCell role="GAMEMASTER" permKey="activity_teamconstruct" />
+                        <PermissionCell role="ADMIN" permKey="activity_teamconstruct" />
                       </tr>
                     </tbody>
                   </table>
