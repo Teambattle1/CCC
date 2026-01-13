@@ -22,7 +22,7 @@ import {
   TEAMLAZER_VIDEO_INDEX
 } from './constants';
 import HubButton from './components/HubButton';
-import Clock from './components/Clock';
+import Clock, { DateDisplay } from './components/Clock';
 import CalendarModal from './components/CalendarModal';
 import DistanceTool from './components/DistanceTool';
 import ClaudeDevModal from './components/ClaudeDevModal';
@@ -480,6 +480,9 @@ const App: React.FC = () => {
   } else if (currentView === 'activities') {
     // Activities: 4 columns grid for 11 items, optimized for tablet landscape
     gridClass = "grid grid-cols-2 sm:grid-cols-3 tablet:grid-cols-4 gap-x-3 gap-y-3 tablet:gap-x-4 tablet:gap-y-4 justify-items-center max-w-5xl mx-auto tablet-landscape-grid";
+  } else if (currentView === 'office') {
+    // Office: 6 columns grid for sections
+    gridClass = "grid grid-cols-3 sm:grid-cols-4 tablet:grid-cols-6 gap-x-3 gap-y-3 tablet:gap-x-4 tablet:gap-y-4 justify-items-center max-w-6xl mx-auto";
   }
 
   return (
@@ -538,7 +541,7 @@ const App: React.FC = () => {
           <User className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-300">{profile?.name || profile?.email}</span>
           <span className={`text-xs px-2 py-0.5 rounded-full ${
-            profile?.role === 'ADMIN' ? 'bg-red-500/20 text-red-400' :
+            profile?.role === 'ADMIN' ? 'bg-red-500/20 text-white' :
             profile?.role === 'GAMEMASTER' ? 'bg-purple-500/20 text-purple-400' :
             'bg-blue-500/20 text-blue-400'
           }`}>
@@ -599,7 +602,7 @@ const App: React.FC = () => {
                     <span className="text-white">TEAM</span>
                     <span className="text-battle-orange">{viewTitle.slice(4)}</span>
                   </>
-                ) : viewTitle === 'OFFICE' ? (
+                ) : viewTitle === 'OFFICE' || viewTitle === 'ADMIN' ? (
                   <span className="text-white">{viewTitle}</span>
                 ) : (
                   <span className="text-battle-orange">{viewTitle}</span>
@@ -607,9 +610,12 @@ const App: React.FC = () => {
               </h1>
             </div>
 
-            <p className="text-battle-white/50 text-xs tablet:text-sm md:text-lg tracking-[0.2em] uppercase">
-              {viewSubtitle}
-            </p>
+            <DateDisplay />
+            {viewSubtitle && (
+              <p className="text-battle-white/50 text-xs tablet:text-sm md:text-lg tracking-[0.2em] uppercase mt-1">
+                {viewSubtitle}
+              </p>
+            )}
             <div className="h-0.5 tablet:h-1 w-16 tablet:w-24 bg-battle-orange mx-auto mt-3 tablet:mt-4 lg:mt-6 rounded-full shadow-[0_0_15px_rgba(255,102,0,1)]"></div>
           </div>
         </header>
@@ -682,20 +688,89 @@ const App: React.FC = () => {
             <TeamSegwayPackingList />
           ) : currentView === 'teamlazer_scorecard' ? (
             <LazerPointScoreboard />
+          ) : currentView === 'office' ? (
+            <div className="w-full max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 gap-3 tablet:gap-4">
+                {[
+                  { name: 'CrewControlCenter', color: 'red', borderColor: 'border-red-500', bgColor: 'bg-red-500/10', titleColor: 'text-red-400' },
+                  { name: 'Office', color: 'green', borderColor: 'border-green-500', bgColor: 'bg-green-500/10', titleColor: 'text-green-400' },
+                  { name: 'Economy', color: 'yellow', borderColor: 'border-yellow-500', bgColor: 'bg-yellow-500/10', titleColor: 'text-yellow-400' },
+                  { name: 'Google Tools', color: 'blue', borderColor: 'border-blue-500', bgColor: 'bg-blue-500/10', titleColor: 'text-blue-400' }
+                ].map((section) => {
+                  const sectionLinks = currentLinks.filter(l => l.section === section.name);
+                  return (
+                    <div
+                      key={section.name}
+                      className={`rounded-lg border ${section.borderColor} ${section.bgColor} p-2 tablet:p-3`}
+                    >
+                      <h3 className={`text-xs tablet:text-sm font-bold ${section.titleColor} uppercase tracking-widest mb-2 tablet:mb-3 text-center`}>
+                        {section.name}
+                      </h3>
+                      <div className="grid grid-cols-2 tablet:grid-cols-4 gap-1 tablet:gap-2 justify-items-center office-grid-small">
+                        {sectionLinks.map((link, idx) => (
+                          <HubButton
+                            key={link.id}
+                            link={link}
+                            index={idx}
+                            onClick={handleLinkClick}
+                            draggable={false}
+                            onDragStart={handleDragStart}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                            compact={true}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           ) : (
-            <div className={gridClass}>
-              {currentLinks.map((link, index) => (
-                <HubButton
-                  key={link.id}
-                  link={link}
-                  index={index}
-                  onClick={handleLinkClick}
-                  draggable={currentView === 'main'}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                />
-              ))}
+            <div className="w-full">
+              {(() => {
+                let lastSection: string | undefined = undefined;
+                return currentLinks.map((link, index) => {
+                  const showSectionHeader = link.section && link.section !== lastSection;
+                  lastSection = link.section;
+                  return (
+                    <React.Fragment key={link.id}>
+                      {showSectionHeader && (
+                        <div className="w-full mb-4 mt-8 first:mt-0">
+                          <div className="flex items-center gap-4">
+                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-battle-orange/30 to-transparent"></div>
+                            <h3 className="text-sm md:text-base font-bold text-battle-orange uppercase tracking-widest">
+                              {link.section}
+                            </h3>
+                            <div className="h-px flex-1 bg-gradient-to-l from-transparent via-battle-orange/30 to-transparent"></div>
+                          </div>
+                        </div>
+                      )}
+                      {index === 0 || showSectionHeader ? (
+                        <div className={gridClass}>
+                          {currentLinks
+                            .filter((l, i) => {
+                              if (!link.section) return i === index;
+                              return l.section === link.section;
+                            })
+                            .map((sectionLink, sectionIndex) => (
+                              <HubButton
+                                key={sectionLink.id}
+                                link={sectionLink}
+                                index={sectionIndex}
+                                onClick={handleLinkClick}
+                                draggable={currentView === 'main'}
+                                onDragStart={handleDragStart}
+                                onDragOver={handleDragOver}
+                                onDrop={handleDrop}
+                              />
+                            ))}
+                        </div>
+                      ) : null}
+                    </React.Fragment>
+                  );
+                });
+              })()}
             </div>
           )}
         </div>

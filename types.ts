@@ -9,4 +9,5 @@ export interface HubLink {
   badge?: string;
   logoUrl?: string;
   color?: string;
+  section?: string;
 }

@@ -21,6 +21,7 @@ import {
   Wallet,
   Briefcase,
   FileSpreadsheet,
+  FileText,
   Code,
   Bot,
   ClipboardList,
@@ -57,38 +58,17 @@ const EconomicLogo = React.forwardRef<SVGSVGElement, LucideProps>((props, ref) =
 EconomicLogo.displayName = 'EconomicLogo';
 
 // Task Control Submenu Links
-export const TASK_CONTROL_LINKS: HubLink[] = [
+export const TASK_CONTROL_LINKS: HubLink[] = [];
+
+// Tools Submenu Links (includes Coding tools)
+export const TOOLS_LINKS: HubLink[] = [
   {
-    id: '1',
-    title: 'ControlCenter',
-    url: 'https://eventday.dk',
-    icon: LayoutDashboard,
-    description: 'ADMIN'
-  },
-  {
-    id: '12',
-    title: 'EXCEL 2025',
-    url: 'https://segway.sharepoint.com/:x:/r/_layouts/15/doc2.aspx?sourcedoc=%7B1AC01354-27AF-4226-9201-9AD803A8BE30%7D&file=TeamBattle%202025%20(OK%201.0).xlsx&action=default&mobileredirect=true&DefaultItemOpen=1',
-    icon: FileSpreadsheet,
-    description: 'Planning',
-    color: 'green'
-  },
-  {
-    id: '14',
-    title: 'EXCEL 2026',
-    url: '#',
-    icon: FileSpreadsheet,
-    description: 'Future Planning',
-    color: 'yellow',
-    badge: 'new'
-  },
-  {
-    id: '8',
-    title: 'SEGWAY APP',
-    url: 'https://app.teambattle.dk/mainpage.aspx',
-    icon: Target,
-    description: 'Operations',
-    color: 'blue'
+    id: 't2',
+    title: 'CODE',
+    url: '#code',
+    icon: Code,
+    description: 'Development Tools',
+    color: 'purple'
   },
   {
     id: '15',
@@ -97,42 +77,6 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
     icon: Users,
     description: 'User Management',
     color: 'red'
-  }
-];
-
-// Tools Submenu Links (includes Coding tools)
-export const TOOLS_LINKS: HubLink[] = [
-  {
-    id: '4',
-    title: 'QR Generator',
-    url: 'https://login.qr-code-generator.com/',
-    icon: QrCode,
-    description: 'Code Generator',
-    color: 'lightblue'
-  },
-  {
-    id: '13',
-    title: 'MY MAPS',
-    url: 'https://www.google.com/maps/d/edit?mid=1kk3NNhrq_jToiol2_X6-_ExAh88Z55I&ll=55.642030146113406%2C12.52053131216431&z=16',
-    icon: Map,
-    description: 'Location Planning',
-    color: 'green'
-  },
-  {
-    id: 't1',
-    title: 'PHOTO',
-    url: 'https://photos.google.com/albums?pli=1',
-    icon: Camera,
-    description: 'Google Photos',
-    color: 'red'
-  },
-  {
-    id: 't2',
-    title: 'CODE',
-    url: '#code',
-    icon: Code,
-    description: 'Development Tools',
-    color: 'purple'
   }
 ];
 
@@ -615,13 +559,25 @@ export const TEAMACTION_LINKS: HubLink[] = [
 
 // Office Submenu Links
 export const OFFICE_LINKS: HubLink[] = [
+  // CrewControlCenter section
+  {
+    id: '8',
+    title: 'SEGWAY APP',
+    url: 'https://app.teambattle.dk/mainpage.aspx',
+    icon: Target,
+    description: 'Operations',
+    color: 'blue',
+    section: 'CrewControlCenter'
+  },
+  // Office section
   {
     id: '6',
     title: 'OUTLOOK',
     url: 'https://outlook.office.com/mail/',
     icon: Mail,
     description: 'Company email',
-    color: 'red'
+    color: 'red',
+    section: 'Office'
   },
   {
     id: '5',
@@ -629,19 +585,122 @@ export const OFFICE_LINKS: HubLink[] = [
     url: 'https://segway-my.sharepoint.com/',
     icon: Cloud,
     description: 'File storage',
-    color: 'blue'
+    color: 'blue',
+    section: 'Office'
   },
   {
-    id: '10',
-    title: 'ECONOMY',
-    url: '#economy',
-    icon: Wallet,
-    description: 'Finance & Banking'
+    id: '12',
+    title: 'EXCEL 2025',
+    url: 'https://segway.sharepoint.com/:x:/r/_layouts/15/doc2.aspx?sourcedoc=%7B1AC01354-27AF-4226-9201-9AD803A8BE30%7D&file=TeamBattle%202025%20(OK%201.0).xlsx&action=default&mobileredirect=true&DefaultItemOpen=1',
+    icon: FileSpreadsheet,
+    description: 'Planning',
+    color: 'green',
+    section: 'Office'
+  },
+  {
+    id: '14',
+    title: 'EXCEL 2026',
+    url: '#',
+    icon: FileSpreadsheet,
+    description: 'Future Planning',
+    color: 'yellow',
+    badge: 'new',
+    section: 'Office'
+  },
+  // Economy section
+  {
+    id: 'e1',
+    title: 'E-conomics',
+    url: 'https://connect.visma.com/password?clientId=economic&returnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Deconomic%26redirect_uri%3Dhttps%253A%252F%252Fid.e-conomic.com%252Fsignin-visma-connect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520email%2520idp_claims%26code_challenge%3DlZoA4c0ZvvK2tE5pTe3MpbQh1tvMnHnxIRpvY-WrnmU%26code_challenge_method%3DS256%26response_mode%3Dform_post%26nonce%3D639013079883742153.NmNlMTYwYjQtNzEwMi00MTBlLTk3ZDgtNThjYTZmOTE2MThmZDAzMTQwZWQtZjQyNS00NmY2LThmNWEtNDliMjAyNWJiNmFl%26state%3DCfDJ8D2TA8BDXn1HkmTBRGIPpGxnewcMYQTBlyGha62Ha0MP87kgIcOJAaW6ITPhxAkEV2i6fm_5M3FrIWuIUlcvsLGsVF709Fjmons1WK6Diq4UKqcj0w6nGN37U7_S-7OFsevIf_SdXar8Tg1c7s8AqCDqKEv65qih8eLF77kO1T22cLjepzSTBB0WOKcTVs-I741xmIV1y4w3JMz4jIcxe2DGSeFcjy2AFZEDJ58cRQ6wqqLYsthtZdaTPm61NL_gNQq7MmyEqSeM8mUHs6H27OTIWxtbQYB7bxjdA_VKFAbs71TvpWqxJaZhXLbX-7icpnTosabK9h6OeNbYsJodxgwwEHvtEk-i8ncGaalFGz7iHi8WEHLKIgJejJ2IecqkHFNrdmYIAEavXGDJib77SctiJ65628qWwM08eUs9FnuJ1gESmZwjbcu9h2tbKaRY6Lt3oN6v471UnXeKIos4wSsizWjxFLeiU3vvFa5tsykBi_gR_nK6W9c2xE6a3fqhzrZxoR2IQg6MFxWov0Ztds9PJmmcpix1bGTz9RnQymQdq9h5W40liyyNP8KrOrfW3rpP0VlWTAaehREgnv7Gle-LGDf4FcJAWOu7d24o0ykR_lq3naX1243weTlRdiZ3G59dafX43QIOzXs_g8HiLvqH2w7miHC26BAeB4H_039kumOrB7B-IKt-jkb7jYZbIC_zLPR1bKWdCM3TXuoiNF80R21nNkt2dNrhkRtP9R29igufU-PbYi9cKFeBhKWZjxHq2Mzph3RiZmk--QMoSqTWqLp0oRC5zI2R6PuqBcSM-fCShCk5Sz4r9_2mk3uc6ffS00yt3iJwi-YcWw-N6QPnwUkqoCZmLOkWn8m2XPlY2lRh4JNIbp3WKEWsUI55LtExBwmqX-P3AdmGmDPuqgFgWBywDwtDJ5HxBtlxu7oshYSmhaq7s_fn6zcmmORS4h4emsgYdHNt93Zj5irfGAOycD2h1FapFwOaUxv425UQ75nFlqmrMxiKtCUp-sue_S3W8acLiYHdVhrW3xmTM29aBMvZZWbgsy4mGp122YT0sLUzBZ1RJD-OluV39OP6UQ%26x-client-SKU%3DID_NET9_0%26x-client-ver%3D8.0.1.0',
+    icon: EconomicLogo,
+    description: 'Accounting',
+    section: 'Economy'
+  },
+  {
+    id: 'e2',
+    title: 'BANK',
+    url: 'https://jyskebank.mitid.dk/client/start?client_id=mb_051&curity_client_id=netbank_erhverv&redirect_uri=https%3A%2F%2Fauth.jyskebank.dk%2Fauthentication%2Fmitid_erhverv_twofactor%2Fcallback&state=6c4a251f-b9a6-48eb-96b7-0be079a24aa4&response_type=code&code_challenge_method=S256&code_challenge=0vwK3E5maoiVsFaDItBoBXlCZsAQ1sA0wdGniQ01iEI&scope=mitid&bankno=51&customerType=E&isTwoFactor=true&isBankCustomer=true&isPsd2=true&ui_locales=DA&acr=mitid_erhverv_twofactor&explicit_acr=true&curity_acr=mitid_erhverv_twofactor&ts=1765711377&sessionId=bkaghmvr7MPHlwGZgSF6f9N16Gjuy34V&hmac=NEj0Pds076RHziGHzQ6Y_FwXm4qlU19wCIwZ09lRT8s',
+    icon: Landmark,
+    description: 'Jyske Bank',
+    section: 'Economy'
+  },
+  // Google Tools section
+  {
+    id: '13',
+    title: 'MY MAPS',
+    url: 'https://www.google.com/maps/d/edit?mid=1kk3NNhrq_jToiol2_X6-_ExAh88Z55I&ll=55.642030146113406%2C12.52053131216431&z=16',
+    icon: Map,
+    description: 'Location Planning',
+    color: 'green',
+    section: 'Google Tools'
+  },
+  {
+    id: 't1',
+    title: 'PHOTO',
+    url: 'https://photos.google.com/albums?pli=1',
+    icon: Camera,
+    description: 'Google Photos',
+    color: 'red',
+    section: 'Google Tools'
+  },
+  {
+    id: 'forms',
+    title: 'FORMS',
+    url: 'https://docs.google.com/forms/u/0/?pli=1',
+    icon: FileText,
+    description: 'Google Forms',
+    color: 'purple',
+    section: 'Google Tools'
+  },
+  {
+    id: '4',
+    title: 'QR Generator',
+    url: 'https://login.qr-code-generator.com/',
+    icon: QrCode,
+    description: 'Code Generator',
+    color: 'lightblue',
+    section: 'Google Tools'
+  }
+];
+
+// Google Tools Submenu Links
+export const GOOGLE_TOOLS_LINKS: HubLink[] = [
+  {
+    id: '13',
+    title: 'MY MAPS',
+    url: 'https://www.google.com/maps/d/edit?mid=1kk3NNhrq_jToiol2_X6-_ExAh88Z55I&ll=55.642030146113406%2C12.52053131216431&z=16',
+    icon: Map,
+    description: 'Location Planning',
+    color: 'green'
+  },
+  {
+    id: 't1',
+    title: 'PHOTO',
+    url: 'https://photos.google.com/albums?pli=1',
+    icon: Camera,
+    description: 'Google Photos',
+    color: 'red'
+  },
+  {
+    id: 'forms',
+    title: 'FORMS',
+    url: 'https://docs.google.com/forms/u/0/?pli=1',
+    icon: FileText,
+    description: 'Google Forms',
+    color: 'purple'
   }
 ];
 
 // Main Hub Links (Categories)
 export const HUB_LINKS: HubLink[] = [
+  {
+    id: '1',
+    title: 'ControlCenter',
+    url: 'https://eventday.dk',
+    icon: LayoutDashboard,
+    description: 'ADMIN',
+    color: 'yellow'
+  },
   {
     id: 'cat1',
     title: 'ADMIN',
