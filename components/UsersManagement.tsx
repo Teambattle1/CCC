@@ -9,6 +9,7 @@ import {
   X,
   Check,
   AlertCircle,
+  AlertTriangle,
   Activity,
   ChevronDown,
   KeyRound,
@@ -152,6 +153,39 @@ const savePermissions = (permissions: PermissionsConfig) => {
 // Export for use in App.tsx
 export const getPermissions = loadPermissions;
 
+// User-level activity permissions (for instructors)
+// Maps activity key to array of user emails who have access
+type UserActivityPermissions = {
+  [activityKey: string]: string[]; // emails of instructors who have access
+};
+
+const DEFAULT_USER_ACTIVITY_PERMISSIONS: UserActivityPermissions = {};
+
+// Load user activity permissions from localStorage
+const loadUserActivityPermissions = (): UserActivityPermissions => {
+  try {
+    const saved = localStorage.getItem('occ_user_activity_permissions');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Failed to load user activity permissions:', e);
+  }
+  return DEFAULT_USER_ACTIVITY_PERMISSIONS;
+};
+
+// Save user activity permissions to localStorage
+const saveUserActivityPermissions = (perms: UserActivityPermissions) => {
+  try {
+    localStorage.setItem('occ_user_activity_permissions', JSON.stringify(perms));
+  } catch (e) {
+    console.error('Failed to save user activity permissions:', e);
+  }
+};
+
+// Export for use in App.tsx
+export const getUserActivityPermissions = loadUserActivityPermissions;
+
 const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) => {
   const { hasPermission, logAction } = useAuth();
   const [users, setUsers] = useState<OCCUser[]>([]);
@@ -164,6 +198,47 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
 
   // Permissions state
   const [permissions, setPermissions] = useState<PermissionsConfig>(loadPermissions);
+
+  // User-level activity permissions state
+  const [userActivityPermissions, setUserActivityPermissions] = useState<UserActivityPermissions>(loadUserActivityPermissions);
+  const [selectedActivity, setSelectedActivity] = useState<{ key: string; name: string } | null>(null);
+
+  // Get instructors list
+  const instructors = users.filter(u => u.role === 'INSTRUCTOR');
+
+  // Toggle user activity permission
+  const toggleUserActivityPermission = (activityKey: string, userEmail: string) => {
+    const currentAccess = userActivityPermissions[activityKey] || [];
+    const hasAccess = currentAccess.includes(userEmail);
+
+    let newAccess: string[];
+    if (hasAccess) {
+      newAccess = currentAccess.filter(email => email !== userEmail);
+    } else {
+      newAccess = [...currentAccess, userEmail];
+    }
+
+    const newPermissions = {
+      ...userActivityPermissions,
+      [activityKey]: newAccess
+    };
+
+    setUserActivityPermissions(newPermissions);
+    saveUserActivityPermissions(newPermissions);
+    logAction('UPDATE_USER_ACTIVITY_PERMISSION', `Changed ${userEmail} access for ${activityKey}`);
+  };
+
+  // Check if any instructor has access to an activity
+  const hasAnyInstructorAccess = (activityKey: string): boolean => {
+    const access = userActivityPermissions[activityKey] || [];
+    return access.length > 0;
+  };
+
+  // Check if specific instructor has access
+  const instructorHasAccess = (activityKey: string, userEmail: string): boolean => {
+    const access = userActivityPermissions[activityKey] || [];
+    return access.includes(userEmail);
+  };
 
   // Toggle permission
   const togglePermission = (role: keyof PermissionsConfig, key: PermissionKey) => {
@@ -865,72 +940,51 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                       <tr className="border-b border-white/5 bg-white/5">
                         <td colSpan={4} className="py-2 px-4 text-battle-orange font-bold text-sm">ACTIVITIES</td>
                       </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamPlay</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamplay" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamplay" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamplay" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamChallenge</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamchallenge" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamchallenge" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamchallenge" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamTaste</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamtaste" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamtaste" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamtaste" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamLazer</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamlazer" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamlazer" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamlazer" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamRobin</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamrobin" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamrobin" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamrobin" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamSegway</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamsegway" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamsegway" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamsegway" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamConnect</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamconnect" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamconnect" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamconnect" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamBox</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teambox" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teambox" />
-                        <PermissionCell role="ADMIN" permKey="activity_teambox" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamControl</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamcontrol" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamcontrol" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamcontrol" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamAction</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamaction" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamaction" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamaction" />
-                      </tr>
-                      <tr className="border-b border-white/5 hover:bg-white/5">
-                        <td className="py-2 px-4 text-white pl-8">TeamConstruct</td>
-                        <PermissionCell role="INSTRUCTOR" permKey="activity_teamconstruct" />
-                        <PermissionCell role="GAMEMASTER" permKey="activity_teamconstruct" />
-                        <PermissionCell role="ADMIN" permKey="activity_teamconstruct" />
-                      </tr>
+                      {[
+                        { key: 'activity_teamplay', name: 'TeamPlay' },
+                        { key: 'activity_teamchallenge', name: 'TeamChallenge' },
+                        { key: 'activity_teamtaste', name: 'TeamTaste' },
+                        { key: 'activity_teamlazer', name: 'TeamLazer' },
+                        { key: 'activity_teamrobin', name: 'TeamRobin' },
+                        { key: 'activity_teamsegway', name: 'TeamSegway' },
+                        { key: 'activity_teamconnect', name: 'TeamConnect' },
+                        { key: 'activity_teambox', name: 'TeamBox' },
+                        { key: 'activity_teamcontrol', name: 'TeamControl' },
+                        { key: 'activity_teamaction', name: 'TeamAction' },
+                        { key: 'activity_teamconstruct', name: 'TeamConstruct' }
+                      ].map((activity) => (
+                        <tr key={activity.key} className="border-b border-white/5 hover:bg-white/5">
+                          <td className="py-2 px-4 pl-8">
+                            <button
+                              onClick={() => setSelectedActivity(activity)}
+                              className="text-white hover:text-battle-orange transition-colors text-left"
+                              title="Klik for at administrere instruktør-adgang"
+                            >
+                              {activity.name}
+                            </button>
+                          </td>
+                          {/* Instructor - Yellow warning, clickable */}
+                          <td className="text-center py-2 px-4">
+                            <button
+                              onClick={() => setSelectedActivity(activity)}
+                              className="p-1 rounded cursor-pointer hover:bg-white/10 hover:scale-110 transition-all"
+                              title="Klik for at administrere instruktør-adgang"
+                            >
+                              <AlertTriangle className={`w-5 h-5 mx-auto ${
+                                hasAnyInstructorAccess(activity.key) ? 'text-yellow-500' : 'text-yellow-500/50'
+                              }`} />
+                            </button>
+                          </td>
+                          {/* Gamemaster - Always green */}
+                          <td className="text-center py-2 px-4">
+                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                          </td>
+                          {/* Admin - Always green */}
+                          <td className="text-center py-2 px-4">
+                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -1054,6 +1108,79 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
           )}
         </div>
       </div>
+
+      {/* Instructor Activity Access Modal */}
+      {selectedActivity && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedActivity(null)} />
+          <div className="relative bg-battle-grey border border-battle-orange/30 rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div>
+                <h3 className="text-lg font-bold text-white">{selectedActivity.name}</h3>
+                <p className="text-sm text-gray-400">INSTRUKTØR ADGANG</p>
+              </div>
+              <button onClick={() => setSelectedActivity(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {instructors.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">Ingen instruktører fundet</p>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-500 mb-4">
+                    Vælg hvilke instruktører der har adgang til {selectedActivity.name}
+                  </p>
+                  {instructors.map(instructor => {
+                    const hasAccess = instructorHasAccess(selectedActivity.key, instructor.email);
+                    return (
+                      <div
+                        key={instructor.id}
+                        className="flex items-center justify-between bg-battle-black rounded-lg p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-battle-grey rounded-full flex items-center justify-center">
+                            <Mail className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-white text-sm">{instructor.name || instructor.email}</p>
+                            <p className="text-xs text-gray-500">{instructor.email}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => toggleUserActivityPermission(selectedActivity.key, instructor.email)}
+                          className={`p-2 rounded-lg transition-all ${
+                            hasAccess
+                              ? 'bg-green-500/20 text-green-500 hover:bg-green-500/30'
+                              : 'bg-white/5 text-gray-500 hover:bg-white/10'
+                          }`}
+                        >
+                          {hasAccess ? (
+                            <Check className="w-5 h-5" />
+                          ) : (
+                            <X className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-white/10 bg-battle-black/50">
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                <span>Gamemaster og Admin har altid adgang</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

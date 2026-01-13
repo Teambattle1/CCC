@@ -27,7 +27,7 @@ import CalendarModal from './components/CalendarModal';
 import DistanceTool from './components/DistanceTool';
 import ClaudeDevModal from './components/ClaudeDevModal';
 import LoginScreen from './components/LoginScreen';
-import UsersManagement, { getPermissions, PermissionsConfig } from './components/UsersManagement';
+import UsersManagement, { getPermissions, PermissionsConfig, getUserActivityPermissions } from './components/UsersManagement';
 import ClaudeAssistant from './components/ClaudeAssistant';
 import PackingList, { TEAMROBIN_PACKING_BEFORE, TEAMROBIN_PACKING_AFTER } from './components/PackingList';
 import VideoPlayer from './components/VideoPlayer';
@@ -98,11 +98,13 @@ const App: React.FC = () => {
 
   // Load permissions from localStorage
   const [permissions, setPermissions] = useState<PermissionsConfig>(getPermissions);
+  const [userActivityPermsVersion, setUserActivityPermsVersion] = useState(0);
 
   // Refresh permissions when UsersManagement modal closes
   useEffect(() => {
     if (!isUsersOpen) {
       setPermissions(getPermissions());
+      setUserActivityPermsVersion(v => v + 1); // Trigger re-filter of activities
     }
   }, [isUsersOpen]);
 
@@ -143,24 +145,23 @@ const App: React.FC = () => {
   const filterActivitiesByRole = (links: HubLink[]): HubLink[] => {
     if (!profile) return links;
 
-    const rolePerms = permissions[profile.role as keyof PermissionsConfig];
-    if (!rolePerms) return links;
+    // Admin and Gamemaster see all activities
+    if (profile.role === 'ADMIN' || profile.role === 'GAMEMASTER') {
+      return links;
+    }
 
-    return links.filter(link => {
-      const titleLower = link.title.toLowerCase();
-      if (titleLower === 'teamplay') return rolePerms.activity_teamplay;
-      if (titleLower === 'teamchallenge') return rolePerms.activity_teamchallenge;
-      if (titleLower === 'teamtaste') return rolePerms.activity_teamtaste;
-      if (titleLower === 'teamlazer') return rolePerms.activity_teamlazer;
-      if (titleLower === 'teamrobin') return rolePerms.activity_teamrobin;
-      if (titleLower === 'teamsegway') return rolePerms.activity_teamsegway;
-      if (titleLower === 'teamconnect') return rolePerms.activity_teamconnect;
-      if (titleLower === 'teambox') return rolePerms.activity_teambox;
-      if (titleLower === 'teamcontrol') return rolePerms.activity_teamcontrol;
-      if (titleLower === 'teamaction') return rolePerms.activity_teamaction;
-      if (titleLower === 'teamconstruct') return rolePerms.activity_teamconstruct;
-      return true;
-    });
+    // Instructors - use user-level permissions
+    if (profile.role === 'INSTRUCTOR') {
+      const userActivityPerms = getUserActivityPermissions();
+      return links.filter(link => {
+        const titleLower = link.title.toLowerCase();
+        const activityKey = `activity_${titleLower}`;
+        const allowedUsers = userActivityPerms[activityKey] || [];
+        return allowedUsers.includes(profile.email);
+      });
+    }
+
+    return links;
   };
 
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
