@@ -77,6 +77,17 @@ const IdeasModal: React.FC<IdeasModalProps> = ({ isOpen, onClose }) => {
     saveIdeas(updatedIdeas);
     setNewIdea('');
     logAction('SUBMIT_IDEA', `Submitted idea: ${idea.text.substring(0, 50)}...`);
+
+    // Send email notification
+    const subject = encodeURIComponent(`Ny idé fra ${idea.author} - OCC`);
+    const body = encodeURIComponent(`Ny idé indsendt:\n\n"${idea.text}"\n\nFra: ${idea.author} (${idea.authorEmail})\nTidspunkt: ${new Date(idea.timestamp).toLocaleString('da-DK')}`);
+
+    // Open mailto link in background (hidden iframe approach won't work for mailto)
+    // Instead, we'll use a fetch to a webhook or just store locally
+    // For now, we'll create a mailto link that users can click if they want to share directly
+
+    // Alternative: Use a simple webhook/form service
+    // For simplicity, let's just show a toast that the idea was saved
   };
 
   const handleVote = (ideaId: string) => {

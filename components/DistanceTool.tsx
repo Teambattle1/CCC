@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Navigation, MapPin, Loader2, ChevronDown } from 'lucide-react';
+import { Send, Navigation, MapPin, Loader2, ChevronDown, Clock } from 'lucide-react';
 
 const PREDEFINED_LOCATIONS = [
   { id: 'my_location', name: 'MY LOCATION', address: '', region: 'unknown' },
@@ -20,6 +20,10 @@ const DistanceTool: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [groundingLinks, setGroundingLinks] = useState<{uri: string, title?: string}[]>([]);
+
+  // Arrival time mode
+  const [useArrivalTime, setUseArrivalTime] = useState(false);
+  const [arrivalTime, setArrivalTime] = useState('');
 
   // Autocomplete state
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -90,6 +94,10 @@ const DistanceTool: React.FC = () => {
 
   const handleCalculate = async () => {
     if (!destination) return;
+    if (useArrivalTime && !arrivalTime) {
+      setResult('❌ Angiv venligst en ankomsttid');
+      return;
+    }
     setIsLoading(true);
     setResult('');
     setGroundingLinks([]);
@@ -118,7 +126,25 @@ const DistanceTool: React.FC = () => {
       const now = new Date();
       const timeStr = now.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
 
-      const prompt = `Du er en præcis ruteberegner. Beregn kørerute fra "${originAddress}" til "${destination}" i Danmark.
+      let prompt: string;
+
+      if (useArrivalTime && arrivalTime) {
+        // Arrival time mode - calculate when to leave
+        prompt = `Du er en præcis ruteberegner. Beregn kørerute fra "${originAddress}" til "${destination}" i Danmark.
+
+Svar KUN med dette præcise format (udskift X med tal):
+• Afstand: X km
+• Køretid: X time(r) X min
+• Afgang: XX:XX (for at ankomme kl. ${arrivalTime})
+• Broafgift: [Ja, 446 kr (Storebælt t/r) ELLER Nej]
+
+Regler:
+- Broafgift KUN hvis ruten krydser Storebæltsbroen (mellem Sjælland og Fyn/Jylland)
+- Brug realistiske køretider baseret på danske motorveje (110-130 km/t) og landeveje (80 km/t)
+- Beregn afgangstid ved at trække køretid fra ankomsttid ${arrivalTime}`;
+      } else {
+        // Departure now mode - calculate arrival time
+        prompt = `Du er en præcis ruteberegner. Beregn kørerute fra "${originAddress}" til "${destination}" i Danmark.
 
 Svar KUN med dette præcise format (udskift X med tal):
 • Afstand: X km
@@ -130,6 +156,7 @@ Regler:
 - Broafgift KUN hvis ruten krydser Storebæltsbroen (mellem Sjælland og Fyn/Jylland)
 - Brug realistiske køretider baseret på danske motorveje (110-130 km/t) og landeveje (80 km/t)
 - Beregn ankomsttid ved at lægge køretid til ${timeStr}`;
+      }
 
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -216,6 +243,48 @@ Regler:
             </select>
             <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-battle-orange w-5 h-5 pointer-events-none" />
           </div>
+        </div>
+
+        {/* Arrival Time Toggle and Input */}
+        <div className="mb-4 w-full">
+          <div className="flex items-center gap-4 mb-2">
+            <button
+              onClick={() => setUseArrivalTime(false)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                !useArrivalTime
+                  ? 'bg-battle-orange text-white'
+                  : 'bg-battle-black/50 text-gray-400 hover:text-white border border-white/10'
+              }`}
+            >
+              <Clock className="w-4 h-4" />
+              Kør nu
+            </button>
+            <button
+              onClick={() => setUseArrivalTime(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                useArrivalTime
+                  ? 'bg-battle-orange text-white'
+                  : 'bg-battle-black/50 text-gray-400 hover:text-white border border-white/10'
+              }`}
+            >
+              <MapPin className="w-4 h-4" />
+              Ankom kl.
+            </button>
+
+            {useArrivalTime && (
+              <input
+                type="time"
+                value={arrivalTime}
+                onChange={(e) => setArrivalTime(e.target.value)}
+                className="bg-battle-black/50 border border-battle-orange/30 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-battle-orange focus:ring-1 focus:ring-battle-orange"
+              />
+            )}
+          </div>
+          {useArrivalTime && (
+            <p className="text-xs text-gray-500 ml-2">
+              Angiv hvornår du skal ankomme - så beregner vi hvornår du skal køre
+            </p>
+          )}
         </div>
 
         {/* Destination Input with Autocomplete */}
