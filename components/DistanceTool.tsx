@@ -250,25 +250,25 @@ Regler:
           <div className="flex items-center gap-4 mb-2">
             <button
               onClick={() => setUseArrivalTime(false)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${
                 !useArrivalTime
                   ? 'bg-battle-orange text-white'
                   : 'bg-battle-black/50 text-gray-400 hover:text-white border border-white/10'
               }`}
             >
               <Clock className="w-4 h-4" />
-              Kør nu
+              KØR NU
             </button>
             <button
               onClick={() => setUseArrivalTime(true)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${
                 useArrivalTime
                   ? 'bg-battle-orange text-white'
                   : 'bg-battle-black/50 text-gray-400 hover:text-white border border-white/10'
               }`}
             >
               <MapPin className="w-4 h-4" />
-              Ankom kl.
+              ANKOM KL.
             </button>
 
             {useArrivalTime && (
@@ -281,8 +281,8 @@ Regler:
             )}
           </div>
           {useArrivalTime && (
-            <p className="text-xs text-gray-500 ml-2">
-              Angiv hvornår du skal ankomme - så beregner vi hvornår du skal køre
+            <p className="text-xs text-gray-500 ml-2 uppercase tracking-wide">
+              ANGIV HVORNÅR DU SKAL ANKOMME
             </p>
           )}
         </div>
@@ -297,7 +297,7 @@ Regler:
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-              placeholder="Indtast destination (f.eks. Slagelse)..."
+              placeholder="INDTAST DESTINATION..."
               className="w-full bg-battle-black/50 border border-battle-orange/30 rounded-xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-battle-orange focus:ring-1 focus:ring-battle-orange transition-all pr-14"
               autoFocus
             />
@@ -334,9 +334,9 @@ Regler:
         </div>
 
         {selectedOrigin === 'my_location' && location && (
-          <div className="text-xs text-center text-gray-500 mb-6 flex items-center justify-center">
+          <div className="text-xs text-center text-gray-500 mb-6 flex items-center justify-center uppercase tracking-wide">
              <Navigation className="w-3 h-3 mr-1" />
-             Using current location: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+             CURRENT LOCATION: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
           </div>
         )}
 
