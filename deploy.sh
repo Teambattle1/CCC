@@ -22,4 +22,7 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>" || echo "No changes to 
 echo "🚀 Pushing to GitHub..."
 git push origin main
 
-echo "✅ Deployed to GitHub! Netlify will auto-deploy."
+echo "🌐 Deploying to Netlify..."
+netlify deploy --prod --dir=dist
+
+echo "✅ Deployed to https://crew.eventday.dk"
