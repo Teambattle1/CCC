@@ -727,50 +727,19 @@ const App: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="w-full">
-              {(() => {
-                let lastSection: string | undefined = undefined;
-                return currentLinks.map((link, index) => {
-                  const showSectionHeader = link.section && link.section !== lastSection;
-                  lastSection = link.section;
-                  return (
-                    <React.Fragment key={link.id}>
-                      {showSectionHeader && (
-                        <div className="w-full mb-4 mt-8 first:mt-0">
-                          <div className="flex items-center gap-4">
-                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-battle-orange/30 to-transparent"></div>
-                            <h3 className="text-sm md:text-base font-bold text-battle-orange uppercase tracking-widest">
-                              {link.section}
-                            </h3>
-                            <div className="h-px flex-1 bg-gradient-to-l from-transparent via-battle-orange/30 to-transparent"></div>
-                          </div>
-                        </div>
-                      )}
-                      {index === 0 || showSectionHeader ? (
-                        <div className={gridClass}>
-                          {currentLinks
-                            .filter((l, i) => {
-                              if (!link.section) return i === index;
-                              return l.section === link.section;
-                            })
-                            .map((sectionLink, sectionIndex) => (
-                              <HubButton
-                                key={sectionLink.id}
-                                link={sectionLink}
-                                index={sectionIndex}
-                                onClick={handleLinkClick}
-                                draggable={currentView === 'main'}
-                                onDragStart={handleDragStart}
-                                onDragOver={handleDragOver}
-                                onDrop={handleDrop}
-                              />
-                            ))}
-                        </div>
-                      ) : null}
-                    </React.Fragment>
-                  );
-                });
-              })()}
+            <div className={gridClass}>
+              {currentLinks.map((link, index) => (
+                <HubButton
+                  key={link.id}
+                  link={link}
+                  index={index}
+                  onClick={handleLinkClick}
+                  draggable={currentView === 'main'}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                />
+              ))}
             </div>
           )}
         </div>
