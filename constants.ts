@@ -57,11 +57,8 @@ const EconomicLogo = React.forwardRef<SVGSVGElement, LucideProps>((props, ref) =
 });
 EconomicLogo.displayName = 'EconomicLogo';
 
-// Task Control Submenu Links
-export const TASK_CONTROL_LINKS: HubLink[] = [];
-
-// Tools Submenu Links (includes Coding tools)
-export const TOOLS_LINKS: HubLink[] = [
+// Task Control Submenu Links (ADMIN)
+export const TASK_CONTROL_LINKS: HubLink[] = [
   {
     id: 't2',
     title: 'CODE',
@@ -79,6 +76,9 @@ export const TOOLS_LINKS: HubLink[] = [
     color: 'red'
   }
 ];
+
+// Tools Submenu Links (hidden)
+export const TOOLS_LINKS: HubLink[] = [];
 
 // Code/Development Submenu Links
 export const CODE_LINKS: HubLink[] = [
@@ -702,14 +702,6 @@ export const HUB_LINKS: HubLink[] = [
     color: 'yellow'
   },
   {
-    id: 'cat1',
-    title: 'ADMIN',
-    url: '#task_control',
-    icon: ClipboardList,
-    description: 'Admin & Ops',
-    color: 'green'
-  },
-  {
     id: 'cat3',
     title: 'OFFICE',
     url: '#office',
@@ -723,15 +715,15 @@ export const HUB_LINKS: HubLink[] = [
     url: '#activities',
     icon: Gamepad2,
     description: 'Event Catalog',
-    color: 'orange'
+    color: 'yellow'
   },
   {
-    id: 'cat2',
-    title: 'TOOLS',
-    url: '#tools',
-    icon: Wrench,
-    description: 'Utilities',
-    color: 'blue'
+    id: 'cat1',
+    title: 'ADMIN',
+    url: '#task_control',
+    icon: ClipboardList,
+    description: 'Admin & Ops',
+    color: 'green'
   }
 ];
 
