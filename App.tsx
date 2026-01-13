@@ -34,6 +34,7 @@ import VideoPlayer from './components/VideoPlayer';
 import TeamLazerPackingList from './components/TeamLazerPackingList';
 import TeamSegwayPackingList from './components/TeamSegwayPackingList';
 import LazerPointScoreboard from './components/LazerPointScoreboard';
+import IdeasModal from './components/IdeasModal';
 import { useAuth } from './contexts/AuthContext';
 import {
   ShieldCheck,
@@ -58,7 +59,8 @@ import {
   Bot,
   Ruler,
   Package,
-  ListChecks
+  ListChecks,
+  HelpCircle
 } from 'lucide-react';
 import { HubLink } from './types';
 
@@ -72,6 +74,7 @@ const App: React.FC = () => {
   const [isClaudeDevOpen, setIsClaudeDevOpen] = useState(false);
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
+  const [isIdeasOpen, setIsIdeasOpen] = useState(false);
 
   // Drag and Drop State - MUST be before any early returns to satisfy React hooks rules
   const [hubLinks, setHubLinks] = useState<HubLink[]>(() => {
@@ -625,6 +628,15 @@ const App: React.FC = () => {
           <LogOut className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-red-500 group-active:text-red-400 transition-colors" />
         </button>
 
+        {/* Ideas Button */}
+        <button
+          onClick={() => setIsIdeasOpen(true)}
+          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-yellow-500/20 active:bg-yellow-500/30 border border-white/10 hover:border-yellow-500 text-white rounded-full transition-all duration-200 touch-manipulation"
+          title="Idéer & Forslag"
+        >
+          <HelpCircle className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-yellow-400 group-active:text-yellow-300 transition-colors" />
+        </button>
+
         {/* Distance Button */}
         <button
           onClick={() => changeView('distance_tool')}
@@ -647,6 +659,7 @@ const App: React.FC = () => {
       <ClaudeDevModal isOpen={isClaudeDevOpen} onClose={() => setIsClaudeDevOpen(false)} />
       <UsersManagement isOpen={isUsersOpen} onClose={() => setIsUsersOpen(false)} />
       <ClaudeAssistant isOpen={isClaudeAssistantOpen} onClose={() => setIsClaudeAssistantOpen(false)} />
+      <IdeasModal isOpen={isIdeasOpen} onClose={() => setIsIdeasOpen(false)} />
 
       {/* Main Content Container - Optimized for tablet landscape */}
       <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-16 tablet:pt-14 lg:pt-20 px-3 tablet:px-4 tablet-landscape-compact">
