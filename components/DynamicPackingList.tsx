@@ -292,7 +292,7 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({ activity, listT
               <button
                 key={item.id}
                 onClick={() => toggleItem(item.id)}
-                className={`w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all ${
+                className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all ${
                   item.indent ? 'ml-4 tablet:ml-6' : ''
                 } ${
                   isChecked
@@ -300,11 +300,14 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({ activity, listT
                     : 'bg-battle-black/30 border border-white/5 hover:border-white/20'
                 }`}
               >
+                {/* Checkbox */}
                 {isChecked ? (
-                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
                 ) : (
-                  <Circle className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-gray-600 flex-shrink-0" />
                 )}
+
+                {/* Text content - left side */}
                 <div className="flex-1 min-w-0">
                   <span className={`text-sm tablet:text-base block ${
                     isChecked ? 'text-green-400 line-through' : 'text-white'
@@ -318,14 +321,16 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({ activity, listT
                       {item.subtext}
                     </span>
                   )}
-                  {item.imageUrl && (
-                    <img
-                      src={item.imageUrl}
-                      alt=""
-                      className="mt-2 rounded-lg max-h-32 object-cover border border-white/10"
-                    />
-                  )}
                 </div>
+
+                {/* Image - right side, fixed size */}
+                {item.imageUrl && (
+                  <img
+                    src={item.imageUrl}
+                    alt=""
+                    className="w-16 h-16 tablet:w-20 tablet:h-20 rounded-lg object-cover border border-white/10 flex-shrink-0"
+                  />
+                )}
               </button>
             );
           })}
