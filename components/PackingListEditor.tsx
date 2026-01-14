@@ -153,7 +153,8 @@ const LIST_TYPE_OPTIONS: Record<string, { value: string; label: string }[]> = {
     { value: 'hjemkomst', label: 'Hjemkomst' },
   ],
   teambox: [
-    { value: 'checklist', label: 'Nulstilling' },
+    { value: 'afgang', label: 'Afgang' },
+    { value: 'hjemkomst', label: 'Hjemkomst' },
   ],
   teamconnect: [
     { value: 'before', label: 'Før Opgaven' },

@@ -107,6 +107,26 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
       { id: 'la4', text: 'Alt pakket i kasser' },
     ]
   },
+  teambox: {
+    afgang: [
+      { id: 'tba1', text: 'Grønne bokse (1 til hvert hold)', subtext: 'Tjek i app hvor mange hold gruppen er inddelt i' },
+      { id: 'tba2', text: 'Husk 1-2 ekstrabokse – just in case' },
+      { id: 'tba3', text: 'Sorte filtmåtter til skrøbelige borde (1 til hver boks)' },
+      { id: 'tba4', text: '1 x powerbank til hver boks + extra' },
+      { id: 'tba5', text: '1 stk JBL musikafspiller' },
+      { id: 'tba6', text: '1 stk sækkevogn – hvis du skal slæbe dem' },
+      { id: 'tba7', text: 'Instruktørkasse', isDivider: true },
+      { id: 'tba8', text: 'Lamineret holdnumre (Tal fra hold 1-18)' },
+      { id: 'tba9', text: 'Ekstramaterialer' },
+    ],
+    hjemkomst: [
+      { id: 'tbh1', text: 'Gearet skal virke og være klar til næste bruger' },
+      { id: 'tbh2', text: 'Alle kasserne skal nulstilles', subtext: 'Se nulstillingsmanual eller https://l.ead.me/teambox-nulstil' },
+      { id: 'tbh3', text: 'Powerbanks SKAL oplades efter brug' },
+      { id: 'tbh4', text: 'Fejl/mangler skrives i evalueringen' },
+      { id: 'tbh5', text: 'Ring ved defekt gear der påvirker næste opgave' },
+    ]
+  },
   teamsegway: {
     before: [
       { id: 'sb1', text: 'Segways (antal efter behov)' },

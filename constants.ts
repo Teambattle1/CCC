@@ -323,8 +323,8 @@ export const TEAMBOX_LINKS: HubLink[] = [
   },
   {
     id: 'tb2',
-    title: 'PAKKELISTE',
-    url: '#',
+    title: 'PAKKELISTER',
+    url: '#teambox_packing',
     icon: ListChecks,
     description: 'Packing List',
     color: 'green'
@@ -362,6 +362,26 @@ export const TEAMBOX_LINKS: HubLink[] = [
     icon: Download,
     description: 'EscapeBOX Print',
     color: 'purple'
+  }
+];
+
+// TeamBox Packing Submenu Links
+export const TEAMBOX_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tbp1',
+    title: 'FØR OPGAVEN',
+    url: '#teambox_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tbp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teambox_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
   }
 ];
 
