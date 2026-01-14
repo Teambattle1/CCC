@@ -316,7 +316,7 @@ export const TEAMBOX_LINKS: HubLink[] = [
   {
     id: 'tb1',
     title: 'GUIDE',
-    url: '#',
+    url: '#teambox_guide',
     icon: Map,
     description: 'Instructions',
     color: 'blue'
