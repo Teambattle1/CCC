@@ -29,11 +29,11 @@ const Clock: React.FC<ClockProps> = ({ showDate = false }) => {
 
   return (
     <div className="flex flex-col items-center font-mono z-50">
-      <div className="text-lg md:text-xl font-bold text-battle-orange tracking-widest drop-shadow-[0_0_8px_rgba(255,102,0,0.6)]">
+      <div className="text-sm mobile-landscape:text-sm tablet-portrait:text-lg tablet-landscape:text-base desktop:text-xl font-bold text-battle-orange tracking-widest drop-shadow-[0_0_8px_rgba(255,102,0,0.6)]">
         {timeString}
       </div>
       {showDate && (
-        <div className="text-[10px] text-battle-white/70 uppercase tracking-widest mt-0.5">
+        <div className="text-[8px] mobile-landscape:text-[8px] tablet-portrait:text-[10px] tablet-landscape:text-[9px] desktop:text-xs text-battle-white/70 uppercase tracking-widest mt-0.5">
           {dateString}
         </div>
       )}
@@ -59,7 +59,7 @@ export const DateDisplay: React.FC = () => {
   }).format(time);
 
   return (
-    <div className="text-[10px] tablet:text-xs md:text-sm text-battle-white/70 uppercase tracking-widest">
+    <div className="text-[9px] mobile-landscape:text-[8px] tablet-portrait:text-xs tablet-landscape:text-[10px] desktop:text-sm text-battle-white/70 uppercase tracking-widest">
       {dateString}
     </div>
   );

@@ -43,13 +43,13 @@ import LazerPointScoreboard from './components/LazerPointScoreboard';
 import IdeasModal from './components/IdeasModal';
 import TeamConstructGuide from './components/TeamConstructGuide';
 import TeamBoxGuide from './components/TeamBoxGuide';
+import TeamBoxDownloads from './components/TeamBoxDownloads';
 import TeamConstructScorecard from './components/TeamConstructScorecard';
 import TeamConstructPackingList from './components/TeamConstructPackingList';
 import TeamControlGuide from './components/TeamControlGuide';
 import FlybrixManual from './components/FlybrixManual';
 import TeamControlPackingList from './components/TeamControlPackingList';
 import FejlsogningReport from './components/FejlsogningReport';
-import TeamBoxChecklist from './components/TeamBoxChecklist';
 import AdminReports from './components/AdminReports';
 import PackingListEditor from './components/PackingListEditor';
 import DynamicPackingList from './components/DynamicPackingList';
@@ -83,7 +83,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'admin_reports' | 'admin_packing_editor';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'admin_reports' | 'admin_packing_editor';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -289,6 +289,7 @@ const App: React.FC = () => {
     else if (link.url === '#teambox_packing') changeView('teambox_packing');
     else if (link.url === '#teambox_packing_afgang') changeView('teambox_packing_afgang');
     else if (link.url === '#teambox_packing_hjemkomst') changeView('teambox_packing_hjemkomst');
+    else if (link.url === '#teambox_downloads') changeView('teambox_downloads');
     else if (link.url === '#teamlazer_video') changeView('teamlazer_video');
     else if (link.url === '#teamlazer_packing') changeView('teamlazer_packing');
     else if (link.url === '#teamsegway_packing') changeView('teamsegway_packing');
@@ -393,6 +394,8 @@ const App: React.FC = () => {
       changeView('teambox');
     } else if (currentView === 'teambox_packing_afgang' || currentView === 'teambox_packing_hjemkomst') {
       changeView('teambox_packing');
+    } else if (currentView === 'teambox_downloads') {
+      changeView('teambox');
     } else if (currentView === 'teamlazer_video') {
       changeView('teamlazer');
     } else if (currentView === 'teamlazer_packing') {
@@ -546,6 +549,12 @@ const App: React.FC = () => {
       viewTitle = 'EFTER OPGAVEN';
       viewSubtitle = 'Hjemkomst Checklist';
       ViewIcon = ListChecks;
+      break;
+    case 'teambox_downloads':
+      currentLinks = [];
+      viewTitle = 'DOWNLOADS';
+      viewSubtitle = 'TeamBox Filer';
+      ViewIcon = Package;
       break;
     case 'teamsegway':
       currentLinks = TEAMSEGWAY_LINKS;
@@ -815,19 +824,19 @@ const App: React.FC = () => {
       break;
   }
 
-  // Grid layout logic - optimized for tablet landscape (1280x800)
-  // Activities grid: 4 columns on tablet+ for better landscape layout
-  let gridClass = "grid grid-cols-2 tablet:grid-cols-4 lg:grid-cols-4 gap-x-4 gap-y-4 tablet:gap-x-6 tablet:gap-y-6 md:gap-x-8 md:gap-y-8 justify-items-center max-w-5xl mx-auto tablet-landscape-grid";
+  // Grid layout logic - Responsive for all 5 modes
+  // Default grid for sub-pages
+  let gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-3 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-5xl mx-auto responsive-activities-grid";
 
   if (currentView === 'main') {
-    // Main view: centered flex layout
-    gridClass = "flex flex-wrap justify-center gap-4 tablet:gap-6 md:gap-8 lg:gap-12 max-w-6xl mx-auto";
+    // Main view: centered flex layout - responsive for all modes
+    gridClass = "flex flex-wrap justify-center gap-3 mobile-landscape:gap-3 tablet-portrait:gap-6 tablet-landscape:gap-5 desktop:gap-8 max-w-6xl mx-auto responsive-main-grid";
   } else if (currentView === 'activities') {
-    // Activities: 4 columns grid for 11 items, optimized for tablet landscape
-    gridClass = "grid grid-cols-2 sm:grid-cols-3 tablet:grid-cols-4 gap-x-3 gap-y-3 tablet:gap-x-4 tablet:gap-y-4 justify-items-center max-w-5xl mx-auto tablet-landscape-grid";
+    // Activities: responsive grid for 11 items
+    gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-3 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-5xl mx-auto responsive-activities-grid";
   } else if (currentView === 'office') {
-    // Office: 6 columns grid for sections
-    gridClass = "grid grid-cols-3 sm:grid-cols-4 tablet:grid-cols-6 gap-x-3 gap-y-3 tablet:gap-x-4 tablet:gap-y-4 justify-items-center max-w-6xl mx-auto";
+    // Office: responsive sections grid
+    gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-2 tablet-portrait:grid-cols-2 tablet-landscape:grid-cols-2 desktop:grid-cols-2 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-6xl mx-auto responsive-office-grid";
   }
 
   return (
@@ -850,15 +859,15 @@ const App: React.FC = () => {
         ></div>
       </div>
 
-      {/* Top Left Back Button - Touch optimized */}
+      {/* Top Left Back Button - Responsive for all 5 modes */}
       {currentView !== 'main' && (
-        <div className="absolute top-3 left-3 tablet:top-4 tablet:left-4 md:top-8 md:left-8 z-50">
+        <div className="absolute top-2 left-2 mobile-landscape:top-1.5 mobile-landscape:left-1.5 tablet-portrait:top-4 tablet-portrait:left-4 tablet-landscape:top-3 tablet-landscape:left-3 desktop:top-8 desktop:left-8 z-50 safe-area-top safe-area-left">
           <button
             onClick={handleBackClick}
-            className="group flex items-center justify-center w-11 h-11 tablet:w-12 tablet:h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation"
+            className="group flex items-center justify-center w-10 h-10 mobile-landscape:w-9 mobile-landscape:h-9 tablet-portrait:w-12 tablet-portrait:h-12 tablet-landscape:w-11 tablet-landscape:h-11 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
             title="Return"
           >
-            <House className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-battle-orange group-active:text-battle-orange transition-colors" />
+            <House className="w-5 h-5 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-6 tablet-portrait:h-6 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-battle-orange group-active:text-battle-orange transition-colors" />
           </button>
         </div>
       )}
@@ -868,21 +877,21 @@ const App: React.FC = () => {
         <Clock />
       </div>
 
-      {/* Top Right User Info and Calendar - Touch optimized */}
-      <div className="absolute top-3 right-3 tablet:top-4 tablet:right-4 md:top-8 md:right-8 z-50 flex items-center gap-2 tablet:gap-3">
+      {/* Top Right User Info and Calendar - Responsive for all 5 modes */}
+      <div className="absolute top-2 right-2 mobile-landscape:top-1.5 mobile-landscape:right-1.5 tablet-portrait:top-4 tablet-portrait:right-4 tablet-landscape:top-3 tablet-landscape:right-3 desktop:top-8 desktop:right-8 z-50 flex items-center gap-1.5 mobile-landscape:gap-1 tablet-portrait:gap-2 tablet-landscape:gap-2 desktop:gap-3 safe-area-top safe-area-right">
         {/* Claude AI Button - Admin Only */}
         {profile?.role === 'ADMIN' && (
           <button
             onClick={() => setIsClaudeAssistantOpen(true)}
-            className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-gradient-to-br from-orange-500/20 to-amber-600/20 hover:from-orange-500/40 hover:to-amber-600/40 active:from-orange-500/50 active:to-amber-600/50 border border-orange-500/30 hover:border-orange-500 text-white rounded-full transition-all duration-200 shadow-[0_0_15px_rgba(255,140,0,0.2)] hover:shadow-[0_0_25px_rgba(255,140,0,0.4)] touch-manipulation"
+            className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-gradient-to-br from-orange-500/20 to-amber-600/20 hover:from-orange-500/40 hover:to-amber-600/40 active:from-orange-500/50 active:to-amber-600/50 border border-orange-500/30 hover:border-orange-500 text-white rounded-full transition-all duration-200 shadow-[0_0_15px_rgba(255,140,0,0.2)] hover:shadow-[0_0_25px_rgba(255,140,0,0.4)] touch-manipulation touch-target"
             title="Claude AI Assistant"
           >
-            <Bot className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 text-orange-400 group-hover:text-orange-300 group-active:text-orange-200 transition-colors" />
+            <Bot className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 text-orange-400 group-hover:text-orange-300 group-active:text-orange-200 transition-colors" />
           </button>
         )}
 
-        {/* User Info - Hidden on small tablets */}
-        <div className="hidden lg:flex items-center gap-2 bg-battle-grey/50 border border-white/10 rounded-full px-4 py-2">
+        {/* User Info - Only visible on desktop */}
+        <div className="hidden desktop:flex items-center gap-2 bg-battle-grey/50 border border-white/10 rounded-full px-4 py-2">
           <User className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-300">{profile?.name || profile?.email}</span>
           <span className={`text-xs px-2 py-0.5 rounded-full ${
@@ -897,36 +906,36 @@ const App: React.FC = () => {
         {/* Logout Button */}
         <button
           onClick={signOut}
-          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-red-500/20 active:bg-red-500/30 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-200 touch-manipulation"
+          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-red-500/20 active:bg-red-500/30 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
           title="Log ud"
         >
-          <LogOut className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-red-500 group-active:text-red-400 transition-colors" />
+          <LogOut className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-red-500 group-active:text-red-400 transition-colors" />
         </button>
 
         {/* Ideas Button */}
         <button
           onClick={() => setIsIdeasOpen(true)}
-          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-yellow-500/20 active:bg-yellow-500/30 border border-white/10 hover:border-yellow-500 text-white rounded-full transition-all duration-200 touch-manipulation"
-          title="Idéer & Forslag"
+          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-yellow-500/20 active:bg-yellow-500/30 border border-white/10 hover:border-yellow-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
+          title="Ideer & Forslag"
         >
-          <HelpCircle className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-yellow-400 group-active:text-yellow-300 transition-colors" />
+          <HelpCircle className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-yellow-400 group-active:text-yellow-300 transition-colors" />
         </button>
 
         {/* Distance Button */}
         <button
           onClick={() => changeView('distance_tool')}
-          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-blue-500/20 active:bg-blue-500/30 border border-white/10 hover:border-blue-500 text-white rounded-full transition-all duration-200 touch-manipulation"
+          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-blue-500/20 active:bg-blue-500/30 border border-white/10 hover:border-blue-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
           title="Afstandsberegner"
         >
-          <Ruler className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-blue-400 group-active:text-blue-300 transition-colors" />
+          <Ruler className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-blue-400 group-active:text-blue-300 transition-colors" />
         </button>
 
         {/* Calendar Button */}
         <button
           onClick={() => setIsCalendarOpen(true)}
-          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation"
+          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
         >
-          <Calendar className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-battle-orange group-active:text-battle-orangeLight transition-colors" />
+          <Calendar className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-battle-orange group-active:text-battle-orangeLight transition-colors" />
         </button>
       </div>
 
@@ -936,22 +945,22 @@ const App: React.FC = () => {
       <ClaudeAssistant isOpen={isClaudeAssistantOpen} onClose={() => setIsClaudeAssistantOpen(false)} />
       <IdeasModal isOpen={isIdeasOpen} onClose={() => setIsIdeasOpen(false)} />
 
-      {/* Main Content Container - Optimized for tablet landscape */}
-      <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-16 tablet:pt-14 lg:pt-20 px-3 tablet:px-4 tablet-landscape-compact">
+      {/* Main Content Container - Responsive for all 5 modes */}
+      <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-14 mobile-landscape:pt-10 tablet-portrait:pt-16 tablet-landscape:pt-12 desktop:pt-20 px-2 mobile-landscape:px-3 tablet-portrait:px-4 tablet-landscape:px-4 desktop:px-6 responsive-top-spacing safe-area-top">
 
-        {/* Header Section - Compact on tablet landscape */}
-        <header className="w-full max-w-6xl mx-auto mb-4 tablet:mb-6 lg:mb-10 relative flex flex-col items-center justify-center tablet-landscape-header">
+        {/* Header Section - Responsive for all 5 modes */}
+        <header className="w-full max-w-6xl mx-auto mb-3 mobile-landscape:mb-2 tablet-portrait:mb-6 tablet-landscape:mb-4 desktop:mb-10 relative flex flex-col items-center justify-center responsive-header">
 
           {/* Centered Title Content - Text centered, Icon absolute left */}
           <div className="text-center flex flex-col items-center">
 
-            <div className="relative flex items-center justify-center mb-1 tablet:mb-2">
+            <div className="relative flex items-center justify-center mb-0.5 mobile-landscape:mb-0.5 tablet-portrait:mb-2 tablet-landscape:mb-1 desktop:mb-2">
                {/* Icon Positioned Absolute Left of the Title */}
-               <div className="absolute right-full mr-3 tablet:mr-4 md:mr-6 text-battle-orange drop-shadow-[0_0_10px_rgba(255,102,0,0.5)] flex items-center">
-                 <ViewIcon className="w-8 h-8 tablet:w-10 tablet:h-10 md:w-14 md:h-14" />
+               <div className="absolute right-full mr-2 mobile-landscape:mr-2 tablet-portrait:mr-4 tablet-landscape:mr-3 desktop:mr-6 text-battle-orange drop-shadow-[0_0_10px_rgba(255,102,0,0.5)] flex items-center">
+                 <ViewIcon className="w-6 h-6 mobile-landscape:w-5 mobile-landscape:h-5 tablet-portrait:w-10 tablet-portrait:h-10 tablet-landscape:w-8 tablet-landscape:h-8 desktop:w-14 desktop:h-14" />
                </div>
 
-               <h1 className="text-3xl tablet:text-4xl md:text-6xl font-black tracking-tighter uppercase">
+               <h1 className="text-xl mobile-landscape:text-lg tablet-portrait:text-4xl tablet-landscape:text-3xl desktop:text-6xl font-black tracking-tighter uppercase responsive-title">
                 {viewTitle.startsWith('TEAM') ? (
                   <>
                     <span className="text-white">TEAM</span>
@@ -967,11 +976,11 @@ const App: React.FC = () => {
 
             <DateDisplay />
             {viewSubtitle && (
-              <p className="text-battle-white/50 text-xs tablet:text-sm md:text-lg tracking-[0.2em] uppercase mt-1">
+              <p className="text-battle-white/50 text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-lg tracking-[0.2em] uppercase mt-0.5 mobile-landscape:mt-0.5 tablet-portrait:mt-1 responsive-subtitle">
                 {viewSubtitle}
               </p>
             )}
-            <div className="h-0.5 tablet:h-1 w-16 tablet:w-24 bg-battle-orange mx-auto mt-3 tablet:mt-4 lg:mt-6 rounded-full shadow-[0_0_15px_rgba(255,102,0,1)]"></div>
+            <div className="h-0.5 w-12 mobile-landscape:w-10 tablet-portrait:w-24 tablet-landscape:w-20 desktop:w-32 desktop:h-1 bg-battle-orange mx-auto mt-2 mobile-landscape:mt-1.5 tablet-portrait:mt-4 tablet-landscape:mt-3 desktop:mt-6 rounded-full shadow-[0_0_15px_rgba(255,102,0,1)]"></div>
           </div>
         </header>
 
@@ -1065,13 +1074,15 @@ const App: React.FC = () => {
               playlistId="PLq4wXYwkH9QYNeIb2OD85T-zLjIkp6MIc"
             />
           ) : currentView === 'teambox_checklist' ? (
-            <TeamBoxChecklist onBack={() => changeView('teambox')} />
+            <DynamicPackingList activity="teambox" listType="nulstil" title="NULSTIL BOX" enableTabs={true} trackCompletion={true} />
           ) : currentView === 'teambox_guide' ? (
             <TeamBoxGuide onNavigate={(view) => changeView(view as ViewState)} />
           ) : currentView === 'teambox_packing_afgang' ? (
             <DynamicPackingList activity="teambox" listType="afgang" />
           ) : currentView === 'teambox_packing_hjemkomst' ? (
             <DynamicPackingList activity="teambox" listType="hjemkomst" />
+          ) : currentView === 'teambox_downloads' ? (
+            <TeamBoxDownloads onBack={() => changeView('teambox')} />
           ) : currentView === 'teamlazer_video' ? (
             <VideoPlayer
               title="TeamLazer Video Guides"
@@ -1109,8 +1120,8 @@ const App: React.FC = () => {
           ) : currentView === 'admin_packing_editor' ? (
             <PackingListEditor />
           ) : currentView === 'office' ? (
-            <div className="w-full max-w-4xl mx-auto">
-              <div className="grid grid-cols-2 gap-3 tablet:gap-4">
+            <div className="w-full max-w-4xl mx-auto px-1 mobile-landscape:px-2 tablet-portrait:px-4">
+              <div className="grid grid-cols-2 gap-2 mobile-landscape:gap-1.5 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-4 responsive-office-grid">
                 {[
                   { name: 'CrewControlCenter', color: 'red', borderColor: 'border-red-500', bgColor: 'bg-red-500/10', titleColor: 'text-red-400' },
                   { name: 'Office', color: 'green', borderColor: 'border-green-500', bgColor: 'bg-green-500/10', titleColor: 'text-green-400' },
@@ -1123,12 +1134,12 @@ const App: React.FC = () => {
                   return (
                     <div
                       key={section.name}
-                      className={`rounded-lg border ${section.borderColor} ${section.bgColor} p-2 tablet:p-3`}
+                      className={`rounded-lg border ${section.borderColor} ${section.bgColor} p-1.5 mobile-landscape:p-1 tablet-portrait:p-3 tablet-landscape:p-2 desktop:p-4`}
                     >
-                      <h3 className={`text-xs tablet:text-sm font-bold ${section.titleColor} uppercase tracking-widest mb-2 tablet:mb-3 text-center`}>
+                      <h3 className={`text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-sm font-bold ${section.titleColor} uppercase tracking-widest mb-1.5 mobile-landscape:mb-1 tablet-portrait:mb-3 tablet-landscape:mb-2 desktop:mb-3 text-center`}>
                         {section.name}
                       </h3>
-                      <div className="grid grid-cols-2 tablet:grid-cols-4 gap-1 tablet:gap-2 justify-items-center office-grid-small">
+                      <div className="grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-4 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-1 mobile-landscape:gap-0.5 tablet-portrait:gap-2 tablet-landscape:gap-1.5 desktop:gap-2 justify-items-center">
                         {sectionLinks.map((link, idx) => (
                           <HubButton
                             key={link.id}

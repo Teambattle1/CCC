@@ -358,9 +358,9 @@ export const TEAMBOX_LINKS: HubLink[] = [
   {
     id: 'tb6',
     title: 'DOWNLOAD',
-    url: 'https://segway.sharepoint.com/:f:/g/IgCLZGdtJLIjTJX_Hcskh9YMAXuCh6SXHl0JKWebxPF4baA?e=OfgetW',
+    url: '#teambox_downloads',
     icon: Download,
-    description: 'EscapeBOX Print',
+    description: 'Billeder & Filer',
     color: 'purple'
   }
 ];

@@ -9,6 +9,16 @@
       tailwind.config = {
         theme: {
           screens: {
+            // Mobile Portrait: 0-479px (default, no prefix)
+            // Mobile Landscape: 480-767px
+            'mobile-landscape': '480px',
+            // Tablet Portrait: 768-1023px
+            'tablet-portrait': '768px',
+            // Tablet Landscape: 1024-1279px
+            'tablet-landscape': '1024px',
+            // Desktop: 1280px+
+            'desktop': '1280px',
+            // Legacy support
             'sm': '640px',
             'md': '768px',
             'tablet': '1024px',
@@ -46,21 +56,255 @@
       }
     </script>
     <style>
-      /* Tablet landscape mode optimizations */
+      /* ===== RESPONSIVE DESIGN FOR ALL 5 MODES ===== */
+
+      /* 1. MOBILE PORTRAIT (0-479px) - Default styles, most compact */
+      .responsive-main-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+        max-width: 100%;
+        padding: 0 0.5rem;
+      }
+      .responsive-activities-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem;
+        max-width: 100%;
+      }
+      .responsive-office-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem;
+      }
+      .responsive-header {
+        margin-bottom: 0.75rem;
+        padding-top: 3.5rem;
+      }
+      .responsive-title {
+        font-size: 1.5rem;
+      }
+      .responsive-subtitle {
+        font-size: 0.65rem;
+      }
+      .responsive-btn-size {
+        width: 4.5rem;
+        height: 4.5rem;
+      }
+      .responsive-icon-size {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+      .responsive-nav-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+      .responsive-top-spacing {
+        padding-top: 3.5rem;
+      }
+
+      /* 2. MOBILE LANDSCAPE (480-767px) - More horizontal space */
+      @media (min-width: 480px) and (orientation: landscape) {
+        .responsive-main-grid {
+          gap: 1rem;
+          max-width: 90%;
+        }
+        .responsive-activities-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 0.75rem;
+        }
+        .responsive-office-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.75rem;
+        }
+        .responsive-header {
+          margin-bottom: 0.5rem;
+          padding-top: 2.5rem;
+        }
+        .responsive-title {
+          font-size: 1.75rem;
+        }
+        .responsive-subtitle {
+          font-size: 0.7rem;
+        }
+        .responsive-btn-size {
+          width: 4rem;
+          height: 4rem;
+        }
+        .responsive-icon-size {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+        .responsive-nav-btn {
+          width: 2.25rem;
+          height: 2.25rem;
+        }
+        .responsive-top-spacing {
+          padding-top: 2.5rem;
+        }
+      }
+
+      /* 3. TABLET PORTRAIT (768-1023px) - iPad vertical */
+      @media (min-width: 768px) and (orientation: portrait) {
+        .responsive-main-grid {
+          gap: 1.5rem;
+          max-width: 85%;
+        }
+        .responsive-activities-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 1rem;
+        }
+        .responsive-office-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1rem;
+        }
+        .responsive-header {
+          margin-bottom: 1.5rem;
+          padding-top: 4rem;
+        }
+        .responsive-title {
+          font-size: 2.5rem;
+        }
+        .responsive-subtitle {
+          font-size: 0.875rem;
+        }
+        .responsive-btn-size {
+          width: 6rem;
+          height: 6rem;
+        }
+        .responsive-icon-size {
+          width: 2.25rem;
+          height: 2.25rem;
+        }
+        .responsive-nav-btn {
+          width: 3rem;
+          height: 3rem;
+        }
+        .responsive-top-spacing {
+          padding-top: 4rem;
+        }
+      }
+
+      /* 4. TABLET LANDSCAPE (1024-1279px) - iPad horizontal */
+      @media (min-width: 1024px) and (max-width: 1279px) and (orientation: landscape) {
+        .responsive-main-grid {
+          gap: 1.25rem;
+          max-width: 90%;
+        }
+        .responsive-activities-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 1rem;
+        }
+        .responsive-office-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1rem;
+        }
+        .responsive-header {
+          margin-bottom: 1rem;
+          padding-top: 3rem;
+        }
+        .responsive-title {
+          font-size: 2.25rem;
+        }
+        .responsive-subtitle {
+          font-size: 0.75rem;
+        }
+        .responsive-btn-size {
+          width: 5.5rem;
+          height: 5.5rem;
+        }
+        .responsive-icon-size {
+          width: 2rem;
+          height: 2rem;
+        }
+        .responsive-nav-btn {
+          width: 2.75rem;
+          height: 2.75rem;
+        }
+        .responsive-top-spacing {
+          padding-top: 3rem;
+        }
+      }
+
+      /* 5. DESKTOP (1280px+) - Full experience */
+      @media (min-width: 1280px) {
+        .responsive-main-grid {
+          gap: 2rem;
+          max-width: 1200px;
+        }
+        .responsive-activities-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 1.5rem;
+        }
+        .responsive-office-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1.5rem;
+        }
+        .responsive-header {
+          margin-bottom: 2rem;
+          padding-top: 5rem;
+        }
+        .responsive-title {
+          font-size: 3.5rem;
+        }
+        .responsive-subtitle {
+          font-size: 1rem;
+        }
+        .responsive-btn-size {
+          width: 8rem;
+          height: 8rem;
+        }
+        .responsive-icon-size {
+          width: 2.5rem;
+          height: 2.5rem;
+        }
+        .responsive-nav-btn {
+          width: 3.5rem;
+          height: 3.5rem;
+        }
+        .responsive-top-spacing {
+          padding-top: 5rem;
+        }
+      }
+
+      /* Legacy tablet landscape support */
       @media (min-width: 1024px) and (max-height: 900px) and (orientation: landscape) {
         .tablet-landscape-grid {
           grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
           gap: 1rem !important;
         }
         .tablet-landscape-compact {
-          padding-top: 4rem !important;
+          padding-top: 3rem !important;
         }
         .tablet-landscape-header {
           margin-bottom: 1rem !important;
         }
         .tablet-touch-target {
-          min-width: 100px !important;
-          min-height: 100px !important;
+          min-width: 88px !important;
+          min-height: 88px !important;
+        }
+      }
+
+      /* Touch-friendly tap targets - minimum 44px for all interactive elements */
+      .touch-target {
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      /* Safe area padding for notched devices */
+      @supports (padding: env(safe-area-inset-top)) {
+        .safe-area-top {
+          padding-top: max(env(safe-area-inset-top), 0.5rem);
+        }
+        .safe-area-bottom {
+          padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+        }
+        .safe-area-left {
+          padding-left: max(env(safe-area-inset-left), 0.5rem);
+        }
+        .safe-area-right {
+          padding-right: max(env(safe-area-inset-right), 0.5rem);
         }
       }
     </style>
