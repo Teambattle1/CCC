@@ -2183,11 +2183,543 @@ const getGenericSections = (activity: string): SectionWithMeta[] => {
   ];
 };
 
+// TeamRobin-specific default sections based on CrewGuide
+const getTeamRobinSections = (): SectionWithMeta[] => {
+  return [
+    // ========== FØR OPGAVEN ==========
+    {
+      activity: 'teamrobin',
+      section_key: 'hvad_er_teamrobin',
+      title: 'HVAD ER TEAMROBIN?',
+      content: `TeamRobin er en moderne og sjov teambuilding-aktivitet baseret på bueskydning. Deltagerne konkurrerer i hold og skal ramme skiver placeret i forskellige afstande.
+
+MÅLSÆTNING:
+At give deltagerne en sjov og udfordrende oplevelse, hvor de gennem samarbejde og god teknik skal forsøge at ramme flest mulige point.
+
+TEAMSTØRRELSE:
+• 3-6 deltagere pr. team (4-5 er optimalt)
+• Max 5 teams ad gangen (5 buer)
+
+VARIGHED: 60-90 minutter typisk`,
+      order_index: 0,
+      icon: Target,
+      iconKey: 'target',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'tidsplan',
+      title: 'TIDSPLAN',
+      content: `TYPISK TIDSPLAN (75 min):
+
+• 10 min: Velkomst og introduktion
+• 10 min: Instruktion i teknik og sikkerhed
+• 45 min: 3 Battles (15 min pr. battle)
+• 10 min: Afslutning og kåring af vinder
+
+VIGTIGT:
+• Ankom minimum 45 min før eventstart (LEAD)
+• Brug tid på ordentlig instruktion - det giver bedre oplevelse
+• Hold pause mellem battles til at samle pile`,
+      order_index: 1,
+      icon: Clock,
+      iconKey: 'clock',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'pakning_gear',
+      title: 'PAKNING & GEAR',
+      content: `FØLGENDE SKAL MED:
+
+☐ 5 buer (tjek strenge og limbs)
+☐ Min. 30 pile (helst 40)
+☐ 5 armguards (underarmsbeskyttere)
+☐ 5 fingerguards (fingerbeskyttere)
+☐ Skydebord/stativ til pile
+☐ Skiver med stativer (min. 3 stk)
+☐ Målebånd til afstande
+☐ JBL musikafspiller
+☐ Scoreboard og tuscher
+
+TJEK FØR AFGANG:
+• At alle buer er intakte og strenge OK
+• At der er nok pile uden skader
+• At alle beskyttelsesudstyr er med`,
+      order_index: 2,
+      icon: ClipboardList,
+      iconKey: 'clipboard',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'ankomst_location',
+      title: 'ANKOMST & LOCATION',
+      content: `VED ANKOMST:
+
+1. FIND PLACERING TIL BANEN
+   • Minimum 30 meter i længden
+   • Ingen gennemgang bag skiverne
+   • Fladt og jævnt underlag
+   • Gerne i læ for vind
+
+2. SIKKERHEDSZONE
+   • Afspær området bag skiverne
+   • Sørg for ingen kan gå ind i skudzonen
+   • Marker tydeligt hvor man må stå
+
+3. TJEK TERRÆN
+   • Ingen forhindringer i skudretningen
+   • Pilene skal kunne findes igen!
+   • Undgå områder med høj vegetation`,
+      order_index: 3,
+      icon: MapPin,
+      iconKey: 'mappin',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'opsaetning_bane',
+      title: 'OPSÆTNING AF BANE',
+      content: `BANE-LAYOUT:
+
+SKYDEPLADSER        SKIVER
+[1][2][3][4][5]  →  [S1][S2][S3]
+     ↑                   ↑
+  Skydelinje         10-20 meter
+
+AFSTANDE:
+• Nybegyndere: 10 meter
+• Let øvede: 15 meter
+• Øvede: 20 meter
+
+OPSÆTNING:
+1. Placer skiver stabilt (brug jernpløkker)
+2. Marker skydelinje tydeligt
+3. Placer skydebord til pile ved siden
+4. Tjek at alle skiver er synlige fra skydelinje
+
+SIKKERHED:
+• Ingen må gå foran skydelinjen når der skydes
+• Afvent signal før pile hentes`,
+      order_index: 4,
+      icon: MapPin,
+      iconKey: 'mappin',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'musik',
+      title: 'MUSIK TIL OPGAVEN',
+      content: `Musik er med til at skabe den rette stemning!
+
+ANBEFALET MUSIK:
+• Rolig instrumental musik under skydning
+• Mere energisk musik under pauser
+• Epic/cinematic musik til finalen
+
+PLAYLISTER:
+Brug TeamBattle's officielle playlister i Spotify under "TeamRobin"
+
+LYDNIVEAU:
+• Ikke for højt - deltagerne skal kunne høre instruktioner
+• Musikken skal være stemningsskabende, ikke dominerende
+
+VIGTIGT:
+Hav musikken klar og tilsluttet FØR deltagerne ankommer!`,
+      order_index: 5,
+      icon: Music,
+      iconKey: 'music',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+
+    // ========== UNDER OPGAVEN ==========
+    {
+      activity: 'teamrobin',
+      section_key: 'velkomst_intro',
+      title: 'VELKOMST & INTRO',
+      content: `BYD VELKOMMEN:
+
+1. Præsenter dig selv og TeamRobin
+2. Forklar dagens program og tidsplan
+3. Opdel i teams (3-6 personer pr. team)
+4. Tildel holdfarver/navne
+
+SIKKERHEDSBRIEFING (VIGTIGT!):
+• Pilen må ALDRIG peges mod mennesker
+• Buen spændes KUN ved skydelinjen
+• ALLE venter på signal før pile hentes
+• Pile hentes KUN når instruktør siger det er OK
+
+TEKNIK-INTRODUKTION:
+• Vis korrekt stand og greb
+• Demonstrer træk og slip
+• Forklar sigte og mesterøje
+• Lad alle prøve et par træningsskud`,
+      order_index: 10,
+      icon: Users,
+      iconKey: 'users',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'teknik',
+      title: 'SKYDESTILLING & TEKNIK',
+      content: `KORREKT STAND:
+
+1. PLACERING
+   • Stå vinkelret på målet (90 grader)
+   • Fødderne skulderbredde fra hinanden
+   • Vægten ligeligt fordelt
+
+2. GREB PÅ BUEN
+   • Hold buen i den hånd der peger mod målet
+   • Let greb - ikke klem!
+   • Armen strakt men ikke låst
+
+3. TRÆK OG ANKER
+   • Træk strengen til hagen/mundvigen
+   • Hold ankerpunktet konsistent
+   • Brug ryg- og skuldermusklerne
+
+4. SIGTE OG SLIP
+   • Brug dit dominante øje (mesterøje)
+   • Sigt langs pilen mod målet
+   • Slip strengen rent - ikke "kast"
+
+5. FOLLOW-THROUGH
+   • Hold stillingen til pilen rammer
+   • Analysér skuddet`,
+      order_index: 11,
+      icon: Target,
+      iconKey: 'target',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'mesteroeje',
+      title: 'MESTERØJE / SKYTTEØJE',
+      content: `Mesterøjet er det dominante øje, som bør bruges til at sigte med.
+
+SÅDAN FINDER DU MESTERØJET:
+
+1. Stræk armene frem og lav en trekant med hænderne
+2. Se på et punkt gennem trekanten med begge øjne åbne
+3. Luk skiftevis det ene og andet øje
+4. Det øje der stadig ser punktet gennem trekanten er mesterøjet
+
+VIGTIGT:
+• De fleste højrehåndede har højre mesterøje
+• Men ikke alle! Tjek altid
+• Ved kryds-dominans (fx højrehåndet med venstre mesterøje) kan det være en udfordring
+
+TIP: Lad deltagerne finde deres mesterøje som en del af introduktionen - det gør dem mere engagerede!`,
+      order_index: 12,
+      icon: Target,
+      iconKey: 'target',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'battle_1',
+      title: 'BATTLE 1 - BATTLE OF SCORES',
+      content: `STANDARDBATTLE - Point pr. ring
+
+REGLER:
+• Hver deltager skyder 3 pile pr. runde
+• Point baseret på skivens ringe (10-1 point)
+• Holdets samlede score tælles
+
+POINTGIVNING:
+• Gul midte: 10 point
+• Rød ring: 8 point
+• Blå ring: 6 point
+• Sort ring: 4 point
+• Hvid ring: 2 point
+• Skive ramt udenfor: 1 point
+• Miss: 0 point
+
+ANTAL RUNDER: 3-5 runder pr. hold
+
+VARIATIONER:
+• Kun gul tæller (alt eller intet)
+• Dobbelt point for første skud
+• Bonuspoint for 3 i samme ring`,
+      order_index: 13,
+      icon: Trophy,
+      iconKey: 'trophy',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'battle_2',
+      title: 'BATTLE 2 - AKKUMULATION BATTLE',
+      content: `AKKUMULERET SCORE
+
+REGLER:
+• Holdene skyder på skift
+• Første hold der når X point vinder
+• Typisk mål: 50-100 point
+
+SPÆNDING:
+• Denne battle skaber drama!
+• Holdene kan se hinandens fremskridt
+• Taktik: Skal man satse eller spille sikkert?
+
+TIPS TIL INSTRUKTØR:
+• Opdater scoreboard løbende
+• Kommenter spændende skud
+• Skab stemning når det er tæt
+
+MÅLSCORE ANBEFALING:
+• 50 point: Hurtig runde
+• 75 point: Medium
+• 100 point: Lang, dramatisk finale`,
+      order_index: 14,
+      icon: Trophy,
+      iconKey: 'trophy',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'battle_3',
+      title: 'BATTLE 3 - ELIMINATION BATTLE',
+      content: `KNOCKOUT / ELIMINATION
+
+REGLER:
+• Alle hold skyder samtidig (1 skud pr. person)
+• Holdet med laveste score er UDE
+• Fortsæt indtil én vinder
+
+SPÆNDINGSELEMENT:
+• Højt pres på hvert enkelt skud
+• Publikum hepper
+• Dramatisk finale!
+
+VARIATIONER:
+• "Sudden Death": Ved uafgjort skyder begge hold igen
+• "Golden Arrow": Kun én skyder pr. hold i finalen
+• "All-in": Alle pile tæller, men man må kun hente pile når alle har skudt
+
+TIPS:
+• Gem denne battle til sidst
+• Skab drama med kommentarer
+• Lav en ægte finale-stemning`,
+      order_index: 15,
+      icon: Trophy,
+      iconKey: 'trophy',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'variationer',
+      title: 'VARIATIONER & BONUS',
+      content: `EKSTRA UDFORDRINGER:
+
+BLIND ARCHER:
+• Skytten har bind for øjnene
+• Teamet guider med ord
+• Sjovt og udfordrende!
+
+SPEED ROUND:
+• Flest pile i skiven på 60 sekunder
+• Hele holdet skyder på skift
+• Kaotisk og sjovt!
+
+MOVING TARGET:
+• Skiver der svinger eller bevæger sig
+• Kræver timing
+
+BALLOON POP:
+• Balloner på skiverne
+• Første hold der sprænger alle vinder
+
+ROBIN HOOD:
+• Bonus for at ramme sin egen pil
+• Ekstremt sjældent men legendarisk!
+
+TIPS:
+Vælg variationer baseret på gruppens niveau og energi`,
+      order_index: 16,
+      icon: Settings,
+      iconKey: 'settings',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+
+    // ========== EFTER OPGAVEN ==========
+    {
+      activity: 'teamrobin',
+      section_key: 'afslutning',
+      title: 'AFSLUTNING & KÅRING',
+      content: `AFSLUTNING:
+
+1. SAMLING
+   • Saml alle deltagere
+   • Opsummer dagens battles
+
+2. KÅRING AF VINDER
+   • Annoncer den samlede score
+   • Kår vinderholdet med begejstring!
+   • Del evt. præmier/diplomer ud
+
+3. TAK FOR I DAG
+   • Tak deltagerne for deres indsats
+   • Nævn highlights fra dagen
+   • Afslut med et smil!
+
+FOTO-MULIGHED:
+Tilbyd at tage et gruppebillede med buerne - populært!`,
+      order_index: 20,
+      icon: Trophy,
+      iconKey: 'trophy',
+      color: 'red',
+      category: 'after',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'nedpakning',
+      title: 'NEDPAKNING & TJEK',
+      content: `NEDPAKNING:
+
+1. PILE
+   • Saml ALLE pile (tæl dem!)
+   • Tjek for skader på spidser og fjer
+   • Rapporter manglende eller ødelagte pile
+
+2. BUER
+   • Afspænd buerne (tag strengen af)
+   • Tjek limbs for revner
+   • Pak forsigtigt i tasker
+
+3. SKIVER OG STATIVER
+   • Pak skiver ned
+   • Saml stativer og pløkker
+   • Tjek at intet efterlades
+
+4. BESKYTTELSESUDSTYR
+   • Saml alle armguards
+   • Saml alle fingerguards
+   • Tæl at alt er med
+
+VIGTIGT:
+Efterlad området som du fandt det!`,
+      order_index: 21,
+      icon: PackageCheck,
+      iconKey: 'package',
+      color: 'red',
+      category: 'after',
+      isDefault: true
+    },
+    {
+      activity: 'teamrobin',
+      section_key: 'hjemkomst',
+      title: 'VED HJEMKOMST',
+      content: `NÅR DU KOMMER HJEM:
+
+1. AFLÆSNING
+   • Bær alt gear ind
+   • Stil det på rette plads
+
+2. TJEK UDSTYRET
+   • Gennemgå pile for skader
+   • Tjek buer og strenge
+   • Rapporter fejl og mangler
+
+3. OPLADNING
+   • Sæt JBL-højtaler til opladning
+   • Tjek tablet hvis brugt
+
+4. RAPPORTERING
+   • Udfyld "Fejl & Mangler" hvis relevant
+   • Giv feedback til kontoret
+
+HUSK: Det næste team skal have udstyret i orden!`,
+      order_index: 22,
+      icon: Home,
+      iconKey: 'home',
+      color: 'red',
+      category: 'after',
+      isDefault: true
+    },
+
+    // ========== DE 10 BUD ==========
+    {
+      activity: 'teamrobin',
+      section_key: 'de_10_bud',
+      title: 'DE 10 BUD - TEAMROBIN',
+      content: `1. SIKKERHED FØRST
+   Pilen peges ALDRIG mod mennesker - uanset om buen er spændt eller ej.
+
+2. VÆR FORBEREDT
+   Tjek alt udstyr inden afgang og ankom i god tid.
+
+3. GIV EN GOD INTRO
+   En grundig instruktion giver bedre oplevelse for alle.
+
+4. SKAB STEMNING
+   Brug musik, entusiasme og energi til at løfte oplevelsen.
+
+5. HOLD ØJE MED SIKKERHED
+   Vær altid opmærksom på hvor pile peges og hvem der er i området.
+
+6. VÆR RETFÆRDIG
+   Alle regler gælder for alle - vær en fair dommer.
+
+7. ENGAGER ALLE
+   Sørg for at selv de usikre føler sig velkomne og inkluderet.
+
+8. TÆL DINE PILE
+   Hold styr på udstyret - manglende pile skal findes eller rapporteres.
+
+9. EFTERLAD STEDET PÆNT
+   Ryd op efter dig og lad området stå som du fandt det.
+
+10. HAV DET SJOVT!
+    Din energi smitter - hvis du har det sjovt, har deltagerne det også!`,
+      order_index: 30,
+      icon: ClipboardList,
+      iconKey: 'clipboard',
+      color: 'blue',
+      category: 'summary',
+      isDefault: true
+    }
+  ];
+};
+
 // Get default sections based on activity
 const getDefaultSections = (activity: string): SectionWithMeta[] => {
   switch (activity) {
     case 'teamlazer':
       return getTeamLazerSections();
+    case 'teamrobin':
+      return getTeamRobinSections();
     case 'teamconstruct':
       return getTeamConstructSections();
     case 'teamchallenge':

@@ -364,6 +364,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamlazer_fejlsogning') changeView('teamlazer_fejlsogning');
     else if (link.url === '#teamlazer_frekvenser') changeView('teamlazer_frekvenser');
     else if (link.url === '#teamlazer_guide') changeView('teamlazer_guide');
+    else if (link.url === '#teamrobin_guide') changeView('teamrobin_guide');
     else if (link.url === '#fejlsogning_teamlazer') changeView('fejlsogning_teamlazer');
     else if (link.url === '#fejlsogning_teamrobin') changeView('fejlsogning_teamrobin');
     else if (link.url === '#fejlsogning_teamsegway') changeView('fejlsogning_teamsegway');
