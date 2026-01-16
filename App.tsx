@@ -287,6 +287,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamrobin_packing_after') changeView('teamrobin_packing_after');
     else if (link.title === 'JUSTERING') changeView('teamlazer_justering');
     else if (link.url === '#teamrobin_video') changeView('teamrobin_video');
+    else if (link.url === '#teamchallenge_guide') changeView('teamchallenge_guide');
     else if (link.url === '#teamchallenge_video') changeView('teamchallenge_video');
     else if (link.url === '#teamchallenge_boxvideos') changeView('teamchallenge_boxvideos');
     else if (link.url === '#teamaction_video') changeView('teamaction_video');
