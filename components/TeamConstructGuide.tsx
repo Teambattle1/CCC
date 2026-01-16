@@ -32,9 +32,9 @@ import {
 type CategoryKey = 'before' | 'during' | 'after';
 
 const CATEGORIES: Record<CategoryKey, { title: string; icon: React.ElementType; color: string }> = {
-  before: { title: 'FØR OPGAVEN', icon: PackageCheck, color: 'yellow' },
-  during: { title: 'UNDER OPGAVEN', icon: Play, color: 'orange' },
-  after: { title: 'EFTER OPGAVEN', icon: CheckCircle2, color: 'green' }
+  before: { title: 'FØR OPGAVEN', icon: PackageCheck, color: 'green' },
+  during: { title: 'UNDER OPGAVEN', icon: Play, color: 'yellow' },
+  after: { title: 'EFTER OPGAVEN', icon: CheckCircle2, color: 'red' }
 };
 
 // Default sections from the TeamConstruct instructor manual
@@ -517,48 +517,48 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
 
       {/* Category-based layout */}
       <div className="space-y-6">
-        {/* FØR OPGAVEN */}
-        <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-3 tablet:p-4">
+        {/* FØR OPGAVEN - Green */}
+        <div className="rounded-2xl border border-green-500/30 bg-green-500/5 p-3 tablet:p-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-yellow-500/20 border border-yellow-500/30">
-              <PackageCheck className="w-5 h-5 tablet:w-6 tablet:h-6 text-yellow-500" />
+            <div className="p-2 rounded-lg bg-green-500/20 border border-green-500/30">
+              <PackageCheck className="w-5 h-5 tablet:w-6 tablet:h-6 text-green-500" />
             </div>
-            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-yellow-400">
+            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-green-400">
               FØR OPGAVEN
             </h2>
-            <span className="text-xs text-yellow-400/50">({sectionsByCategory.before.length} sektioner)</span>
+            <span className="text-xs text-green-400/50">({sectionsByCategory.before.length} sektioner)</span>
           </div>
           <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-3">
             {sectionsByCategory.before.map(renderSection)}
           </div>
         </div>
 
-        {/* UNDER OPGAVEN */}
-        <div className="rounded-2xl border border-orange-500/30 bg-orange-500/5 p-3 tablet:p-4">
+        {/* UNDER OPGAVEN - Yellow */}
+        <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-3 tablet:p-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-orange-500/20 border border-orange-500/30">
-              <Play className="w-5 h-5 tablet:w-6 tablet:h-6 text-orange-500" />
+            <div className="p-2 rounded-lg bg-yellow-500/20 border border-yellow-500/30">
+              <Play className="w-5 h-5 tablet:w-6 tablet:h-6 text-yellow-500" />
             </div>
-            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-orange-400">
+            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-yellow-400">
               UNDER OPGAVEN
             </h2>
-            <span className="text-xs text-orange-400/50">({sectionsByCategory.during.length} sektioner)</span>
+            <span className="text-xs text-yellow-400/50">({sectionsByCategory.during.length} sektioner)</span>
           </div>
-          <div className="grid grid-cols-1 tablet:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-4 gap-3">
             {sectionsByCategory.during.map(renderSection)}
           </div>
         </div>
 
-        {/* EFTER OPGAVEN */}
-        <div className="rounded-2xl border border-green-500/30 bg-green-500/5 p-3 tablet:p-4">
+        {/* EFTER OPGAVEN - Red */}
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-3 tablet:p-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-green-500/20 border border-green-500/30">
-              <CheckCircle2 className="w-5 h-5 tablet:w-6 tablet:h-6 text-green-500" />
+            <div className="p-2 rounded-lg bg-red-500/20 border border-red-500/30">
+              <CheckCircle2 className="w-5 h-5 tablet:w-6 tablet:h-6 text-red-500" />
             </div>
-            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-green-400">
+            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-red-400">
               EFTER OPGAVEN
             </h2>
-            <span className="text-xs text-green-400/50">({sectionsByCategory.after.length} sektioner)</span>
+            <span className="text-xs text-red-400/50">({sectionsByCategory.after.length} sektioner)</span>
           </div>
           <div className="grid grid-cols-1 gap-3">
             {sectionsByCategory.after.map(renderSection)}
