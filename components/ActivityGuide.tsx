@@ -21,18 +21,17 @@ import {
   CheckCircle2,
   Plus,
   Trash2,
-  GripVertical,
   FileText,
-  Bold,
-  Italic,
-  Underline,
-  AlignCenter,
-  AlignLeft,
-  List,
-  Palette,
-  Type,
   CheckSquare,
-  Square
+  Square,
+  Zap,
+  Navigation,
+  Gamepad2,
+  Package,
+  Swords,
+  Car,
+  Utensils,
+  LucideIcon
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -70,199 +69,34 @@ const getIconByKey = (key: string): React.ElementType => {
   return ICON_OPTIONS.find(i => i.key === key)?.icon || FileText;
 };
 
-// Default sections from the TeamConstruct instructor manual
-const DEFAULT_SECTIONS = [
-  {
-    section_key: 'maalsaetning',
-    title: 'MÅLSÆTNING & TEAMS',
-    content: `Formålet med TeamConstruct er at alle TEAMS skal løse en 100% ens opgave, med de helt samme materialer, og med et Add-on midtvejs i tiden.
+// Activity icons and colors
+const ACTIVITY_CONFIG: Record<string, { icon: LucideIcon; color: string; title: string }> = {
+  teamlazer: { icon: Zap, color: 'blue', title: 'TeamLazer' },
+  teamrobin: { icon: Target, color: 'green', title: 'TeamRobin' },
+  teamsegway: { icon: Navigation, color: 'red', title: 'TeamSegway' },
+  teamcontrol: { icon: Gamepad2, color: 'purple', title: 'TeamControl' },
+  teamconnect: { icon: Users, color: 'purple', title: 'TeamConnect' },
+  teambox: { icon: Package, color: 'gray', title: 'TeamBox' },
+  teamaction: { icon: Swords, color: 'lightblue', title: 'TeamAction' },
+  teamchallenge: { icon: Trophy, color: 'pink', title: 'TeamChallenge' },
+  teamconstruct: { icon: Settings, color: 'yellow', title: 'TeamConstruct' },
+  teamrace: { icon: Car, color: 'orange', title: 'TeamRace' },
+  teamplay: { icon: Users, color: 'blue', title: 'TeamPlay' },
+  teamtaste: { icon: Utensils, color: 'gold', title: 'TeamTaste' }
+};
 
-TEAMOPDELING: 3-4 deltagere pr. team
-
-Resultatet bliver, trods samme udgangspunkt – meget forskelligt.`,
-    order_index: 0,
-    icon: Target,
-    iconKey: 'target',
-    color: 'red',
-    category: 'before' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'musik',
-    title: 'MUSIK TIL OPGAVEN',
-    content: `Connect JBL musikafspiller med bluetooth til din telefon.
-
-Start TeamBattle Play QR playliste - findes i tablet kassernes låg.
-
-REGLER:
-• Musik skal spille når gæsterne kommer
-• Sluk under velkomst og fællesinstruktioner
-• Tænd når holdene bygger
-• Tænd altid ved oprydning`,
-    order_index: 1,
-    icon: Music,
-    iconKey: 'music',
-    color: 'green',
-    category: 'during' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'tidsplan',
-    title: 'TIDSPLAN',
-    content: `FØR OPGAVEN:
-• 15 min - Forberedelse lager (Tjekliste AFGANG)
-• 10 min - Opsætning af gear
-
-AFVIKLING:
-• 30 min - Velkomst og TEAMS
-• 05 min - Instruktion
-• 60-65 min - Konkurrence
-
-EFTER:
-• 15 min - Kåring og afslutning
-• 15 min - Oprydning
-• 10 min - Tjekliste HJEMKOMST`,
-    order_index: 2,
-    icon: Clock,
-    iconKey: 'clock',
-    color: 'blue',
-    category: 'before' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'foer_opgaven',
-    title: 'PAKKELISTE & TJEK',
-    content: `Tjek de gule/sorte værktøjskasser.
-
-PAKKELISTE:
-• Paprør (2,5 til hver gruppe = 4 meter)
-• Rundstokke (3 pinde til hvert hold)
-• Sorte/gule Construct kasser med:
-  - Golfbold, skærebræt, sav
-  - Skærehandsker, målebånd
-  - Gaffatape, manual DK/UK
-• Gul gearkasse med ekstra udstyr
-• ADD ON A5 kort
-• Sorte borde (et til hvert hold)`,
-    order_index: 3,
-    icon: ClipboardList,
-    iconKey: 'clipboard',
-    color: 'yellow',
-    link: '#teamconstruct_packing_afgang',
-    linkText: 'PAKKELISTE AFGANG',
-    isInternal: true,
-    category: 'before' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'ankomst',
-    title: 'ANKOMST & OPSÆTNING',
-    content: `1. Find konferencecrew eller kontaktperson
-2. Tjek location i app: teambattle.dk/map
-3. Er pladsen for lille? Find løsning FØR kunden kommer
-4. SMS til kunden når du er ankommet
-
-OPSÆTNING:
-• Hvert hold: sort foldebord, 3 rundstokke, 2,5 paprør, gul/sort gearkasse
-• Ca. 5 meters afstand mellem bordene
-• Tænd musik svagt som det første`,
-    order_index: 4,
-    icon: MapPin,
-    iconKey: 'mappin',
-    color: 'purple',
-    link: 'https://l.ead.me/TeamConstruct-Video',
-    linkText: 'SE OPSÆTNING VIDEO',
-    category: 'before' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'velkomst',
-    title: 'VELKOMST',
-    content: `Byd velkommen og fortæl:
-• Hvem du er
-• At du glæder dig til at udfordre dem
-• Det er en underholdende konstruktionsopgave
-• Der kommer lidt overraskelser undervejs
-
-Sørg for at ALLE kan høre dig tydeligt.`,
-    order_index: 5,
-    icon: Users,
-    iconKey: 'users',
-    color: 'orange',
-    category: 'during' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'afvikling',
-    title: 'AFVIKLING & SIKKERHED',
-    content: `Dit job er at sikre:
-• Alle forstår opgaven
-• Sikkerhedsregler overholdes
-• Tiderne overholdes
-• Add-on udleveres på det rigtige tidspunkt
-
-SIKKERHED:
-• Skærehandsker SKAL bruges ved savning
-• Hold øje med korrekt brug af værktøj
-• Grib ind ved farlig adfærd`,
-    order_index: 6,
-    icon: Settings,
-    iconKey: 'settings',
-    color: 'red',
-    link: 'https://l.ead.me/TeamConstruct-Video',
-    linkText: 'SE AFVIKLING VIDEO',
-    category: 'during' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'kaaring',
-    title: 'KONKURRENCE & KÅRING',
-    content: `AFSLUTNINGEN ER DET VIGTIGSTE!
-
-1. Alle fra alle hold går rundt sammen
-2. Et hold tjekker om modstanderen opfylder kriterierne
-3. Du noterer pointene ned
-4. Annoncér vinderen højtideligt
-
-Sørg for god stemning og anerkendelse til ALLE hold.`,
-    order_index: 7,
-    icon: Trophy,
-    iconKey: 'trophy',
-    color: 'yellow',
-    category: 'during' as CategoryKey,
-    isDefault: true
-  },
-  {
-    section_key: 'oprydning',
-    title: 'OPRYDNING & HJEMKOMST',
-    content: `Gearet skal virke og være klar til næste bruger!
-
-EFTER HVER OPGAVE:
-• Smid brugte paprør og gaffatape ud
-• OMPAK og tjek alt i de gule værktøjskasser
-• Skriv fejl/mangler i evalueringen
-• Ring STRAKS hvis gear ikke virker
-
-Tænd musik under oprydning!`,
-    order_index: 8,
-    icon: Home,
-    iconKey: 'home',
-    color: 'green',
-    link: '#teamconstruct_packing_hjemkomst',
-    linkText: 'TJEKLISTE HJEMKOMST',
-    isInternal: true,
-    category: 'after' as CategoryKey,
-    isDefault: true
-  }
-];
-
+// Color classes
 const COLORS: Record<string, { bg: string; border: string; text: string; icon: string }> = {
-  red: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400', icon: 'text-red-500' },
-  green: { bg: 'bg-green-500/10', border: 'border-green-500/30', text: 'text-green-400', icon: 'text-green-500' },
-  blue: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400', icon: 'text-blue-500' },
-  yellow: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-400', icon: 'text-yellow-500' },
-  purple: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400', icon: 'text-purple-500' },
-  orange: { bg: 'bg-orange-500/10', border: 'border-orange-500/30', text: 'text-orange-400', icon: 'text-orange-500' }
+  green: { bg: 'bg-green-500/10', border: 'border-green-500/30', text: 'text-green-400', icon: 'text-green-400' },
+  yellow: { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', text: 'text-yellow-400', icon: 'text-yellow-400' },
+  red: { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400', icon: 'text-red-400' },
+  blue: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400', icon: 'text-blue-400' },
+  purple: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400', icon: 'text-purple-400' },
+  orange: { bg: 'bg-orange-500/10', border: 'border-orange-500/30', text: 'text-orange-400', icon: 'text-orange-400' },
+  pink: { bg: 'bg-pink-500/10', border: 'border-pink-500/30', text: 'text-pink-400', icon: 'text-pink-400' },
+  gray: { bg: 'bg-gray-500/10', border: 'border-gray-500/30', text: 'text-gray-400', icon: 'text-gray-400' },
+  lightblue: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', text: 'text-cyan-400', icon: 'text-cyan-400' },
+  gold: { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400', icon: 'text-amber-400' }
 };
 
 interface SectionWithMeta extends GuideSection {
@@ -276,11 +110,66 @@ interface SectionWithMeta extends GuideSection {
   isDefault?: boolean;
 }
 
-interface TeamConstructGuideProps {
+interface ActivityGuideProps {
+  activity: string;
   onNavigate?: (view: string) => void;
 }
 
-const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) => {
+// Default empty sections for new activities
+const getDefaultSections = (activity: string): SectionWithMeta[] => {
+  return [
+    {
+      activity,
+      section_key: 'velkommen',
+      title: 'VELKOMMEN',
+      content: 'Tilføj information om velkomst og introduktion her.',
+      order_index: 0,
+      icon: Users,
+      iconKey: 'users',
+      color: 'blue',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity,
+      section_key: 'forberedelse',
+      title: 'FORBEREDELSE',
+      content: 'Tilføj information om forberedelse her.',
+      order_index: 1,
+      icon: ClipboardList,
+      iconKey: 'clipboard',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity,
+      section_key: 'afvikling',
+      title: 'AFVIKLING',
+      content: 'Tilføj information om afvikling af aktiviteten her.',
+      order_index: 2,
+      icon: Play,
+      iconKey: 'play',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity,
+      section_key: 'oprydning',
+      title: 'OPRYDNING',
+      content: 'Tilføj information om oprydning her.',
+      order_index: 3,
+      icon: CheckCircle2,
+      iconKey: 'check',
+      color: 'red',
+      category: 'after',
+      isDefault: true
+    }
+  ];
+};
+
+const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) => {
   const { profile } = useAuth();
   const [sections, setSections] = useState<SectionWithMeta[]>([]);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -301,70 +190,52 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   const [newSectionIcon, setNewSectionIcon] = useState('file');
   const [newSectionImage, setNewSectionImage] = useState<File | null>(null);
   const [newSectionImagePreview, setNewSectionImagePreview] = useState<string | null>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const [showColorPicker, setShowColorPicker] = useState(false);
   const [newSectionChecklist, setNewSectionChecklist] = useState<string[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState('');
 
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER';
-
-  // Rich text editor formatting functions
-  const formatText = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
-    editorRef.current?.focus();
-  };
-
-  const EDITOR_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff', '#9ca3af'];
+  const activityConfig = ACTIVITY_CONFIG[activity] || { icon: Settings, color: 'blue', title: activity };
 
   useEffect(() => {
     loadSections();
-  }, []);
+  }, [activity]);
 
   const loadSections = async () => {
     setIsLoading(true);
-    const result = await getGuideSections('teamconstruct');
+    const result = await getGuideSections(activity);
 
     // Start with defaults
-    let allSections: SectionWithMeta[] = DEFAULT_SECTIONS.map(s => ({
-      ...s,
-      activity: 'teamconstruct'
-    } as SectionWithMeta));
+    let allSections: SectionWithMeta[] = getDefaultSections(activity);
 
-    if (result.success && result.data && result.data.length > 0) {
-      // Merge saved data with defaults and add custom sections
-      allSections = DEFAULT_SECTIONS.map(defaultSection => {
-        const savedSection = result.data?.find(s => s.section_key === defaultSection.section_key);
-        return {
-          ...defaultSection,
-          ...savedSection,
-          activity: 'teamconstruct',
-          icon: defaultSection.icon,
-          iconKey: defaultSection.iconKey,
-          color: defaultSection.color,
-          link: defaultSection.link,
-          linkText: defaultSection.linkText,
-          category: (savedSection?.category as CategoryKey) || defaultSection.category,
-          isDefault: true
-        } as SectionWithMeta;
-      });
-
-      // Add custom sections (not in defaults)
-      const customSections = result.data.filter(
-        s => !DEFAULT_SECTIONS.find(d => d.section_key === s.section_key)
-      );
-      customSections.forEach(cs => {
-        allSections.push({
-          ...cs,
-          icon: getIconByKey(cs.section_key.split('_')[0] || 'file'),
-          iconKey: cs.section_key.split('_')[0] || 'file',
-          color: 'blue',
-          category: (cs.category as CategoryKey) || 'before',
-          isDefault: false
-        } as SectionWithMeta);
+    if (result.success && result.data) {
+      // Merge with database sections
+      result.data.forEach((dbSection: GuideSection) => {
+        const existingIndex = allSections.findIndex(s => s.section_key === dbSection.section_key);
+        if (existingIndex >= 0) {
+          // Update existing section
+          allSections[existingIndex] = {
+            ...allSections[existingIndex],
+            ...dbSection,
+            icon: allSections[existingIndex].icon,
+            iconKey: allSections[existingIndex].iconKey,
+            color: allSections[existingIndex].color,
+            category: (dbSection.category as CategoryKey) || allSections[existingIndex].category
+          };
+        } else {
+          // Add new custom section
+          allSections.push({
+            ...dbSection,
+            icon: getIconByKey(dbSection.section_key.split('_')[0] || 'file'),
+            iconKey: dbSection.section_key.split('_')[0] || 'file',
+            color: 'blue',
+            category: (dbSection.category as CategoryKey) || 'before',
+            isDefault: false
+          });
+        }
       });
     }
 
-    // Sort by order_index within each category
+    // Sort by order_index
     allSections.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
     setSections(allSections);
     setIsLoading(false);
@@ -411,7 +282,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     if (!file) return;
 
     setUploadingSectionKey(sectionKey);
-    const result = await uploadGuideImage(file, 'teamconstruct', sectionKey);
+    const result = await uploadGuideImage(file, activity, sectionKey);
 
     if (result.success && result.url) {
       const section = sections.find(s => s.section_key === sectionKey);
@@ -428,9 +299,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
       }
     }
     setUploadingSectionKey(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const triggerImageUpload = (sectionKey: string) => {
@@ -438,35 +307,30 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     fileInputRef.current?.click();
   };
 
-  // Move section up/down within category
   const moveSection = async (sectionKey: string, direction: 'up' | 'down') => {
-    const section = sections.find(s => s.section_key === sectionKey);
-    if (!section) return;
+    const currentSection = sections.find(s => s.section_key === sectionKey);
+    if (!currentSection) return;
 
-    const categorySections = sections.filter(s => s.category === section.category);
-    const currentIndex = categorySections.findIndex(s => s.section_key === sectionKey);
+    const sameCategorySections = sections
+      .filter(s => s.category === currentSection.category)
+      .sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
 
-    if (direction === 'up' && currentIndex === 0) return;
-    if (direction === 'down' && currentIndex === categorySections.length - 1) return;
-
+    const currentIndex = sameCategorySections.findIndex(s => s.section_key === sectionKey);
     const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    const swapSection = categorySections[swapIndex];
 
-    // Swap order indices
-    const tempOrder = section.order_index;
-    section.order_index = swapSection.order_index;
+    if (swapIndex < 0 || swapIndex >= sameCategorySections.length) return;
+
+    const swapSection = sameCategorySections[swapIndex];
+    const tempOrder = currentSection.order_index;
+    currentSection.order_index = swapSection.order_index;
     swapSection.order_index = tempOrder;
 
-    // Save both sections
-    await Promise.all([
-      saveGuideSection({ ...section, category: section.category }),
-      saveGuideSection({ ...swapSection, category: swapSection.category })
-    ]);
+    await saveGuideSection(currentSection);
+    await saveGuideSection(swapSection);
 
-    // Update local state
     setSections(prev => {
       const updated = prev.map(s => {
-        if (s.section_key === section.section_key) return { ...s, order_index: section.order_index };
+        if (s.section_key === currentSection.section_key) return { ...s, order_index: currentSection.order_index };
         if (s.section_key === swapSection.section_key) return { ...s, order_index: swapSection.order_index };
         return s;
       });
@@ -474,28 +338,14 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     });
   };
 
-  // Delete custom section
   const handleDeleteSection = async (section: SectionWithMeta) => {
-    if (section.isDefault) return;
-    if (!confirm(`Er du sikker på at du vil slette "${section.title}"?`)) return;
+    if (!section.id || section.isDefault) return;
+    if (!confirm('Er du sikker på at du vil slette denne sektion?')) return;
 
-    if (section.id) {
-      const result = await deleteGuideSection(section.id);
-      if (result.success) {
-        setSections(prev => prev.filter(s => s.section_key !== section.section_key));
-      }
+    const result = await deleteGuideSection(section.id);
+    if (result.success) {
+      setSections(prev => prev.filter(s => s.section_key !== section.section_key));
     }
-  };
-
-  // Add new section
-  const openNewSectionModal = (category: CategoryKey) => {
-    setNewSectionCategory(category);
-    setNewSectionTitle('');
-    setNewSectionContent('');
-    setNewSectionIcon('file');
-    setNewSectionImage(null);
-    setNewSectionImagePreview(null);
-    setShowNewSectionModal(true);
   };
 
   const handleNewSectionImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -503,9 +353,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     if (file) {
       setNewSectionImage(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewSectionImagePreview(reader.result as string);
-      };
+      reader.onload = (e) => setNewSectionImagePreview(e.target?.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -520,7 +368,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
 
     let imageUrl: string | undefined;
     if (newSectionImage) {
-      const uploadResult = await uploadGuideImage(newSectionImage, 'teamconstruct', sectionKey);
+      const uploadResult = await uploadGuideImage(newSectionImage, activity, sectionKey);
       if (uploadResult.success) {
         imageUrl = uploadResult.url;
       }
@@ -534,7 +382,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     }
 
     const newSection: GuideSection = {
-      activity: 'teamconstruct',
+      activity,
       section_key: sectionKey,
       title: newSectionTitle.toUpperCase(),
       content: fullContent,
@@ -543,36 +391,27 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
       category: newSectionCategory
     };
 
-    try {
-      const result = await saveGuideSection(newSection);
-      console.log('Save result:', result);
-      if (result.success) {
-        const newSectionWithMeta: SectionWithMeta = {
-          ...newSection,
-          id: result.id,
-          icon: getIconByKey(newSectionIcon),
-          iconKey: newSectionIcon,
-          color: 'blue',
-          category: newSectionCategory,
-          isDefault: false
-        };
-        setSections(prev => [...prev, newSectionWithMeta].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
-        // Reset modal state
-        setShowNewSectionModal(false);
-        setNewSectionTitle('');
-        setNewSectionContent('');
-        setNewSectionIcon('file');
-        setNewSectionImage(null);
-        setNewSectionImagePreview(null);
-        setNewSectionChecklist([]);
-        setNewChecklistItem('');
-      } else {
-        console.error('Failed to save section:', result.error);
-        alert('Kunne ikke gemme sektion: ' + (result.error || 'Ukendt fejl'));
-      }
-    } catch (err) {
-      console.error('Error saving section:', err);
-      alert('Fejl ved gemning af sektion');
+    const result = await saveGuideSection(newSection);
+    if (result.success) {
+      const newSectionWithMeta: SectionWithMeta = {
+        ...newSection,
+        id: result.id,
+        icon: getIconByKey(newSectionIcon),
+        iconKey: newSectionIcon,
+        color: 'blue',
+        category: newSectionCategory,
+        isDefault: false
+      };
+      setSections(prev => [...prev, newSectionWithMeta].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
+      // Reset modal state
+      setShowNewSectionModal(false);
+      setNewSectionTitle('');
+      setNewSectionContent('');
+      setNewSectionIcon('file');
+      setNewSectionImage(null);
+      setNewSectionImagePreview(null);
+      setNewSectionChecklist([]);
+      setNewChecklistItem('');
     }
     setIsSaving(false);
   };
@@ -628,89 +467,80 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     return (
       <div
         key={section.section_key}
-        className={`rounded-xl border ${colorClasses.border} ${colorClasses.bg} overflow-hidden transition-all duration-300 ${
-          isExpanded ? 'tablet:col-span-3 tablet:row-span-2' : ''
-        }`}
+        className={`${colorClasses.bg} border ${colorClasses.border} rounded-xl tablet:rounded-2xl overflow-hidden transition-all duration-300`}
       >
-        {/* Header - Always visible */}
-        <div className="flex items-center">
-          {/* Reorder buttons for admin */}
-          {isAdmin && (
-            <div className="flex flex-col border-r border-white/10">
-              <button
-                onClick={(e) => { e.stopPropagation(); moveSection(section.section_key, 'up'); }}
-                disabled={index === 0}
-                className="p-1.5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed"
-                title="Flyt op"
-              >
-                <ChevronUp className="w-4 h-4 text-gray-400" />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); moveSection(section.section_key, 'down'); }}
-                disabled={index === totalInCategory - 1}
-                className="p-1.5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed"
-                title="Flyt ned"
-              >
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              </button>
+        {/* Section Header */}
+        <button
+          onClick={() => handleToggleSection(section.section_key)}
+          className="w-full flex items-center justify-between p-4 tablet:p-5 text-left"
+        >
+          <div className="flex items-center gap-3 tablet:gap-4">
+            <div className={`p-2 tablet:p-3 ${colorClasses.bg} rounded-lg tablet:rounded-xl border ${colorClasses.border}`}>
+              <Icon className={`w-5 h-5 tablet:w-6 tablet:h-6 ${colorClasses.icon}`} />
             </div>
-          )}
-          <button
-            onClick={() => handleToggleSection(section.section_key)}
-            className="flex-1 p-3 tablet:p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${colorClasses.bg} border ${colorClasses.border}`}>
-                <Icon className={`w-5 h-5 tablet:w-6 tablet:h-6 ${colorClasses.icon}`} />
-              </div>
-              <h3 className={`text-sm tablet:text-base font-bold uppercase tracking-wider ${colorClasses.text}`}>
-                {section.title}
-              </h3>
-            </div>
-            <div className="flex items-center gap-2">
-              {isAdmin && !section.isDefault && (
+            <h3 className={`text-sm tablet:text-base font-bold ${colorClasses.text} uppercase tracking-wider`}>
+              {section.title}
+            </h3>
+          </div>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <div className="flex gap-1 mr-2">
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDeleteSection(section); }}
-                  className="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors"
-                  title="Slet sektion"
+                  onClick={(e) => { e.stopPropagation(); moveSection(section.section_key, 'up'); }}
+                  disabled={index === 0}
+                  className="p-1 text-gray-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  <Trash2 className="w-4 h-4 text-red-400" />
+                  <ChevronUp className="w-4 h-4" />
                 </button>
-              )}
-              {isExpanded ? (
-                <ChevronUp className={`w-5 h-5 ${colorClasses.text}`} />
-              ) : (
-                <ChevronDown className={`w-5 h-5 ${colorClasses.text}`} />
-              )}
-            </div>
-          </button>
-        </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); moveSection(section.section_key, 'down'); }}
+                  disabled={index === totalInCategory - 1}
+                  className="p-1 text-gray-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            {isExpanded ? (
+              <ChevronUp className={`w-5 h-5 ${colorClasses.icon}`} />
+            ) : (
+              <ChevronDown className={`w-5 h-5 ${colorClasses.icon}`} />
+            )}
+          </div>
+        </button>
 
-        {/* Expanded Content */}
+        {/* Section Content */}
         {isExpanded && (
-          <div className="p-4 tablet:p-6 border-t border-white/10">
-            <div className="flex flex-col tablet:flex-row gap-4">
+          <div className="px-4 tablet:px-5 pb-4 tablet:pb-5 border-t border-white/10">
+            <div className="pt-4 flex flex-col tablet:flex-row gap-4">
               {/* Image Section */}
               <div className="tablet:w-1/3">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => uploadingSectionKey && handleImageUpload(e, uploadingSectionKey)}
+                  accept="image/*"
+                  className="hidden"
+                />
                 {section.image_url ? (
-                  <div className="relative group">
+                  <div
+                    className={`relative rounded-lg tablet:rounded-xl overflow-hidden border-2 border-dashed ${colorClasses.border} cursor-pointer group`}
+                    onClick={() => isAdmin && triggerImageUpload(section.section_key)}
+                  >
                     <img
                       src={section.image_url}
                       alt={section.title}
-                      className="w-full h-48 tablet:h-64 object-cover rounded-lg"
+                      className="w-full h-48 tablet:h-64 object-cover"
                     />
                     {isAdmin && (
-                      <button
-                        onClick={() => triggerImageUpload(section.section_key)}
-                        className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg"
-                      >
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Upload className="w-8 h-8 text-white" />
-                      </button>
+                      </div>
                     )}
                   </div>
                 ) : (
                   <div
-                    className={`w-full h-48 tablet:h-64 rounded-lg border-2 border-dashed ${colorClasses.border} flex flex-col items-center justify-center gap-2 ${
+                    className={`h-48 tablet:h-64 rounded-lg tablet:rounded-xl border-2 border-dashed ${colorClasses.border} flex flex-col items-center justify-center gap-2 ${
                       isAdmin ? 'cursor-pointer hover:bg-white/5' : ''
                     }`}
                     onClick={() => isAdmin && triggerImageUpload(section.section_key)}
@@ -784,10 +614,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                               <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">Tjekliste</div>
                               {checklist.map((item, idx) => (
                                 <label key={idx} className="flex items-center gap-3 cursor-pointer group">
-                                  <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                  />
+                                  <input type="checkbox" className="sr-only peer" />
                                   <div className="w-5 h-5 rounded border border-white/30 flex items-center justify-center peer-checked:bg-green-500 peer-checked:border-green-500 transition-colors">
                                     <CheckSquare className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" />
                                   </div>
@@ -828,14 +655,27 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                           </a>
                         )
                       )}
+
+                      {/* Admin edit button */}
                       {isAdmin && (
-                        <button
-                          onClick={() => handleStartEdit(section)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-battle-orange/20 border border-battle-orange/30 rounded-lg text-battle-orange text-xs uppercase tracking-wider hover:bg-battle-orange/30 transition-colors"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                          REDIGER
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleStartEdit(section)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 text-xs uppercase tracking-wider hover:bg-blue-500/30 transition-colors"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                            REDIGER
+                          </button>
+                          {!section.isDefault && section.id && (
+                            <button
+                              onClick={() => handleDeleteSection(section)}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/30 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              SLET
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -848,63 +688,73 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     );
   };
 
-  const renderCategory = (categoryKey: CategoryKey, colorName: string, IconComponent: React.ElementType) => {
+  const renderCategory = (categoryKey: CategoryKey) => {
+    const category = CATEGORIES[categoryKey];
     const categorySections = sectionsByCategory[categoryKey];
-    const colorClasses = COLORS[colorName];
-    const categoryInfo = CATEGORIES[categoryKey];
+    const CategoryIcon = category.icon;
+    const colorClasses = COLORS[category.color];
 
     return (
-      <div className={`rounded-2xl border ${colorClasses.border} ${colorClasses.bg} p-3 tablet:p-4`}>
-        <div className="flex items-center justify-between mb-4">
+      <div key={categoryKey} className="space-y-3">
+        {/* Category Header */}
+        <div className={`flex items-center justify-between gap-3 px-2 py-3 ${colorClasses.bg} rounded-xl border ${colorClasses.border}`}>
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${colorClasses.bg} border ${colorClasses.border}`}>
-              <IconComponent className={`w-5 h-5 tablet:w-6 tablet:h-6 ${colorClasses.icon}`} />
-            </div>
-            <h2 className={`text-base tablet:text-lg font-bold uppercase tracking-wider ${colorClasses.text}`}>
-              {categoryInfo.title}
+            <CategoryIcon className={`w-6 h-6 ${colorClasses.icon}`} />
+            <h2 className={`text-lg font-bold ${colorClasses.text} uppercase tracking-wider`}>
+              {category.title}
             </h2>
-            <span className={`text-xs ${colorClasses.text}/50`}>({categorySections.length} sektioner)</span>
+            <span className={`text-xs ${colorClasses.text} opacity-60`}>
+              ({categorySections.length})
+            </span>
           </div>
           {isAdmin && (
             <button
-              onClick={() => openNewSectionModal(categoryKey)}
-              className={`flex items-center gap-2 px-3 py-1.5 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
+              onClick={() => {
+                setNewSectionCategory(categoryKey);
+                setShowNewSectionModal(true);
+              }}
+              className={`flex items-center gap-1 px-3 py-1.5 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
             >
               <Plus className="w-4 h-4" />
-              TILFØJ
+              NY
             </button>
           )}
         </div>
-        <div className={`grid grid-cols-1 ${categoryKey === 'after' ? '' : 'tablet:grid-cols-2 desktop:grid-cols-3'} gap-3`}>
-          {categorySections.map((s, idx) => renderSection(s, colorName, idx, categorySections.length))}
+
+        {/* Sections */}
+        <div className="space-y-3">
+          {categorySections.map((section, index) => renderSection(section, category.color, index, categorySections.length))}
         </div>
       </div>
     );
   };
 
-  return (
-    <div className="w-full max-w-6xl mx-auto px-2 tablet:px-4">
-      <input
-        type="file"
-        ref={fileInputRef}
-        className="hidden"
-        accept="image/*"
-        onChange={(e) => uploadingSectionKey && handleImageUpload(e, uploadingSectionKey)}
-      />
+  const ActivityIcon = activityConfig.icon;
 
-      {/* Category-based layout */}
-      <div className="space-y-6">
-        {renderCategory('before', 'green', PackageCheck)}
-        {renderCategory('during', 'yellow', Play)}
-        {renderCategory('after', 'red', CheckCircle2)}
+  return (
+    <div className="w-full max-w-6xl mx-auto px-2 tablet:px-4 space-y-6">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <ActivityIcon className={`w-8 h-8 ${COLORS[activityConfig.color]?.icon || 'text-battle-orange'}`} />
+          <h1 className="text-2xl tablet:text-3xl font-bold text-white uppercase tracking-wider">
+            {activityConfig.title} Guide
+          </h1>
+        </div>
+        <p className="text-gray-400 text-sm">Crew instruktioner og vejledning</p>
       </div>
+
+      {/* Categories */}
+      {renderCategory('before')}
+      {renderCategory('during')}
+      {renderCategory('after')}
 
       {/* New Section Modal */}
       {showNewSectionModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-battle-grey rounded-2xl border border-white/20 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+          <div className="bg-battle-grey border border-white/20 rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white uppercase tracking-wider">
                 Ny Sektion - {CATEGORIES[newSectionCategory].title}
               </h3>
               <button
@@ -914,7 +764,8 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
-            <div className="p-4 space-y-4">
+
+            <div className="space-y-4">
               {/* Title */}
               <div>
                 <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
@@ -935,7 +786,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                   Ikon
                 </label>
                 <div className="grid grid-cols-5 gap-2">
-                  {ICON_OPTIONS.map(opt => {
+                  {ICON_OPTIONS.map((opt) => {
                     const IconOpt = opt.icon;
                     return (
                       <button
@@ -975,7 +826,6 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                   Tjekliste (valgfrit)
                 </label>
                 <div className="space-y-2">
-                  {/* Add item input */}
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -993,7 +843,6 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
-                  {/* Checklist items */}
                   {newSectionChecklist.length > 0 && (
                     <div className="bg-battle-black/30 border border-white/10 rounded-lg p-2 space-y-1">
                       {newSectionChecklist.map((item, index) => (
@@ -1054,19 +903,19 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                 )}
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-2">
+              {/* Submit Buttons */}
+              <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleCreateSection}
                   disabled={!newSectionTitle.trim() || isSaving}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 font-medium uppercase tracking-wider hover:bg-green-500/30 transition-colors disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 uppercase tracking-wider hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-5 h-5" />
                   {isSaving ? 'OPRETTER...' : 'OPRET SEKTION'}
                 </button>
                 <button
                   onClick={() => setShowNewSectionModal(false)}
-                  className="px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-gray-400 font-medium uppercase tracking-wider hover:bg-white/20 transition-colors"
+                  className="px-6 py-3 bg-gray-500/20 border border-gray-500/30 rounded-lg text-gray-400 uppercase tracking-wider hover:bg-gray-500/30 transition-colors"
                 >
                   ANNULLER
                 </button>
@@ -1079,4 +928,4 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   );
 };
 
-export default TeamConstructGuide;
+export default ActivityGuide;
