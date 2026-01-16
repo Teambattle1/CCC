@@ -583,7 +583,7 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
 
         {/* Tabs */}
         {hasTabs && (
-          <div className="flex gap-1 mb-4 overflow-x-auto pb-2">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {sections.map((s, idx) => {
               const sChecked = s.items.filter(i => checkedItems.has(i.id)).length;
               const sTotal = s.items.length;
@@ -593,7 +593,7 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
                 <button
                   key={s.id}
                   onClick={() => setCurrentSection(idx)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium uppercase transition-colors ${
+                  className={`px-3 py-2 rounded-lg text-xs font-medium uppercase transition-colors whitespace-nowrap ${
                     idx === currentSection
                       ? 'bg-battle-orange text-white'
                       : isComplete
@@ -601,7 +601,7 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
                       : 'bg-white/10 text-gray-400 hover:bg-white/20'
                   }`}
                 >
-                  {s.title.length > 12 ? s.title.substring(0, 12) + '...' : s.title}
+                  {s.title}
                 </button>
               );
             })}

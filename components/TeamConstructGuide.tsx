@@ -15,7 +15,10 @@ import {
   X,
   Edit3,
   Save,
-  ExternalLink
+  ExternalLink,
+  PackageCheck,
+  Play,
+  CheckCircle2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -24,6 +27,15 @@ import {
   uploadGuideImage,
   GuideSection
 } from '../lib/supabase';
+
+// Category definitions
+type CategoryKey = 'before' | 'during' | 'after';
+
+const CATEGORIES: Record<CategoryKey, { title: string; icon: React.ElementType; color: string }> = {
+  before: { title: 'FØR OPGAVEN', icon: PackageCheck, color: 'yellow' },
+  during: { title: 'UNDER OPGAVEN', icon: Play, color: 'orange' },
+  after: { title: 'EFTER OPGAVEN', icon: CheckCircle2, color: 'green' }
+};
 
 // Default sections from the TeamConstruct instructor manual
 const DEFAULT_SECTIONS = [
@@ -37,7 +49,8 @@ TEAMOPDELING: 3-4 deltagere pr. team
 Resultatet bliver, trods samme udgangspunkt – meget forskelligt.`,
     order_index: 0,
     icon: Target,
-    color: 'red'
+    color: 'red',
+    category: 'before' as CategoryKey
   },
   {
     section_key: 'musik',
@@ -53,7 +66,8 @@ REGLER:
 • Tænd altid ved oprydning`,
     order_index: 1,
     icon: Music,
-    color: 'green'
+    color: 'green',
+    category: 'before' as CategoryKey
   },
   {
     section_key: 'tidsplan',
@@ -73,11 +87,12 @@ EFTER:
 • 10 min - Tjekliste HJEMKOMST`,
     order_index: 2,
     icon: Clock,
-    color: 'blue'
+    color: 'blue',
+    category: 'before' as CategoryKey
   },
   {
     section_key: 'foer_opgaven',
-    title: 'FØR OPGAVEN',
+    title: 'PAKKELISTE & TJEK',
     content: `Tjek de gule/sorte værktøjskasser.
 
 PAKKELISTE:
@@ -95,7 +110,8 @@ PAKKELISTE:
     color: 'yellow',
     link: '#teamconstruct_packing_afgang',
     linkText: 'PAKKELISTE AFGANG',
-    isInternal: true
+    isInternal: true,
+    category: 'before' as CategoryKey
   },
   {
     section_key: 'ankomst',
@@ -113,7 +129,8 @@ OPSÆTNING:
     icon: MapPin,
     color: 'purple',
     link: 'https://l.ead.me/TeamConstruct-Video',
-    linkText: 'SE OPSÆTNING VIDEO'
+    linkText: 'SE OPSÆTNING VIDEO',
+    category: 'before' as CategoryKey
   },
   {
     section_key: 'velkomst',
@@ -127,7 +144,8 @@ OPSÆTNING:
 Sørg for at ALLE kan høre dig tydeligt.`,
     order_index: 5,
     icon: Users,
-    color: 'orange'
+    color: 'orange',
+    category: 'during' as CategoryKey
   },
   {
     section_key: 'afvikling',
@@ -146,7 +164,8 @@ SIKKERHED:
     icon: Settings,
     color: 'red',
     link: 'https://l.ead.me/TeamConstruct-Video',
-    linkText: 'SE AFVIKLING VIDEO'
+    linkText: 'SE AFVIKLING VIDEO',
+    category: 'during' as CategoryKey
   },
   {
     section_key: 'kaaring',
@@ -161,7 +180,8 @@ SIKKERHED:
 Sørg for god stemning og anerkendelse til ALLE hold.`,
     order_index: 7,
     icon: Trophy,
-    color: 'yellow'
+    color: 'yellow',
+    category: 'during' as CategoryKey
   },
   {
     section_key: 'oprydning',
@@ -180,7 +200,8 @@ Tænd musik under oprydning!`,
     color: 'green',
     link: '#teamconstruct_packing_hjemkomst',
     linkText: 'TJEKLISTE HJEMKOMST',
-    isInternal: true
+    isInternal: true,
+    category: 'after' as CategoryKey
   }
 ];
 
@@ -199,6 +220,7 @@ interface SectionWithMeta extends GuideSection {
   link?: string;
   linkText?: string;
   isInternal?: boolean;
+  category: CategoryKey;
 }
 
 interface TeamConstructGuideProps {
@@ -237,7 +259,8 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
           icon: defaultSection.icon,
           color: defaultSection.color,
           link: defaultSection.link,
-          linkText: defaultSection.linkText
+          linkText: defaultSection.linkText,
+          category: defaultSection.category
         } as SectionWithMeta;
       });
       setSections(mergedSections);
@@ -324,19 +347,14 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     );
   }
 
-  return (
-    <div className="w-full max-w-6xl mx-auto px-2 tablet:px-4">
-      <input
-        type="file"
-        ref={fileInputRef}
-        className="hidden"
-        accept="image/*"
-        onChange={(e) => uploadingSectionKey && handleImageUpload(e, uploadingSectionKey)}
-      />
+  // Group sections by category
+  const sectionsByCategory = {
+    before: sections.filter(s => s.category === 'before'),
+    during: sections.filter(s => s.category === 'during'),
+    after: sections.filter(s => s.category === 'after')
+  };
 
-      {/* 3x3 Grid */}
-      <div className="grid grid-cols-1 tablet:grid-cols-3 gap-3 tablet:gap-4">
-        {sections.map((section) => {
+  const renderSection = (section: SectionWithMeta) => {
           const Icon = section.icon;
           const colorClasses = COLORS[section.color] || COLORS.blue;
           const isExpanded = expandedSection === section.section_key;
@@ -484,8 +502,68 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                 </div>
               )}
             </div>
-          );
-        })}
+    );
+  };
+
+  return (
+    <div className="w-full max-w-6xl mx-auto px-2 tablet:px-4">
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={(e) => uploadingSectionKey && handleImageUpload(e, uploadingSectionKey)}
+      />
+
+      {/* Category-based layout */}
+      <div className="space-y-6">
+        {/* FØR OPGAVEN */}
+        <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-3 tablet:p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-yellow-500/20 border border-yellow-500/30">
+              <PackageCheck className="w-5 h-5 tablet:w-6 tablet:h-6 text-yellow-500" />
+            </div>
+            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-yellow-400">
+              FØR OPGAVEN
+            </h2>
+            <span className="text-xs text-yellow-400/50">({sectionsByCategory.before.length} sektioner)</span>
+          </div>
+          <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-3">
+            {sectionsByCategory.before.map(renderSection)}
+          </div>
+        </div>
+
+        {/* UNDER OPGAVEN */}
+        <div className="rounded-2xl border border-orange-500/30 bg-orange-500/5 p-3 tablet:p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-orange-500/20 border border-orange-500/30">
+              <Play className="w-5 h-5 tablet:w-6 tablet:h-6 text-orange-500" />
+            </div>
+            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-orange-400">
+              UNDER OPGAVEN
+            </h2>
+            <span className="text-xs text-orange-400/50">({sectionsByCategory.during.length} sektioner)</span>
+          </div>
+          <div className="grid grid-cols-1 tablet:grid-cols-3 gap-3">
+            {sectionsByCategory.during.map(renderSection)}
+          </div>
+        </div>
+
+        {/* EFTER OPGAVEN */}
+        <div className="rounded-2xl border border-green-500/30 bg-green-500/5 p-3 tablet:p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-green-500/20 border border-green-500/30">
+              <CheckCircle2 className="w-5 h-5 tablet:w-6 tablet:h-6 text-green-500" />
+            </div>
+            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-green-400">
+              EFTER OPGAVEN
+            </h2>
+            <span className="text-xs text-green-400/50">({sectionsByCategory.after.length} sektioner)</span>
+          </div>
+          <div className="grid grid-cols-1 gap-3">
+            {sectionsByCategory.after.map(renderSection)}
+          </div>
+        </div>
       </div>
     </div>
   );

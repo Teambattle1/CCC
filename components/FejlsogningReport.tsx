@@ -253,7 +253,7 @@ Sendt fra CrewCenter`
               ref={cameraInputRef}
               onChange={handleImageUpload}
               accept="image/*"
-              capture="environment"
+              capture
               className="hidden"
             />
             {imageUrl ? (
