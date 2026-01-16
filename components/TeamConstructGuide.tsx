@@ -354,9 +354,9 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     after: sections.filter(s => s.category === 'after')
   };
 
-  const renderSection = (section: SectionWithMeta) => {
+  const renderSection = (section: SectionWithMeta, categoryColor: string) => {
           const Icon = section.icon;
-          const colorClasses = COLORS[section.color] || COLORS.blue;
+          const colorClasses = COLORS[categoryColor] || COLORS.blue;
           const isExpanded = expandedSection === section.section_key;
           const isEditing = editingSection === section.section_key;
 
@@ -529,7 +529,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
             <span className="text-xs text-green-400/50">({sectionsByCategory.before.length} sektioner)</span>
           </div>
           <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-3">
-            {sectionsByCategory.before.map(renderSection)}
+            {sectionsByCategory.before.map(s => renderSection(s, 'green'))}
           </div>
         </div>
 
@@ -545,7 +545,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
             <span className="text-xs text-yellow-400/50">({sectionsByCategory.during.length} sektioner)</span>
           </div>
           <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-4 gap-3">
-            {sectionsByCategory.during.map(renderSection)}
+            {sectionsByCategory.during.map(s => renderSection(s, 'yellow'))}
           </div>
         </div>
 
@@ -561,7 +561,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
             <span className="text-xs text-red-400/50">({sectionsByCategory.after.length} sektioner)</span>
           </div>
           <div className="grid grid-cols-1 gap-3">
-            {sectionsByCategory.after.map(renderSection)}
+            {sectionsByCategory.after.map(s => renderSection(s, 'red'))}
           </div>
         </div>
       </div>
