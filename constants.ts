@@ -188,6 +188,15 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
     description: 'Video Guides',
     color: 'red',
     badge: 'new'
+  },
+  {
+    id: 'tc6',
+    title: 'BOKSE',
+    url: '#teamchallenge_boxvideos',
+    icon: Package,
+    description: 'Gennemgang af Bokse',
+    color: 'pink',
+    badge: 'new'
   }
 ];
 
