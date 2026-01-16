@@ -655,9 +655,9 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
               </button>
             </div>
           )}
-          <button
+          <div
             onClick={() => handleToggleSection(section.section_key)}
-            className="flex-1 p-3 tablet:p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+            className="flex-1 p-3 tablet:p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${colorClasses.bg} border ${colorClasses.border}`}>
@@ -683,7 +683,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                 <ChevronDown className={`w-5 h-5 ${colorClasses.text}`} />
               )}
             </div>
-          </button>
+          </div>
         </div>
 
         {/* Expanded Content */}
