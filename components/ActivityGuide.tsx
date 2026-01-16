@@ -31,7 +31,9 @@ import {
   Swords,
   Car,
   Utensils,
-  LucideIcon
+  LucideIcon,
+  Bell,
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -108,7 +110,73 @@ interface SectionWithMeta extends GuideSection {
   isInternal?: boolean;
   category: CategoryKey;
   isDefault?: boolean;
+  updated_at?: string;
 }
+
+// Helper to format relative time in Danish
+const formatRelativeTime = (dateStr?: string): string => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Lige nu';
+  if (diffMins < 60) return `${diffMins} min. siden`;
+  if (diffHours < 24) return `${diffHours} time${diffHours > 1 ? 'r' : ''} siden`;
+  if (diffDays < 7) return `${diffDays} dag${diffDays > 1 ? 'e' : ''} siden`;
+  return date.toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: diffDays > 365 ? 'numeric' : undefined });
+};
+
+// Helper to get last viewed sections from localStorage
+const getViewedSections = (userId: string, activity: string): Record<string, string> => {
+  try {
+    const key = `guide_viewed_${userId}_${activity}`;
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+};
+
+// Helper to mark section as viewed
+const markSectionViewed = (userId: string, activity: string, sectionKey: string) => {
+  try {
+    const key = `guide_viewed_${userId}_${activity}`;
+    const viewed = getViewedSections(userId, activity);
+    viewed[sectionKey] = new Date().toISOString();
+    localStorage.setItem(key, JSON.stringify(viewed));
+  } catch {
+    // Ignore localStorage errors
+  }
+};
+
+// Helper to check if section is new (updated since last view)
+const isSectionNew = (section: SectionWithMeta, viewedSections: Record<string, string>): boolean => {
+  if (!section.updated_at) return false;
+  const lastViewed = viewedSections[section.section_key];
+  if (!lastViewed) return true; // Never viewed = new
+  return new Date(section.updated_at) > new Date(lastViewed);
+};
+
+// Helper to get/set last login time for activity guide
+const getLastGuideVisit = (userId: string, activity: string): string | null => {
+  try {
+    return localStorage.getItem(`guide_lastvisit_${userId}_${activity}`);
+  } catch {
+    return null;
+  }
+};
+
+const setLastGuideVisit = (userId: string, activity: string) => {
+  try {
+    localStorage.setItem(`guide_lastvisit_${userId}_${activity}`, new Date().toISOString());
+  } catch {
+    // Ignore localStorage errors
+  }
+};
 
 interface ActivityGuideProps {
   activity: string;
@@ -193,12 +261,25 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
   const [newSectionChecklist, setNewSectionChecklist] = useState<string[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState('');
 
+  // Viewed sections tracking
+  const [viewedSections, setViewedSections] = useState<Record<string, string>>({});
+  const [showChangesPopup, setShowChangesPopup] = useState(false);
+  const [changedSections, setChangedSections] = useState<SectionWithMeta[]>([]);
+
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER';
   const activityConfig = ACTIVITY_CONFIG[activity] || { icon: Settings, color: 'blue', title: activity };
 
   useEffect(() => {
     loadSections();
   }, [activity]);
+
+  // Load viewed sections when profile or activity changes
+  useEffect(() => {
+    if (profile?.id) {
+      const viewed = getViewedSections(profile.id, activity);
+      setViewedSections(viewed);
+    }
+  }, [profile?.id, activity]);
 
   const loadSections = async () => {
     setIsLoading(true);
@@ -219,7 +300,8 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
             icon: allSections[existingIndex].icon,
             iconKey: allSections[existingIndex].iconKey,
             color: allSections[existingIndex].color,
-            category: (dbSection.category as CategoryKey) || allSections[existingIndex].category
+            category: (dbSection.category as CategoryKey) || allSections[existingIndex].category,
+            updated_at: dbSection.updated_at
           };
         } else {
           // Add new custom section
@@ -229,7 +311,8 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
             iconKey: dbSection.section_key.split('_')[0] || 'file',
             color: 'blue',
             category: (dbSection.category as CategoryKey) || 'before',
-            isDefault: false
+            isDefault: false,
+            updated_at: dbSection.updated_at
           });
         }
       });
@@ -239,10 +322,37 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
     allSections.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
     setSections(allSections);
     setIsLoading(false);
+
+    // Check for changes since last visit (for non-admins)
+    if (profile?.id && profile.role === 'INSTRUCTOR') {
+      const lastVisit = getLastGuideVisit(profile.id, activity);
+      if (lastVisit) {
+        const changedSince = allSections.filter(s => {
+          if (!s.updated_at) return false;
+          return new Date(s.updated_at) > new Date(lastVisit);
+        });
+        if (changedSince.length > 0) {
+          setChangedSections(changedSince);
+          setShowChangesPopup(true);
+        }
+      }
+      // Update last visit time
+      setLastGuideVisit(profile.id, activity);
+    }
   };
 
   const handleToggleSection = (sectionKey: string) => {
-    setExpandedSection(expandedSection === sectionKey ? null : sectionKey);
+    const isExpanding = expandedSection !== sectionKey;
+    setExpandedSection(isExpanding ? sectionKey : null);
+
+    // Mark section as viewed when expanded (removes NEW badge)
+    if (isExpanding && profile?.id) {
+      markSectionViewed(profile.id, activity, sectionKey);
+      setViewedSections(prev => ({
+        ...prev,
+        [sectionKey]: new Date().toISOString()
+      }));
+    }
   };
 
   const handleStartEdit = (section: SectionWithMeta) => {
@@ -359,59 +469,75 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
   };
 
   const handleCreateSection = async () => {
-    if (!newSectionTitle.trim()) return;
+    if (!newSectionTitle.trim()) {
+      alert('Indtast en titel til sektionen');
+      return;
+    }
 
     setIsSaving(true);
-    const sectionKey = `${newSectionIcon}_custom_${Date.now()}`;
-    const categorySections = sections.filter(s => s.category === newSectionCategory);
-    const maxOrder = Math.max(...categorySections.map(s => s.order_index || 0), -1);
+    try {
+      const sectionKey = `${newSectionIcon}_custom_${Date.now()}`;
+      const categorySections = sections.filter(s => s.category === newSectionCategory);
+      const maxOrder = Math.max(...categorySections.map(s => s.order_index || 0), -1);
 
-    let imageUrl: string | undefined;
-    if (newSectionImage) {
-      const uploadResult = await uploadGuideImage(newSectionImage, activity, sectionKey);
-      if (uploadResult.success) {
-        imageUrl = uploadResult.url;
+      let imageUrl: string | undefined;
+      if (newSectionImage) {
+        const uploadResult = await uploadGuideImage(newSectionImage, activity, sectionKey);
+        if (uploadResult.success) {
+          imageUrl = uploadResult.url;
+        } else {
+          console.error('Image upload failed:', uploadResult.error);
+        }
       }
-    }
 
-    // Combine content with checklist
-    let fullContent = newSectionContent;
-    if (newSectionChecklist.length > 0) {
-      const checklistJson = JSON.stringify(newSectionChecklist);
-      fullContent = fullContent + '\n<!--CHECKLIST:' + checklistJson + '-->';
-    }
+      // Combine content with checklist
+      let fullContent = newSectionContent || '';
+      if (newSectionChecklist.length > 0) {
+        const checklistJson = JSON.stringify(newSectionChecklist);
+        fullContent = fullContent + '\n<!--CHECKLIST:' + checklistJson + '-->';
+      }
 
-    const newSection: GuideSection = {
-      activity,
-      section_key: sectionKey,
-      title: newSectionTitle.toUpperCase(),
-      content: fullContent,
-      image_url: imageUrl,
-      order_index: maxOrder + 1,
-      category: newSectionCategory
-    };
-
-    const result = await saveGuideSection(newSection);
-    if (result.success) {
-      const newSectionWithMeta: SectionWithMeta = {
-        ...newSection,
-        id: result.id,
-        icon: getIconByKey(newSectionIcon),
-        iconKey: newSectionIcon,
-        color: 'blue',
-        category: newSectionCategory,
-        isDefault: false
+      const newSection: GuideSection = {
+        activity,
+        section_key: sectionKey,
+        title: newSectionTitle.toUpperCase(),
+        content: fullContent,
+        image_url: imageUrl,
+        order_index: maxOrder + 1,
+        category: newSectionCategory
       };
-      setSections(prev => [...prev, newSectionWithMeta].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
-      // Reset modal state
-      setShowNewSectionModal(false);
-      setNewSectionTitle('');
-      setNewSectionContent('');
-      setNewSectionIcon('file');
-      setNewSectionImage(null);
-      setNewSectionImagePreview(null);
-      setNewSectionChecklist([]);
-      setNewChecklistItem('');
+
+      console.log('Creating section:', newSection);
+      const result = await saveGuideSection(newSection);
+      console.log('Save result:', result);
+
+      if (result.success) {
+        const newSectionWithMeta: SectionWithMeta = {
+          ...newSection,
+          id: result.id,
+          icon: getIconByKey(newSectionIcon),
+          iconKey: newSectionIcon,
+          color: 'blue',
+          category: newSectionCategory,
+          isDefault: false,
+          updated_at: new Date().toISOString()
+        };
+        setSections(prev => [...prev, newSectionWithMeta].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
+        // Reset modal state
+        setShowNewSectionModal(false);
+        setNewSectionTitle('');
+        setNewSectionContent('');
+        setNewSectionIcon('file');
+        setNewSectionImage(null);
+        setNewSectionImagePreview(null);
+        setNewSectionChecklist([]);
+        setNewChecklistItem('');
+      } else {
+        alert('Kunne ikke oprette sektion: ' + (result.error || 'Ukendt fejl'));
+      }
+    } catch (err) {
+      console.error('Error creating section:', err);
+      alert('Fejl ved oprettelse af sektion');
     }
     setIsSaving(false);
   };
@@ -463,11 +589,12 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
     const colorClasses = COLORS[categoryColor] || COLORS.blue;
     const isExpanded = expandedSection === section.section_key;
     const isEditing = editingSection === section.section_key;
+    const isNew = isSectionNew(section, viewedSections);
 
     return (
       <div
         key={section.section_key}
-        className={`${colorClasses.bg} border ${colorClasses.border} rounded-xl tablet:rounded-2xl overflow-hidden transition-all duration-300`}
+        className={`${colorClasses.bg} border ${colorClasses.border} rounded-xl tablet:rounded-2xl overflow-hidden transition-all duration-300 ${isNew ? 'ring-2 ring-battle-orange/50' : ''}`}
       >
         {/* Section Header */}
         <button
@@ -475,12 +602,26 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
           className="w-full flex items-center justify-between p-4 tablet:p-5 text-left"
         >
           <div className="flex items-center gap-3 tablet:gap-4">
-            <div className={`p-2 tablet:p-3 ${colorClasses.bg} rounded-lg tablet:rounded-xl border ${colorClasses.border}`}>
+            <div className={`p-2 tablet:p-3 ${colorClasses.bg} rounded-lg tablet:rounded-xl border ${colorClasses.border} relative`}>
               <Icon className={`w-5 h-5 tablet:w-6 tablet:h-6 ${colorClasses.icon}`} />
+              {/* NEW Badge */}
+              {isNew && (
+                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-battle-orange text-white text-[9px] font-bold rounded-full uppercase">
+                  NY
+                </span>
+              )}
             </div>
-            <h3 className={`text-sm tablet:text-base font-bold ${colorClasses.text} uppercase tracking-wider`}>
-              {section.title}
-            </h3>
+            <div className="flex flex-col">
+              <h3 className={`text-sm tablet:text-base font-bold ${colorClasses.text} uppercase tracking-wider`}>
+                {section.title}
+              </h3>
+              {/* Last edit timestamp */}
+              {section.updated_at && (
+                <span className="text-[10px] text-gray-500">
+                  Sidst redigeret: {formatRelativeTime(section.updated_at)}
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {isAdmin && (
@@ -748,6 +889,53 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
       {renderCategory('before')}
       {renderCategory('during')}
       {renderCategory('after')}
+
+      {/* Changes Popup Modal */}
+      {showChangesPopup && changedSections.length > 0 && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-battle-grey border border-battle-orange/30 rounded-2xl p-6 w-full max-w-md">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-battle-orange/20 rounded-full">
+                <Bell className="w-6 h-6 text-battle-orange" />
+              </div>
+              <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+                Ændringer siden sidst
+              </h3>
+            </div>
+            <p className="text-gray-400 text-sm mb-4">
+              Følgende afsnit er blevet opdateret siden dit sidste besøg:
+            </p>
+            <div className="space-y-2 max-h-64 overflow-y-auto mb-6">
+              {changedSections.map(section => {
+                const categoryInfo = CATEGORIES[section.category];
+                const colorClasses = COLORS[categoryInfo?.color || 'blue'];
+                return (
+                  <div
+                    key={section.section_key}
+                    className={`flex items-center gap-3 p-3 ${colorClasses.bg} border ${colorClasses.border} rounded-lg`}
+                  >
+                    <span className="px-1.5 py-0.5 bg-battle-orange text-white text-[9px] font-bold rounded uppercase">
+                      NY
+                    </span>
+                    <div className="flex-1">
+                      <div className={`font-semibold ${colorClasses.text} text-sm`}>{section.title}</div>
+                      <div className="text-xs text-gray-500">
+                        {categoryInfo?.title} · {formatRelativeTime(section.updated_at)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setShowChangesPopup(false)}
+              className="w-full py-3 bg-battle-orange hover:bg-battle-orangeLight text-white font-bold rounded-xl uppercase tracking-wider transition-colors"
+            >
+              Forstået
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* New Section Modal */}
       {showNewSectionModal && (
