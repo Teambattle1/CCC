@@ -35,6 +35,7 @@ import {
   Play,
   Download,
   Car,
+  AlertTriangle,
   LucideProps
 } from 'lucide-react';
 import { HubLink } from './types';
@@ -154,7 +155,8 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
     icon: Map,
     description: 'Instructions',
     color: 'blue',
-    badge: 'new'
+    badge: 'beta',
+    badgeColor: 'pink'
   },
   {
     id: 'tc1',
@@ -244,7 +246,8 @@ export const TEAMLAZER_LINKS: HubLink[] = [
     icon: Map,
     description: 'Instructions',
     color: 'blue',
-    badge: 'new'
+    badge: 'beta',
+    badgeColor: 'pink'
   },
   {
     id: 'tl6',
@@ -449,7 +452,9 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
     url: '#teamconstruct_guide',
     icon: Map,
     description: 'Instructions',
-    color: 'blue'
+    color: 'blue',
+    badge: 'beta',
+    badgeColor: 'pink'
   },
   {
     id: 'tcons3',
@@ -618,7 +623,8 @@ export const TEAMROBIN_LINKS: HubLink[] = [
     icon: Map,
     description: 'Instructions',
     color: 'blue',
-    badge: 'new'
+    badge: 'beta',
+    badgeColor: 'pink'
   },
   {
     id: 'tr3',
@@ -758,7 +764,9 @@ export const TEAMRACE_LINKS: HubLink[] = [
     url: '#teamrace_guide',
     icon: Map,
     description: 'Instructions',
-    color: 'blue'
+    color: 'blue',
+    badge: 'beta',
+    badgeColor: 'pink'
   },
   {
     id: 'trace3',
@@ -1000,6 +1008,14 @@ export const HUB_LINKS: HubLink[] = [
     icon: ClipboardList,
     description: 'Admin & Ops',
     color: 'green'
+  },
+  {
+    id: 'fejlrapporter',
+    title: 'FEJLRAPPORTER',
+    url: '#admin_reports',
+    icon: AlertTriangle,
+    description: 'Alle Fejlrapporter',
+    color: 'pink'
   }
 ];
 

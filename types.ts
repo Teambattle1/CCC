@@ -7,6 +7,7 @@ export interface HubLink {
   icon: LucideIcon;
   description?: string;
   badge?: string;
+  badgeColor?: 'orange' | 'pink' | 'green' | 'blue' | 'red';
   logoUrl?: string;
   color?: string;
   section?: string;

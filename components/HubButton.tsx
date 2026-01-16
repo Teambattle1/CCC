@@ -90,7 +90,17 @@ const HubButton: React.FC<HubButtonProps> = ({
       >
         {/* Active Badge */}
         {link.badge && (
-          <div className="absolute -top-1 -right-1 z-30 bg-battle-orange text-black text-[9px] tablet:text-[10px] font-bold px-1.5 tablet:px-2 py-0.5 rounded-full shadow-neon animate-pulse-slow">
+          <div className={`absolute -top-1 -right-1 z-30 text-[9px] tablet:text-[10px] font-bold px-1.5 tablet:px-2 py-0.5 rounded-full animate-pulse-slow ${
+            link.badgeColor === 'pink'
+              ? 'bg-pink-500 text-white shadow-[0_0_10px_rgba(236,72,153,0.6)]'
+              : link.badgeColor === 'green'
+                ? 'bg-green-500 text-white shadow-[0_0_10px_rgba(34,197,94,0.6)]'
+                : link.badgeColor === 'blue'
+                  ? 'bg-blue-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.6)]'
+                  : link.badgeColor === 'red'
+                    ? 'bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.6)]'
+                    : 'bg-battle-orange text-black shadow-neon'
+          }`}>
             {link.badge}
           </div>
         )}

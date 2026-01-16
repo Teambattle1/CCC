@@ -698,3 +698,62 @@ export const deleteTeamRaceSession = async (
     return { success: false, error: 'Failed to delete session' };
   }
 };
+
+// ============ Fejlsogning Reports ============
+
+// Get count of unread fejlsogning reports (reports from last 24 hours or unresolved)
+export const getUnreadFejlsogningCount = async (): Promise<{ count: number; error?: string }> => {
+  try {
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+    const { count, error } = await supabase
+      .from('fejlsogning_reports')
+      .select('*', { count: 'exact', head: true })
+      .or(`resolved.is.null,resolved.eq.false`)
+      .gte('created_at', oneDayAgo.toISOString());
+
+    if (error) throw error;
+    return { count: count || 0 };
+  } catch (err) {
+    console.error('Failed to get unread fejlsogning count:', err);
+    return { count: 0, error: 'Failed to get count' };
+  }
+};
+
+// Subscribe to new fejlsogning reports (realtime)
+export const subscribeFejlsogningReports = (
+  callback: (payload: { count: number }) => void
+) => {
+  const channel = supabase
+    .channel('fejlsogning-reports-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'fejlsogning_reports'
+      },
+      async () => {
+        // Get updated count when new report is inserted
+        const { count } = await getUnreadFejlsogningCount();
+        callback({ count });
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'fejlsogning_reports'
+      },
+      async () => {
+        // Get updated count when report is updated (e.g., resolved)
+        const { count } = await getUnreadFejlsogningCount();
+        callback({ count });
+      }
+    )
+    .subscribe();
+
+  return channel;
+};

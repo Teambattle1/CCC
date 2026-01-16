@@ -68,6 +68,7 @@ import TeamRaceScorecard from './components/TeamRaceScorecard';
 import ActivityGuide from './components/ActivityGuide';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
+import { getUnreadFejlsogningCount, subscribeFejlsogningReports } from './lib/supabase';
 import {
   ShieldCheck,
   House,
@@ -109,6 +110,7 @@ const App: React.FC = () => {
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
   const [isIdeasOpen, setIsIdeasOpen] = useState(false);
+  const [fejlsogningCount, setFejlsogningCount] = useState(0);
 
   // Device Preview State
   const [previewDevice, setPreviewDevice] = useState<DeviceType | null>(null);
@@ -147,6 +149,39 @@ const App: React.FC = () => {
     }
   }, [isUsersOpen]);
 
+  // Fejlsogning reports realtime subscription
+  useEffect(() => {
+    // Load initial count
+    const loadInitialCount = async () => {
+      const { count } = await getUnreadFejlsogningCount();
+      setFejlsogningCount(count);
+    };
+    loadInitialCount();
+
+    // Subscribe to realtime updates
+    const channel = subscribeFejlsogningReports(({ count }) => {
+      setFejlsogningCount(count);
+    });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
+
+  // Add dynamic badges to hub links (e.g., fejlsogning count)
+  const enhanceHubLinksWithBadges = (links: HubLink[]): HubLink[] => {
+    return links.map(link => {
+      if (link.title === 'FEJLRAPPORTER' && fejlsogningCount > 0) {
+        return {
+          ...link,
+          badge: fejlsogningCount.toString(),
+          badgeColor: 'pink' as const
+        };
+      }
+      return link;
+    });
+  };
+
   // Role-based access control - filter links based on user role and permissions
   const filterLinksByRole = (links: HubLink[]): HubLink[] => {
     if (!profile) return links;
@@ -160,6 +195,7 @@ const App: React.FC = () => {
       if (link.title === 'OFFICE') return rolePerms.landing_office;
       if (link.title === 'ACTIVITIES') return rolePerms.landing_activities;
       if (link.title === 'ControlCenter') return rolePerms.landing_controlcenter;
+      if (link.title === 'FEJLRAPPORTER') return rolePerms.landing_admin; // Only show for admins
       return true;
     });
   };
@@ -999,8 +1035,8 @@ const App: React.FC = () => {
       break;
     case 'main':
     default:
-      // Use the state for main view to reflect drag and drop order, filtered by role
-      currentLinks = filterLinksByRole(hubLinks);
+      // Use the state for main view to reflect drag and drop order, filtered by role, with dynamic badges
+      currentLinks = enhanceHubLinksWithBadges(filterLinksByRole(hubLinks));
       viewTitle = 'TEAMBATTLE';
       viewSubtitle = 'Operational Command Center';
       ViewIcon = ShieldCheck;

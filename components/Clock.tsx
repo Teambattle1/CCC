@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // App version - update this when deploying new versions
-export const APP_VERSION = '2.4.1';
+export const APP_VERSION = '2.5.0';
 
 interface ClockProps {
   showDate?: boolean;
