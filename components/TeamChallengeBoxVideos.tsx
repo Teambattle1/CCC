@@ -84,8 +84,29 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
   const [editorMetadata, setEditorMetadata] = useState<BoxMetadata>(DEFAULT_METADATA);
   const [showDropdown, setShowDropdown] = useState(false);
   const [infoBox, setInfoBox] = useState<BoxVideo | null>(null);
+  const [activeFilters, setActiveFilters] = useState<(keyof BoxMetadata)[]>([]);
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Toggle filter on/off
+  const toggleFilter = useCallback((filter: keyof BoxMetadata) => {
+    setActiveFilters(prev =>
+      prev.includes(filter)
+        ? prev.filter(f => f !== filter)
+        : [...prev, filter]
+    );
+  }, []);
+
+  // Filter boxes based on active filters (show boxes that match ANY active filter)
+  const filteredBoxes = React.useMemo(() => {
+    if (activeFilters.length === 0) return BOX_VIDEOS;
+    return BOX_VIDEOS.filter(video => {
+      if (!video.id) return false; // Don't show boxes without videos
+      const meta = metadata[String(video.boxNumber)] || DEFAULT_METADATA;
+      // Show box if it matches ANY of the active filters
+      return activeFilters.some(filter => meta[filter]);
+    });
+  }, [activeFilters, metadata]);
   const touchStartTime = useRef<number>(0);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -379,12 +400,75 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
             </button>
           </div>
         </div>
+
+        {/* Filter Buttons */}
+        <div className="max-w-7xl mx-auto mt-3 flex items-center gap-2 flex-wrap">
+          <span className="text-gray-400 text-sm mr-2">Filter:</span>
+          <button
+            onClick={() => toggleFilter('indoor')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-all ${
+              activeFilters.includes('indoor')
+                ? 'bg-cyan-400/30 border-cyan-400 text-cyan-400'
+                : 'bg-gray-800/50 border-gray-600 text-gray-400 hover:border-gray-500'
+            }`}
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Inde</span>
+          </button>
+          <button
+            onClick={() => toggleFilter('outdoor')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-all ${
+              activeFilters.includes('outdoor')
+                ? 'bg-yellow-400/30 border-yellow-400 text-yellow-400'
+                : 'bg-gray-800/50 border-gray-600 text-gray-400 hover:border-gray-500'
+            }`}
+          >
+            <Sun className="w-3.5 h-3.5" />
+            <span>Ude</span>
+          </button>
+          <button
+            onClick={() => toggleFilter('funbuilding')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-all ${
+              activeFilters.includes('funbuilding')
+                ? 'bg-green-400/30 border-green-400 text-green-400'
+                : 'bg-gray-800/50 border-gray-600 text-gray-400 hover:border-gray-500'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>Funbuilding</span>
+          </button>
+          <button
+            onClick={() => toggleFilter('instructorScore')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-all ${
+              activeFilters.includes('instructorScore')
+                ? 'bg-purple-400/30 border-purple-400 text-purple-400'
+                : 'bg-gray-800/50 border-gray-600 text-gray-400 hover:border-gray-500'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5" />
+            <span>Instruktør</span>
+          </button>
+          {activeFilters.length > 0 && (
+            <button
+              onClick={() => setActiveFilters([])}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Nulstil</span>
+            </button>
+          )}
+          {activeFilters.length > 0 && (
+            <span className="text-gray-500 text-sm ml-2">
+              ({filteredBoxes.length} bokse)
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Video Grid */}
       <div className="flex-1 px-4 pb-4 overflow-y-auto">
         <div className="max-w-7xl mx-auto grid grid-cols-4 mobile-landscape:grid-cols-6 tablet-portrait:grid-cols-6 tablet-landscape:grid-cols-8 desktop:grid-cols-10 gap-2 tablet-landscape:gap-3">
-          {BOX_VIDEOS.map((video) => (
+          {filteredBoxes.map((video) => (
             <button
               key={String(video.boxNumber)}
               onClick={() => video.id && handleVideoClick(video)}
