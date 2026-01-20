@@ -3734,18 +3734,30 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                       );
                     })()}
 
-                    {/* Embedded Packing List Checklist */}
-                    {section.linked_packing_list && (
-                      <div className="mt-4">
-                        <LinkedPackingListChecklist
-                          linkedKey={section.linked_packing_list}
-                          sectionKey={section.section_key}
-                          fetchItems={fetchLinkedPackingList}
-                          cachedItems={linkedPackingListData[section.linked_packing_list]}
-                          colorClasses={colorClasses}
-                        />
-                      </div>
-                    )}
+                    {/* Linked Packing List Button */}
+                    {section.linked_packing_list && onNavigate && (() => {
+                      const [packingActivity, listType] = section.linked_packing_list!.split(':');
+                      const buttonText = listType === 'afgang' ? 'PAKKELISTE AFGANG' :
+                                         listType === 'hjemkomst' ? 'PAKKELISTE HJEMKOMST' :
+                                         listType === 'before' ? 'PAKKELISTE FØR' :
+                                         listType === 'after' ? 'PAKKELISTE EFTER' :
+                                         listType === 'nulstil' ? 'NULSTIL BOX' :
+                                         listType === 'taske' ? 'PAKKELISTE TASKE' : `PAKKELISTE ${listType.toUpperCase()}`;
+                      return (
+                        <div className="mt-4">
+                          <button
+                            onClick={() => {
+                              const view = `${packingActivity}_packing_${listType}`;
+                              onNavigate(view);
+                            }}
+                            className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
+                          >
+                            <ClipboardList className="w-4 h-4" />
+                            {buttonText}
+                          </button>
+                        </div>
+                      );
+                    })()}
 
                     {/* Action buttons for links */}
                     {section.link && (
