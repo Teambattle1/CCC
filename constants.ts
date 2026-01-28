@@ -155,6 +155,50 @@ export const TEAMPLAY_LINKS: HubLink[] = [
     icon: Play,
     description: 'Start spil',
     color: 'green'
+  },
+  {
+    id: 'tplay2',
+    title: 'GUIDE',
+    url: '#teamplay_guide',
+    icon: Map,
+    description: 'Instructions',
+    color: 'blue',
+    badge: 'new'
+  },
+  {
+    id: 'tplay3',
+    title: 'VIDEO',
+    url: '#teamplay_video',
+    icon: Play,
+    description: 'Video Guides',
+    color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'tplay4',
+    title: 'PAKKELISTER',
+    url: '#teamplay_packing',
+    icon: Package,
+    description: 'Packing Lists',
+    color: 'green',
+    badge: 'new'
+  },
+  {
+    id: 'tplay5',
+    title: 'FEJLSØGNING',
+    url: '#teamplay_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
+  },
+  {
+    id: 'tplay6',
+    title: 'FEJL & MANGLER',
+    url: '#fejlsogning_teamplay',
+    icon: Wrench,
+    description: 'Rapporter fejl',
+    color: 'yellow'
   }
 ];
 
@@ -167,6 +211,50 @@ export const TEAMTASTE_LINKS: HubLink[] = [
     icon: Play,
     description: 'Start spil',
     color: 'gold'
+  },
+  {
+    id: 'ttaste2',
+    title: 'GUIDE',
+    url: '#teamtaste_guide',
+    icon: Map,
+    description: 'Instructions',
+    color: 'blue',
+    badge: 'new'
+  },
+  {
+    id: 'ttaste3',
+    title: 'VIDEO',
+    url: '#teamtaste_video',
+    icon: Play,
+    description: 'Video Guides',
+    color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'ttaste4',
+    title: 'PAKKELISTER',
+    url: '#teamtaste_packing',
+    icon: Package,
+    description: 'Packing Lists',
+    color: 'green',
+    badge: 'new'
+  },
+  {
+    id: 'ttaste5',
+    title: 'FEJLSØGNING',
+    url: '#teamtaste_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
+  },
+  {
+    id: 'ttaste6',
+    title: 'FEJL & MANGLER',
+    url: '#fejlsogning_teamtaste',
+    icon: Wrench,
+    description: 'Rapporter fejl',
+    color: 'yellow'
   }
 ];
 
@@ -222,6 +310,24 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
     icon: Package,
     description: 'Gennemgang af Bokse',
     color: 'pink',
+    badge: 'new'
+  },
+  {
+    id: 'tc7',
+    title: 'PAKKELISTER',
+    url: '#teamchallenge_packing',
+    icon: Package,
+    description: 'Packing Lists',
+    color: 'green',
+    badge: 'new'
+  },
+  {
+    id: 'tc8',
+    title: 'FEJLSØGNING',
+    url: '#teamchallenge_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
     badge: 'new'
   }
 ];
@@ -437,6 +543,15 @@ export const TEAMBOX_LINKS: HubLink[] = [
     icon: Download,
     description: 'Billeder & Filer',
     color: 'purple'
+  },
+  {
+    id: 'tb7',
+    title: 'FEJLSØGNING',
+    url: '#teambox_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
   }
 ];
 
@@ -504,6 +619,15 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
     description: 'Video Guides',
     color: 'red',
     badge: 'new'
+  },
+  {
+    id: 'tcons6',
+    title: 'FEJLSØGNING',
+    url: '#teamconstruct_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
   }
 ];
 
@@ -557,6 +681,15 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
     icon: Play,
     description: 'Video Guides',
     color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'tctrl7',
+    title: 'FEJLSØGNING',
+    url: '#teamcontrol_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
     badge: 'new'
   }
 ];
@@ -615,10 +748,11 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
   {
     id: 'tc2',
     title: 'PAKKELISTER',
-    url: '#',
+    url: '#teamconnect_packing',
     icon: Package,
     description: 'Packing Lists',
-    color: 'green'
+    color: 'green',
+    badge: 'new'
   },
   {
     id: 'tc3',
@@ -627,6 +761,24 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
     icon: Wrench,
     description: 'Rapporter fejl',
     color: 'yellow'
+  },
+  {
+    id: 'tc4',
+    title: 'VIDEO',
+    url: '#teamconnect_video',
+    icon: Play,
+    description: 'Video Guides',
+    color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'tc5',
+    title: 'FEJLSØGNING',
+    url: '#teamconnect_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
   }
 ];
 
@@ -769,6 +921,24 @@ export const TEAMACTION_LINKS: HubLink[] = [
     description: 'Video Guides',
     color: 'red',
     badge: 'new'
+  },
+  {
+    id: 'ta5',
+    title: 'PAKKELISTER',
+    url: '#teamaction_packing',
+    icon: Package,
+    description: 'Packing Lists',
+    color: 'green',
+    badge: 'new'
+  },
+  {
+    id: 'ta6',
+    title: 'FEJLSØGNING',
+    url: '#teamaction_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
   }
 ];
 
@@ -833,6 +1003,15 @@ export const TEAMRACE_LINKS: HubLink[] = [
     icon: Map,
     description: 'Vejledninger',
     color: 'lightblue'
+  },
+  {
+    id: 'trace8',
+    title: 'FEJLSØGNING',
+    url: '#teamrace_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
   }
 ];
 
@@ -1150,5 +1329,63 @@ export const TEAMROBIN_FEJLSOGNING_VIDEO_INDEX = [
 ];
 
 export const TEAMSEGWAY_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+// Placeholder Video Indexes for activities without videos
+export const TEAMPLAY_VIDEO_INDEX = [
+  { title: 'Video - Kommer snart', index: 0 },
+];
+
+export const TEAMTASTE_VIDEO_INDEX = [
+  { title: 'Video - Kommer snart', index: 0 },
+];
+
+export const TEAMCONNECT_VIDEO_INDEX = [
+  { title: 'Video - Kommer snart', index: 0 },
+];
+
+export const TEAMACTION_VIDEO_INDEX = [
+  { title: 'Video - Kommer snart', index: 0 },
+];
+
+export const TEAMCHALLENGE_VIDEO_INDEX = [
+  { title: 'Video - Kommer snart', index: 0 },
+];
+
+// Placeholder Fejlsøgning Video Indexes
+export const TEAMPLAY_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMTASTE_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMCHALLENGE_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMCONNECT_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMBOX_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMCONTROL_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMACTION_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMCONSTRUCT_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMRACE_FEJLSOGNING_VIDEO_INDEX = [
   { title: 'Fejlsøgning - Kommer snart', index: 0 },
 ];
