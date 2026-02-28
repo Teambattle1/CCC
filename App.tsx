@@ -731,7 +731,7 @@ const App: React.FC = () => {
       break;
     case 'job_input':
       currentLinks = [];
-      viewTitle = 'JOB';
+      viewTitle = 'OPGAVE';
       viewSubtitle = 'Indtast Opgave ID';
       ViewIcon = Briefcase;
       break;
@@ -743,8 +743,8 @@ const App: React.FC = () => {
       break;
     case 'job_overview':
       currentLinks = [];
-      viewTitle = 'JOB OVERSIGT';
-      viewSubtitle = activeJob?.client_name || '';
+      viewTitle = 'OPGAVE';
+      viewSubtitle = activeJob?.client_name ? `${activeJob.client_name}${activeInstructor ? ` — ${activeInstructor.name}` : ''}` : '';
       ViewIcon = Briefcase;
       break;
     case 'office':
@@ -1482,9 +1482,9 @@ const App: React.FC = () => {
         ></div>
       </div>
 
-      {/* Top Left Back Button - Responsive for all 5 modes */}
+      {/* Top Left Back Button + Instructor Badge */}
       {currentView !== 'main' && (
-        <div className="absolute top-2 left-2 mobile-landscape:top-1.5 mobile-landscape:left-1.5 tablet-portrait:top-4 tablet-portrait:left-4 tablet-landscape:top-3 tablet-landscape:left-3 desktop:top-8 desktop:left-8 z-50 safe-area-top safe-area-left">
+        <div className="absolute top-2 left-2 mobile-landscape:top-1.5 mobile-landscape:left-1.5 tablet-portrait:top-4 tablet-portrait:left-4 tablet-landscape:top-3 tablet-landscape:left-3 desktop:top-8 desktop:left-8 z-50 safe-area-top safe-area-left flex items-center gap-1.5">
           <button
             onClick={handleBackClick}
             className="group flex items-center justify-center w-10 h-10 mobile-landscape:w-9 mobile-landscape:h-9 tablet-portrait:w-12 tablet-portrait:h-12 tablet-landscape:w-11 tablet-landscape:h-11 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
@@ -1492,6 +1492,14 @@ const App: React.FC = () => {
           >
             <House className="w-5 h-5 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-6 tablet-portrait:h-6 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-battle-orange group-active:text-battle-orange transition-colors" />
           </button>
+          {activeInstructor && (
+            <div className="flex items-center gap-1 bg-battle-orange/15 border border-battle-orange/30 rounded-full px-2 py-1 tablet-portrait:px-3 tablet-portrait:py-1.5">
+              <User className="w-3 h-3 tablet-portrait:w-4 tablet-portrait:h-4 text-battle-orange" />
+              <span className="text-[10px] tablet-portrait:text-xs text-battle-orange font-bold uppercase truncate max-w-[80px] tablet-portrait:max-w-[120px]">
+                {activeInstructor.name}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -1633,9 +1641,9 @@ const App: React.FC = () => {
           {currentView === 'distance_tool' ? (
             <DistanceTool />
           ) : currentView === 'teamrobin_packing_before' ? (
-            <DynamicPackingList activity="teamrobin" listType="afgang" title="FØR OPGAVEN" onEditPacking={() => { setEditPackingActivity('teamrobin'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamrobin" listType="afgang" title="FØR OPGAVEN" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamrobin'); changeView('edit_packing'); }} />
           ) : currentView === 'teamrobin_packing_after' ? (
-            <DynamicPackingList activity="teamrobin" listType="hjemkomst" title="EFTER OPGAVEN" onEditPacking={() => { setEditPackingActivity('teamrobin'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamrobin" listType="hjemkomst" title="EFTER OPGAVEN" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamrobin'); changeView('edit_packing'); }} />
           ) : currentView === 'teamlazer_justering' ? (
             <VideoPlayer
               title="TeamLazer Justering"
@@ -1668,9 +1676,9 @@ const App: React.FC = () => {
           ) : currentView === 'teamconstruct_scorecard' ? (
             <TeamConstructScorecard />
           ) : currentView === 'teamconstruct_packing_afgang' ? (
-            <DynamicPackingList activity="teamconstruct" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamconstruct'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamconstruct" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamconstruct'); changeView('edit_packing'); }} />
           ) : currentView === 'teamconstruct_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamconstruct" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamconstruct'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamconstruct" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamconstruct'); changeView('edit_packing'); }} />
           ) : currentView === 'teamcontrol_video' ? (
             <VideoPlayer
               title="TeamControl Video Guides"
@@ -1682,9 +1690,9 @@ const App: React.FC = () => {
           ) : currentView === 'teamcontrol_flybrix_manual' ? (
             <FlybrixManual />
           ) : currentView === 'teamcontrol_packing_afgang' ? (
-            <DynamicPackingList activity="teamcontrol" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamcontrol'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamcontrol" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamcontrol'); changeView('edit_packing'); }} />
           ) : currentView === 'teamcontrol_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamcontrol" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamcontrol'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamcontrol" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamcontrol'); changeView('edit_packing'); }} />
           ) : currentView === 'teamcontrol_musik' ? (
             <div className="w-full max-w-2xl mx-auto px-2 tablet:px-4">
               <div className="bg-battle-grey/20 border border-green-500/30 rounded-xl tablet:rounded-2xl p-6 tablet:p-8 backdrop-blur-sm">
@@ -1711,13 +1719,13 @@ const App: React.FC = () => {
           ) : currentView === 'teambox_video' ? (
             <TeamBoxVideoGrid onBack={() => changeView('teambox')} />
           ) : currentView === 'teambox_checklist' ? (
-            <DynamicPackingList activity="teambox" listType="nulstil" title="NULSTIL BOX" enableTabs={true} trackCompletion={true} />
+            <DynamicPackingList activity="teambox" listType="nulstil" title="NULSTIL BOX" enableTabs={true} trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} />
           ) : currentView === 'teambox_guide' ? (
             <ActivityGuide activity="teambox" onNavigate={(view) => changeView(view as ViewState)} />
           ) : currentView === 'teambox_packing_afgang' ? (
-            <DynamicPackingList activity="teambox" listType="afgang" onEditPacking={() => { setEditPackingActivity('teambox'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teambox" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teambox'); changeView('edit_packing'); }} />
           ) : currentView === 'teambox_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teambox" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teambox'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teambox" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teambox'); changeView('edit_packing'); }} />
           ) : currentView === 'teambox_downloads' ? (
             <TeamBoxDownloads onBack={() => changeView('teambox')} />
           ) : currentView === 'teamlazer_video' ? (
@@ -1764,13 +1772,13 @@ const App: React.FC = () => {
               videoIndex={TEAMSEGWAY_FEJLSOGNING_VIDEO_INDEX}
             />
           ) : currentView === 'teamlazer_packing_afgang' ? (
-            <DynamicPackingList activity="teamlazer" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamlazer'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamlazer" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamlazer'); changeView('edit_packing'); }} />
           ) : currentView === 'teamlazer_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamlazer" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamlazer'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamlazer" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamlazer'); changeView('edit_packing'); }} />
           ) : currentView === 'teamsegway_packing_afgang' ? (
-            <DynamicPackingList activity="teamsegway" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamsegway'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamsegway" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamsegway'); changeView('edit_packing'); }} />
           ) : currentView === 'teamsegway_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamsegway" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamsegway'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamsegway" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamsegway'); changeView('edit_packing'); }} />
           ) : currentView === 'teamlazer_scorecard' ? (
             <LazerPointScoreboard />
           ) : currentView === 'fejlsogning_teamlazer' ? (
@@ -1810,11 +1818,11 @@ const App: React.FC = () => {
               totalPages={3}
             />
           ) : currentView === 'teamrace_packing_afgang' ? (
-            <DynamicPackingList activity="teamrace" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamrace'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamrace" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamrace'); changeView('edit_packing'); }} />
           ) : currentView === 'teamrace_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamrace" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamrace'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamrace" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamrace'); changeView('edit_packing'); }} />
           ) : currentView === 'teamrace_packing_taske' ? (
-            <DynamicPackingList activity="teamrace" listType="taske" title="TASKE - Sæbekasse Pakkeliste" onEditPacking={() => { setEditPackingActivity('teamrace'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamrace" listType="taske" title="TASKE - Sæbekasse Pakkeliste" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamrace'); changeView('edit_packing'); }} />
           ) : currentView === 'teamrace_instructions' ? (
             <TeamRaceInstructions totalSlides={10} />
           ) : currentView === 'teamrace_scorecard' ? (
@@ -1839,9 +1847,9 @@ const App: React.FC = () => {
               videoIndex={TEAMPLAY_VIDEO_INDEX}
             />
           ) : currentView === 'teamplay_packing_afgang' ? (
-            <DynamicPackingList activity="teamplay" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamplay'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamplay" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamplay'); changeView('edit_packing'); }} />
           ) : currentView === 'teamplay_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamplay" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamplay'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamplay" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamplay'); changeView('edit_packing'); }} />
           ) : currentView === 'teamplay_fejlsogning' ? (
             <VideoPlayer
               title="TeamPlay Fejlsøgning"
@@ -1857,9 +1865,9 @@ const App: React.FC = () => {
               videoIndex={TEAMTASTE_VIDEO_INDEX}
             />
           ) : currentView === 'teamtaste_packing_afgang' ? (
-            <DynamicPackingList activity="teamtaste" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamtaste'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamtaste" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamtaste'); changeView('edit_packing'); }} />
           ) : currentView === 'teamtaste_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamtaste" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamtaste'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamtaste" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamtaste'); changeView('edit_packing'); }} />
           ) : currentView === 'teamtaste_fejlsogning' ? (
             <VideoPlayer
               title="TeamTaste Fejlsøgning"
@@ -1868,9 +1876,9 @@ const App: React.FC = () => {
           ) : currentView === 'fejlsogning_teamtaste' ? (
             <FejlsogningReport activity="teamtaste" />
           ) : currentView === 'teamchallenge_packing_afgang' ? (
-            <DynamicPackingList activity="teamchallenge" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamchallenge'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamchallenge" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamchallenge'); changeView('edit_packing'); }} />
           ) : currentView === 'teamchallenge_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamchallenge" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamchallenge'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamchallenge" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamchallenge'); changeView('edit_packing'); }} />
           ) : currentView === 'teamchallenge_fejlsogning' ? (
             <VideoPlayer
               title="TeamChallenge Fejlsøgning"
@@ -1882,18 +1890,18 @@ const App: React.FC = () => {
               videoIndex={TEAMCONNECT_VIDEO_INDEX}
             />
           ) : currentView === 'teamconnect_packing_afgang' ? (
-            <DynamicPackingList activity="teamconnect" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamconnect'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamconnect" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamconnect'); changeView('edit_packing'); }} />
           ) : currentView === 'teamconnect_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamconnect" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamconnect'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamconnect" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamconnect'); changeView('edit_packing'); }} />
           ) : currentView === 'teamconnect_fejlsogning' ? (
             <VideoPlayer
               title="TeamConnect Fejlsøgning"
               videoIndex={TEAMCONNECT_FEJLSOGNING_VIDEO_INDEX}
             />
           ) : currentView === 'teamaction_packing_afgang' ? (
-            <DynamicPackingList activity="teamaction" listType="afgang" onEditPacking={() => { setEditPackingActivity('teamaction'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamaction" listType="afgang" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamaction'); changeView('edit_packing'); }} />
           ) : currentView === 'teamaction_packing_hjemkomst' ? (
-            <DynamicPackingList activity="teamaction" listType="hjemkomst" onEditPacking={() => { setEditPackingActivity('teamaction'); changeView('edit_packing'); }} />
+            <DynamicPackingList activity="teamaction" listType="hjemkomst" trackCompletion={true} instructorName={activeInstructor?.name} jobId={activeJob?.id} jobShortCode={activeJob?.short_code || undefined} onEditPacking={() => { setEditPackingActivity('teamaction'); changeView('edit_packing'); }} />
           ) : currentView === 'teamaction_fejlsogning' ? (
             <VideoPlayer
               title="TeamAction Fejlsøgning"

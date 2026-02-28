@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Package, CheckCircle2, Circle, RotateCcw, Plane, Home, Clock, Send, ChevronLeft, ChevronRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Package, CheckCircle2, Circle, RotateCcw, Plane, Home, Clock, Send, ChevronLeft, ChevronRight, Edit3, AlertTriangle, FileText } from 'lucide-react';
+import { supabase, sendPackingEmail } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
 interface PackingItem {
@@ -82,7 +82,7 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
     ]
   },
   teamrobin: {
-    before: [
+    afgang: [
       { id: 'rb1', text: 'Buer (antal efter behov)' },
       { id: 'rb2', text: 'Pile (min. 6 per bue)' },
       { id: 'rb3', text: 'Skydeskiver med stativer' },
@@ -90,7 +90,7 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
       { id: 'rb5', text: 'Afspærringsbånd' },
       { id: 'rb6', text: 'Højtaler' },
     ],
-    after: [
+    hjemkomst: [
       { id: 'ra1', text: 'Alle buer pakket korrekt' },
       { id: 'ra2', text: 'Pile tjekket for skader' },
       { id: 'ra3', text: 'Skydeskiver rengjort' },
@@ -98,7 +98,7 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
     ]
   },
   teamlazer: {
-    before: [
+    afgang: [
       { id: 'lb1', text: 'Geværer (antal efter behov)' },
       { id: 'lb2', text: 'Kastere' },
       { id: 'lb3', text: 'Pointtavler' },
@@ -107,7 +107,7 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
       { id: 'lb6', text: 'Ledninger og kabler' },
       { id: 'lb7', text: 'Højtaler' },
     ],
-    after: [
+    hjemkomst: [
       { id: 'la1', text: 'Alle geværer slukket' },
       { id: 'la2', text: 'Batterier til opladning' },
       { id: 'la3', text: 'Gear tjekket for skader' },
@@ -179,14 +179,14 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
     ]
   },
   teamsegway: {
-    before: [
+    afgang: [
       { id: 'sb1', text: 'Segways (antal efter behov)' },
       { id: 'sb2', text: 'Hjelme til alle' },
       { id: 'sb3', text: 'Kegler til bane' },
       { id: 'sb4', text: 'Ladere' },
       { id: 'sb5', text: 'Førstehjælpskasse' },
     ],
-    after: [
+    hjemkomst: [
       { id: 'sa1', text: 'Segways til opladning' },
       { id: 'sa2', text: 'Hjelme rengjort' },
       { id: 'sa3', text: 'Tjek for skader' },
@@ -264,6 +264,10 @@ interface DynamicPackingListProps {
   title?: string;
   enableTabs?: boolean;
   trackCompletion?: boolean;
+  onEditPacking?: () => void;
+  instructorName?: string;
+  jobId?: string;
+  jobShortCode?: string;
 }
 
 const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
@@ -271,7 +275,11 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
   listType,
   title,
   enableTabs = true,
-  trackCompletion = false
+  trackCompletion = false,
+  onEditPacking,
+  instructorName,
+  jobId,
+  jobShortCode
 }) => {
   const { profile } = useAuth();
   const [items, setItems] = useState<PackingItem[]>([]);
@@ -282,6 +290,8 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [completed, setCompleted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const [isUrgent, setIsUrgent] = useState(false);
 
   const storageKey = `${activity}_packing_${listType}`;
   const activityName = ACTIVITY_NAMES[activity] || activity;
@@ -398,7 +408,7 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
   }, [checkedItems, storageKey, items.length, startTime, trackCompletion]);
 
   const handleFirstCheck = () => {
-    if (trackCompletion && !startTime) {
+    if (!startTime) {
       setStartTime(new Date());
     }
   };
@@ -477,26 +487,48 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
   };
 
   const handleComplete = async () => {
-    if (!trackCompletion) return;
-
     setIsSaving(true);
     try {
       const endTime = new Date();
       const duration = startTime ? Math.floor((endTime.getTime() - startTime.getTime()) / 1000) : 0;
+      const completedByName = instructorName || profile?.name || profile?.email || 'unknown';
 
+      // Save completion to database
       await supabase
         .from('packing_list_completions')
         .insert({
           activity,
           list_type: listType,
           completed_by: profile?.email || 'unknown',
-          completed_by_name: profile?.name || profile?.email || 'unknown',
+          completed_by_name: completedByName,
           started_at: startTime?.toISOString(),
           completed_at: endTime.toISOString(),
           duration_seconds: duration,
           items_checked: totalChecked,
-          items_total: totalItems
+          items_total: totalItems,
+          notes: noteText || null,
+          urgent: isUrgent,
+          instructor_name: instructorName || null,
+          job_id: jobId || null,
+          job_short_code: jobShortCode || null
         });
+
+      // Send email notification (best effort - don't fail completion if email fails)
+      sendPackingEmail({
+        activity,
+        listType,
+        completedBy: profile?.email || 'unknown',
+        completedByName,
+        durationSeconds: duration,
+        itemsChecked: totalChecked,
+        itemsTotal: totalItems,
+        instructorName: instructorName || null,
+        jobShortCode: jobShortCode || null,
+        startedAt: startTime?.toISOString() || null,
+        completedAt: endTime.toISOString(),
+        notes: noteText || null,
+        urgent: isUrgent
+      }).catch(err => console.warn('Email notification failed:', err));
 
       localStorage.removeItem(storageKey);
       setCompleted(true);
@@ -566,6 +598,15 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
             </div>
           </div>
           <div className="flex gap-2">
+            {onEditPacking && (
+              <button
+                onClick={onEditPacking}
+                className="flex items-center gap-1 px-2 tablet:px-3 py-1.5 bg-battle-orange/20 border border-battle-orange/30 rounded-lg text-battle-orange text-xs uppercase hover:bg-battle-orange/30 transition-colors"
+                title="Ret pakkeliste"
+              >
+                <Edit3 className="w-3 h-3 tablet:w-4 tablet:h-4" />
+              </button>
+            )}
             <button
               onClick={hasTabs ? checkAllSection : checkAll}
               className="flex items-center gap-1 px-2 tablet:px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-xs uppercase hover:bg-green-500/30 transition-colors"
@@ -692,6 +733,51 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
           })}
         </div>
 
+        {/* Note + Urgent section - shown when all items checked */}
+        {overallProgress === 100 && (
+          <div className="mt-4 space-y-3">
+            {/* Note field */}
+            <div className="bg-black/30 rounded-xl border border-white/10 p-3">
+              <div className="flex items-center gap-2 text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <FileText size={14} />
+                <span>Note (valgfrit)</span>
+              </div>
+              <textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder="Skriv evt. bemærkninger her..."
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-battle-orange/50 resize-none"
+                rows={3}
+              />
+            </div>
+
+            {/* Urgent checkbox */}
+            <button
+              onClick={() => setIsUrgent(!isUrgent)}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                isUrgent
+                  ? 'bg-red-500/20 border-red-500/50 text-red-400'
+                  : 'bg-black/30 border-white/10 text-gray-400 hover:border-white/20'
+              }`}
+            >
+              <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
+                isUrgent ? 'bg-red-500 border-red-500' : 'border-gray-600'
+              }`}>
+                {isUrgent && <CheckCircle2 className="w-4 h-4 text-white" />}
+              </div>
+              <AlertTriangle className={`w-5 h-5 ${isUrgent ? 'text-red-400' : 'text-gray-500'}`} />
+              <span className="text-sm font-bold uppercase tracking-wider">
+                HASTER
+              </span>
+              {isUrgent && (
+                <span className="text-[10px] text-red-400/70 ml-auto">
+                  Kopi sendes til ansvarlig
+                </span>
+              )}
+            </button>
+          </div>
+        )}
+
         {/* Navigation for tabs */}
         {hasTabs && (
           <div className="flex gap-3 mt-4">
@@ -703,7 +789,7 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
               <ChevronLeft className="w-5 h-5" />
               Forrige
             </button>
-            {currentSection === sections.length - 1 && overallProgress === 100 && trackCompletion ? (
+            {currentSection === sections.length - 1 && overallProgress === 100 ? (
               <button
                 onClick={handleComplete}
                 disabled={isSaving}
@@ -739,13 +825,27 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
           </button>
         )}
 
-        {/* Completion message (for non-tabs) */}
+        {/* Completion message + FÆRDIG button (for non-tabs) */}
         {!hasTabs && overallProgress === 100 && (
           <div className="mt-4 tablet:mt-6 p-3 bg-green-500/20 border border-green-500/30 rounded-xl text-center">
             <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-2" />
-            <div className="text-lg font-bold text-green-400 uppercase">
+            <div className="text-lg font-bold text-green-400 uppercase mb-3">
               {isAfgang ? 'KLAR TIL AFGANG!' : 'FÆRDIG!'}
             </div>
+            <button
+              onClick={handleComplete}
+              disabled={isSaving}
+              className="px-6 py-3 bg-green-500/30 border border-green-500/40 rounded-lg text-green-400 uppercase tracking-wider font-bold hover:bg-green-500/40 transition-colors disabled:opacity-50"
+            >
+              {isSaving ? (
+                <div className="w-5 h-5 border-2 border-green-400/30 border-t-green-400 rounded-full animate-spin mx-auto" />
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <Send className="w-5 h-5" />
+                  FÆRDIG
+                </span>
+              )}
+            </button>
           </div>
         )}
       </div>

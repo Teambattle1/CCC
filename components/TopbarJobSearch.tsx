@@ -30,7 +30,7 @@ const TopbarJobSearch: React.FC<TopbarJobSearchProps> = ({ onJobLoaded }) => {
       input.value = '';
       input.placeholder = `#${padded} ?`;
       setTimeout(() => {
-        input.placeholder = 'Job #';
+        input.placeholder = 'Opgave #';
         setHasError(false);
       }, 2000);
       return;
@@ -64,7 +64,7 @@ const TopbarJobSearch: React.FC<TopbarJobSearchProps> = ({ onJobLoaded }) => {
         inputMode="numeric"
         pattern="[0-9]*"
         maxLength={4}
-        placeholder="Job #"
+        placeholder="Opgave #"
         className="bg-transparent text-white text-xs mobile-landscape:text-xs tablet-portrait:text-sm font-mono tracking-wider w-12 mobile-landscape:w-12 tablet-portrait:w-14 tablet-landscape:w-16 desktop:w-20 outline-none placeholder-gray-600"
         onChange={(e) => {
           e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);

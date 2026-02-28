@@ -36,6 +36,7 @@ import {
   Download,
   Car,
   AlertTriangle,
+  Edit3,
   LucideProps
 } from 'lucide-react';
 import { HubLink } from './types';
@@ -219,6 +220,14 @@ export const TEAMPLAY_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tplayp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamplay',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -295,6 +304,14 @@ export const TEAMTASTE_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'ttastep3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamtaste',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -389,6 +406,14 @@ export const TEAMCHALLENGE_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tchp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamchallenge',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -501,6 +526,14 @@ export const TEAMLAZER_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tlp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamlazer',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -589,6 +622,14 @@ export const TEAMSEGWAY_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tsp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamsegway',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -672,6 +713,14 @@ export const TEAMBOX_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tbp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teambox',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -831,6 +880,14 @@ export const TEAMCONTROL_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tcpk3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamcontrol',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -899,6 +956,14 @@ export const TEAMCONNECT_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tconp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamconnect',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -976,6 +1041,14 @@ export const TEAMROBIN_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'trp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamrobin',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -995,6 +1068,14 @@ export const TEAMCONSTRUCT_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tcp3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamconstruct',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -1079,6 +1160,14 @@ export const TEAMACTION_PACKING_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Hjemkomst',
     color: 'blue'
+  },
+  {
+    id: 'tap3',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamaction',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 
@@ -1181,6 +1270,14 @@ export const TEAMRACE_PACKING_LINKS: HubLink[] = [
     description: 'Sæbekasse Pakkeliste',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'trp4',
+    title: 'RET PAKKELISTE',
+    url: '#edit_packing_teamrace',
+    icon: Edit3,
+    description: 'Rediger pakkeliste',
+    color: 'orange'
   }
 ];
 

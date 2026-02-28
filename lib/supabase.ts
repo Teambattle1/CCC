@@ -768,6 +768,12 @@ export const sendPackingEmail = async (data: {
   durationSeconds: number;
   itemsChecked: number;
   itemsTotal: number;
+  instructorName?: string | null;
+  jobShortCode?: string | null;
+  startedAt?: string | null;
+  completedAt?: string;
+  notes?: string | null;
+  urgent?: boolean;
 }): Promise<{ success: boolean; warning?: string }> => {
   try {
     const { data: result, error } = await supabase.functions.invoke('send-packing-email', {

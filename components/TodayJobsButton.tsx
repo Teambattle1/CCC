@@ -85,7 +85,7 @@ const TodayJobsButton: React.FC<TodayJobsButtonProps> = ({ onSelectJob }) => {
         <div className="absolute top-full left-0 mt-2 w-72 bg-[#1a1a1a] border border-battle-orange/30 rounded-xl shadow-[0_0_30px_rgba(255,102,0,0.15)] overflow-hidden z-[60]">
           <div className="px-3 py-2.5 border-b border-white/10 flex items-center justify-between">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-              Opgaver idag
+              Opgaver i dag
             </h3>
             <span className="text-[10px] text-gray-500">
               {new Date().toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })}

@@ -24,7 +24,7 @@ interface PackingListData {
 // Default packing lists - these are loaded if no custom data exists
 const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
   teamrobin: {
-    before: [
+    afgang: [
       { id: 'rb1', text: 'Buer (antal efter behov)' },
       { id: 'rb2', text: 'Pile (min. 6 per bue)' },
       { id: 'rb3', text: 'Skydeskiver med stativer' },
@@ -32,7 +32,7 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
       { id: 'rb5', text: 'Afspærringsbånd' },
       { id: 'rb6', text: 'Højtaler' },
     ],
-    after: [
+    hjemkomst: [
       { id: 'ra1', text: 'Alle buer pakket korrekt' },
       { id: 'ra2', text: 'Pile tjekket for skader' },
       { id: 'ra3', text: 'Skydeskiver rengjort' },
@@ -40,7 +40,7 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
     ]
   },
   teamlazer: {
-    before: [
+    afgang: [
       { id: 'lb1', text: 'Geværer (antal efter behov)' },
       { id: 'lb2', text: 'Kastere' },
       { id: 'lb3', text: 'Pointtavler' },
@@ -49,7 +49,7 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
       { id: 'lb6', text: 'Ledninger og kabler' },
       { id: 'lb7', text: 'Højtaler' },
     ],
-    after: [
+    hjemkomst: [
       { id: 'la1', text: 'Alle geværer slukket' },
       { id: 'la2', text: 'Batterier til opladning' },
       { id: 'la3', text: 'Gear tjekket for skader' },
@@ -57,14 +57,14 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
     ]
   },
   teamsegway: {
-    before: [
+    afgang: [
       { id: 'sb1', text: 'Segways (antal efter behov)' },
       { id: 'sb2', text: 'Hjelme til alle' },
       { id: 'sb3', text: 'Kegler til bane' },
       { id: 'sb4', text: 'Ladere' },
       { id: 'sb5', text: 'Førstehjælpskasse' },
     ],
-    after: [
+    hjemkomst: [
       { id: 'sa1', text: 'Segways til opladning' },
       { id: 'sa2', text: 'Hjelme rengjort' },
       { id: 'sa3', text: 'Tjek for skader' },
@@ -131,49 +131,39 @@ const ACTIVITY_OPTIONS = [
   { value: 'teamchallenge', label: 'TeamChallenge' },
 ];
 
+const DEFAULT_TYPE_OPTIONS = [
+  { value: 'afgang', label: 'Før Opgaven' },
+  { value: 'hjemkomst', label: 'Efter Opgaven' },
+];
+
 const LIST_TYPE_OPTIONS: Record<string, { value: string; label: string }[]> = {
-  teamrobin: [
-    { value: 'before', label: 'Før Opgaven' },
-    { value: 'after', label: 'Efter Opgaven' },
-  ],
-  teamlazer: [
-    { value: 'before', label: 'Før Opgaven' },
-    { value: 'after', label: 'Efter Opgaven' },
-  ],
-  teamsegway: [
-    { value: 'before', label: 'Før Opgaven' },
-    { value: 'after', label: 'Efter Opgaven' },
-  ],
-  teamcontrol: [
-    { value: 'afgang', label: 'Afgang' },
-    { value: 'hjemkomst', label: 'Hjemkomst' },
-  ],
-  teamconstruct: [
-    { value: 'afgang', label: 'Afgang' },
-    { value: 'hjemkomst', label: 'Hjemkomst' },
-  ],
+  teamrobin: DEFAULT_TYPE_OPTIONS,
+  teamlazer: DEFAULT_TYPE_OPTIONS,
+  teamsegway: DEFAULT_TYPE_OPTIONS,
+  teamcontrol: DEFAULT_TYPE_OPTIONS,
+  teamconstruct: DEFAULT_TYPE_OPTIONS,
   teambox: [
-    { value: 'afgang', label: 'Afgang' },
-    { value: 'hjemkomst', label: 'Hjemkomst' },
+    ...DEFAULT_TYPE_OPTIONS,
     { value: 'nulstil', label: 'Nulstil Box' },
   ],
-  teamconnect: [
-    { value: 'before', label: 'Før Opgaven' },
-    { value: 'after', label: 'Efter Opgaven' },
-  ],
-  teamaction: [
-    { value: 'before', label: 'Før Opgaven' },
-    { value: 'after', label: 'Efter Opgaven' },
-  ],
-  teamchallenge: [
-    { value: 'before', label: 'Før Opgaven' },
-    { value: 'after', label: 'Efter Opgaven' },
+  teamconnect: DEFAULT_TYPE_OPTIONS,
+  teamaction: DEFAULT_TYPE_OPTIONS,
+  teamchallenge: DEFAULT_TYPE_OPTIONS,
+  teamplay: DEFAULT_TYPE_OPTIONS,
+  teamtaste: DEFAULT_TYPE_OPTIONS,
+  teamrace: [
+    ...DEFAULT_TYPE_OPTIONS,
+    { value: 'taske', label: 'Taske' },
   ],
 };
 
-const PackingListEditor: React.FC = () => {
+interface PackingListEditorProps {
+  initialActivity?: string;
+}
+
+const PackingListEditor: React.FC<PackingListEditorProps> = ({ initialActivity }) => {
   const { profile } = useAuth();
-  const [selectedActivity, setSelectedActivity] = useState('teamrobin');
+  const [selectedActivity, setSelectedActivity] = useState(initialActivity || 'teamrobin');
   const [selectedListType, setSelectedListType] = useState('before');
   const [items, setItems] = useState<PackingItem[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
