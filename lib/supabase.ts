@@ -757,3 +757,211 @@ export const subscribeFejlsogningReports = (
 
   return channel;
 };
+
+// ============ Packing List Email Notification ============
+
+export const sendPackingEmail = async (data: {
+  activity: string;
+  listType: string;
+  completedBy: string;
+  completedByName: string;
+  durationSeconds: number;
+  itemsChecked: number;
+  itemsTotal: number;
+}): Promise<{ success: boolean; warning?: string }> => {
+  try {
+    const { data: result, error } = await supabase.functions.invoke('send-packing-email', {
+      body: data
+    });
+
+    if (error) {
+      console.warn('Email notification failed:', error);
+      return { success: false, warning: error.message };
+    }
+
+    return { success: result?.success ?? false, warning: result?.warning };
+  } catch (err) {
+    console.warn('Email notification error:', err);
+    return { success: false, warning: 'Network error' };
+  }
+};
+
+// ============ OCC Task Job Integration ============
+
+// OCC Activity ID → CCC ViewState mapping
+export const ACTIVITY_TO_VIEW: Record<string, string> = {
+  'A1':  'team_challenge',
+  'A2':  'teamlazer',
+  'A3':  'teamrobin',
+  'A4':  'teambox',
+  'A5':  'teamconnect',
+  'A6':  'teamplay',
+  'A7':  'teamtaste',
+  'A8':  'teamsegway',
+  'A9':  'teamcontrol',
+  'A10': 'teamconstruct',
+  'A11': 'teamaction',
+  'A12': 'teamrace',
+};
+
+export interface TaskJob {
+  id: string;
+  short_code: string | null;
+  client_name: string | null;
+  event_date: string | null;
+  event_end: string | null;
+  duration_minutes: number | null;
+  activities: string[] | null;
+  location_name: string | null;
+  location_address: string | null;
+  guests_count: number | null;
+  instructors_count: number | null;
+  assistants_count: number | null;
+  get_in_location: string | null;
+  get_in_time_storage: string | null;
+  get_in_time_location: string | null;
+  get_back_location: string | null;
+  vehicle_id: string | null;
+  trailer_id: string | null;
+  lane_setup: string | null;
+  lane_teardown: string | null;
+  notes: string | null;
+  status: string | null;
+}
+
+export interface ResolvedActivity {
+  id: string;
+  name: string;
+  viewState: string;
+}
+
+export interface CrewAssignment {
+  employee_name: string;
+  role: string;
+}
+
+// Fetch a task job by 4-digit short_code
+export const fetchTaskJobByCode = async (
+  shortCode: string
+): Promise<{ success: boolean; data?: TaskJob; error?: string }> => {
+  try {
+    const { data, error } = await supabase
+      .from('task_jobs')
+      .select('id, short_code, client_name, event_date, event_end, duration_minutes, activities, location_name, location_address, guests_count, instructors_count, assistants_count, get_in_location, get_in_time_storage, get_in_time_location, get_back_location, vehicle_id, trailer_id, lane_setup, lane_teardown, notes, status')
+      .eq('short_code', shortCode)
+      .single();
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true, data: data as TaskJob };
+  } catch (err) {
+    return { success: false, error: 'Kunne ikke hente opgave' };
+  }
+};
+
+// Resolve OCC activity IDs to names + CCC view states
+export const resolveActivities = async (
+  activityIds: string[]
+): Promise<ResolvedActivity[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('activities')
+      .select('id, name')
+      .in('id', activityIds);
+
+    if (error || !data) return [];
+    return data
+      .map(a => ({
+        id: a.id,
+        name: a.name,
+        viewState: ACTIVITY_TO_VIEW[a.id] || ''
+      }))
+      .filter(a => a.viewState !== '');
+  } catch {
+    return [];
+  }
+};
+
+// Fetch crew assignments for a job
+export const fetchJobCrew = async (
+  jobId: string
+): Promise<CrewAssignment[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('job_crew_assignments')
+      .select('role, employee_id')
+      .eq('job_id', jobId);
+
+    if (error || !data || data.length === 0) return [];
+
+    const employeeIds = data.map(d => d.employee_id);
+    const { data: employees } = await supabase
+      .from('employees')
+      .select('id, navn')
+      .in('id', employeeIds);
+
+    const nameMap: Record<string, string> = {};
+    (employees || []).forEach((e: { id: string; navn: string }) => {
+      nameMap[e.id] = e.navn || e.id;
+    });
+
+    return data.map(d => ({
+      employee_name: nameMap[d.employee_id] || d.employee_id,
+      role: d.role || 'instruktør'
+    }));
+  } catch {
+    return [];
+  }
+};
+
+// Fetch all employees (for instructor selection)
+export interface Employee {
+  id: string;
+  name: string;
+}
+
+export const fetchAllEmployees = async (): Promise<Employee[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('employees')
+      .select('id, navn')
+      .order('navn');
+
+    if (error || !data) return [];
+    return data.map((e: { id: string; navn: string }) => ({
+      id: e.id,
+      name: e.navn
+    }));
+  } catch {
+    return [];
+  }
+};
+
+// Shared select fields for task_jobs queries
+const TASK_JOB_SELECT = 'id, short_code, client_name, event_date, event_end, duration_minutes, activities, location_name, location_address, guests_count, instructors_count, assistants_count, get_in_location, get_in_time_storage, get_in_time_location, get_back_location, vehicle_id, trailer_id, lane_setup, lane_teardown, notes, status';
+
+// Fetch all jobs scheduled for today
+export const fetchTodayJobs = async (): Promise<TaskJob[]> => {
+  try {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
+    const { data, error } = await supabase
+      .from('task_jobs')
+      .select(TASK_JOB_SELECT)
+      .gte('event_date', startOfDay.toISOString())
+      .lte('event_date', endOfDay.toISOString())
+      .order('event_date', { ascending: true });
+
+    if (error) {
+      console.error('fetchTodayJobs error:', error.message);
+      return [];
+    }
+    return (data as TaskJob[]) || [];
+  } catch (err) {
+    console.error('fetchTodayJobs exception:', err);
+    return [];
+  }
+};
