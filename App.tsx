@@ -11,6 +11,7 @@ import {
   LOQUIZ_LINKS,
   TEAMACTION_LINKS,
   TEAMLAZER_LINKS,
+  TEAMLAZER_PACKING_LINKS,
   TEAMLAZER_FEJLSOGNING_LINKS,
   TEAMROBIN_LINKS,
   TEAMCONNECT_LINKS,
@@ -47,7 +48,13 @@ import {
   TEAMRACE_LINKS,
   TEAMRACE_PACKING_LINKS,
   TEAMPLAY_LINKS,
-  TEAMTASTE_LINKS
+  TEAMPLAY_PACKING_LINKS,
+  TEAMTASTE_LINKS,
+  TEAMTASTE_PACKING_LINKS,
+  TEAMCHALLENGE_PACKING_LINKS,
+  TEAMSEGWAY_PACKING_LINKS,
+  TEAMCONNECT_PACKING_LINKS,
+  TEAMACTION_PACKING_LINKS
 } from './constants';
 import HubButton from './components/HubButton';
 import Clock, { DateDisplay } from './components/Clock';
@@ -84,9 +91,11 @@ import TeamRaceScorecard from './components/TeamRaceScorecard';
 import TeamRobinVideoGrid from './components/TeamRobinVideoGrid';
 import TeamSegwayVideoGrid from './components/TeamSegwayVideoGrid';
 import ActivityGuide from './components/ActivityGuide';
+import JobInput from './components/JobInput';
+import JobOverview from './components/JobOverview';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
-import { getUnreadFejlsogningCount, subscribeFejlsogningReports } from './lib/supabase';
+import { getUnreadFejlsogningCount, subscribeFejlsogningReports, TaskJob, ResolvedActivity } from './lib/supabase';
 import {
   ShieldCheck,
   House,
@@ -119,7 +128,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'job_overview';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -131,6 +140,8 @@ const App: React.FC = () => {
   const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
   const [isIdeasOpen, setIsIdeasOpen] = useState(false);
   const [fejlsogningCount, setFejlsogningCount] = useState(0);
+  const [activeJob, setActiveJob] = useState<TaskJob | null>(null);
+  const [activeJobActivities, setActiveJobActivities] = useState<ResolvedActivity[]>([]);
 
   // Device Preview State
   const [previewDevice, setPreviewDevice] = useState<DeviceType | null>(null);
@@ -373,7 +384,11 @@ const App: React.FC = () => {
     else if (link.url === '#teambox_downloads') changeView('teambox_downloads');
     else if (link.url === '#teamlazer_video') changeView('teamlazer_video');
     else if (link.url === '#teamlazer_packing') changeView('teamlazer_packing');
+    else if (link.url === '#teamlazer_packing_afgang') changeView('teamlazer_packing_afgang');
+    else if (link.url === '#teamlazer_packing_hjemkomst') changeView('teamlazer_packing_hjemkomst');
     else if (link.url === '#teamsegway_packing') changeView('teamsegway_packing');
+    else if (link.url === '#teamsegway_packing_afgang') changeView('teamsegway_packing_afgang');
+    else if (link.url === '#teamsegway_packing_hjemkomst') changeView('teamsegway_packing_hjemkomst');
     else if (link.url === '#teamlazer_scorecard') changeView('teamlazer_scorecard');
     else if (link.url === '#teamlazer_fejlsogning') changeView('teamlazer_fejlsogning');
     else if (link.url === '#teamlazer_frekvenser') changeView('teamlazer_frekvenser');
@@ -403,29 +418,40 @@ const App: React.FC = () => {
     else if (link.url === '#teamplay_guide') changeView('teamplay_guide');
     else if (link.url === '#teamplay_video') changeView('teamplay_video');
     else if (link.url === '#teamplay_packing') changeView('teamplay_packing');
+    else if (link.url === '#teamplay_packing_afgang') changeView('teamplay_packing_afgang');
+    else if (link.url === '#teamplay_packing_hjemkomst') changeView('teamplay_packing_hjemkomst');
     else if (link.url === '#teamplay_fejlsogning') changeView('teamplay_fejlsogning');
     else if (link.url === '#fejlsogning_teamplay') changeView('fejlsogning_teamplay');
     // TeamTaste views
     else if (link.url === '#teamtaste_guide') changeView('teamtaste_guide');
     else if (link.url === '#teamtaste_video') changeView('teamtaste_video');
     else if (link.url === '#teamtaste_packing') changeView('teamtaste_packing');
+    else if (link.url === '#teamtaste_packing_afgang') changeView('teamtaste_packing_afgang');
+    else if (link.url === '#teamtaste_packing_hjemkomst') changeView('teamtaste_packing_hjemkomst');
     else if (link.url === '#teamtaste_fejlsogning') changeView('teamtaste_fejlsogning');
     else if (link.url === '#fejlsogning_teamtaste') changeView('fejlsogning_teamtaste');
     // TeamChallenge new views
     else if (link.url === '#teamchallenge_packing') changeView('teamchallenge_packing');
+    else if (link.url === '#teamchallenge_packing_afgang') changeView('teamchallenge_packing_afgang');
+    else if (link.url === '#teamchallenge_packing_hjemkomst') changeView('teamchallenge_packing_hjemkomst');
     else if (link.url === '#teamchallenge_fejlsogning') changeView('teamchallenge_fejlsogning');
     // TeamConnect new views
     else if (link.url === '#teamconnect_video') changeView('teamconnect_video');
     else if (link.url === '#teamconnect_packing') changeView('teamconnect_packing');
+    else if (link.url === '#teamconnect_packing_afgang') changeView('teamconnect_packing_afgang');
+    else if (link.url === '#teamconnect_packing_hjemkomst') changeView('teamconnect_packing_hjemkomst');
     else if (link.url === '#teamconnect_fejlsogning') changeView('teamconnect_fejlsogning');
     // TeamAction new views
     else if (link.url === '#teamaction_packing') changeView('teamaction_packing');
+    else if (link.url === '#teamaction_packing_afgang') changeView('teamaction_packing_afgang');
+    else if (link.url === '#teamaction_packing_hjemkomst') changeView('teamaction_packing_hjemkomst');
     else if (link.url === '#teamaction_fejlsogning') changeView('teamaction_fejlsogning');
     // New fejlsogning views
     else if (link.url === '#teambox_fejlsogning') changeView('teambox_fejlsogning');
     else if (link.url === '#teamcontrol_fejlsogning') changeView('teamcontrol_fejlsogning');
     else if (link.url === '#teamconstruct_fejlsogning') changeView('teamconstruct_fejlsogning');
     else if (link.url === '#teamrace_fejlsogning') changeView('teamrace_fejlsogning');
+    else if (link.url === '#job_input') changeView('job_input');
     else if (link.url === '#code') changeView('code');
     else if (link.url === '#admin_reports') changeView('admin_reports');
     else if (link.url === '#admin_packing_editor') changeView('admin_packing_editor');
@@ -435,7 +461,11 @@ const App: React.FC = () => {
 
   const handleBackClick = () => {
     // Nested navigation logic
-    if (currentView === 'economy') {
+    if (currentView === 'job_input') {
+      changeView('main');
+    } else if (currentView === 'job_overview') {
+      changeView('job_input');
+    } else if (currentView === 'economy') {
       changeView('office');
     } else if (currentView === 'team_challenge') {
       changeView('activities');
@@ -547,8 +577,12 @@ const App: React.FC = () => {
       changeView('team_challenge');
     } else if (currentView === 'teamlazer_packing') {
       changeView('teamlazer');
+    } else if (currentView === 'teamlazer_packing_afgang' || currentView === 'teamlazer_packing_hjemkomst') {
+      changeView('teamlazer_packing');
     } else if (currentView === 'teamsegway_packing') {
       changeView('teamsegway');
+    } else if (currentView === 'teamsegway_packing_afgang' || currentView === 'teamsegway_packing_hjemkomst') {
+      changeView('teamsegway_packing');
     } else if (currentView === 'teamlazer_scorecard') {
       changeView('teamlazer');
     } else if (currentView === 'fejlsogning_teamlazer') {
@@ -572,18 +606,28 @@ const App: React.FC = () => {
     } else if (currentView === 'fejlsogning_loquiz') {
       changeView('loquiz');
     // TeamPlay back navigation
+    } else if (currentView === 'teamplay_packing_afgang' || currentView === 'teamplay_packing_hjemkomst') {
+      changeView('teamplay_packing');
     } else if (currentView === 'teamplay_guide' || currentView === 'teamplay_video' || currentView === 'teamplay_packing' || currentView === 'teamplay_fejlsogning' || currentView === 'fejlsogning_teamplay') {
       changeView('teamplay');
     // TeamTaste back navigation
+    } else if (currentView === 'teamtaste_packing_afgang' || currentView === 'teamtaste_packing_hjemkomst') {
+      changeView('teamtaste_packing');
     } else if (currentView === 'teamtaste_guide' || currentView === 'teamtaste_video' || currentView === 'teamtaste_packing' || currentView === 'teamtaste_fejlsogning' || currentView === 'fejlsogning_teamtaste') {
       changeView('teamtaste');
     // TeamChallenge new back navigation
+    } else if (currentView === 'teamchallenge_packing_afgang' || currentView === 'teamchallenge_packing_hjemkomst') {
+      changeView('teamchallenge_packing');
     } else if (currentView === 'teamchallenge_packing' || currentView === 'teamchallenge_fejlsogning') {
       changeView('team_challenge');
     // TeamConnect new back navigation
+    } else if (currentView === 'teamconnect_packing_afgang' || currentView === 'teamconnect_packing_hjemkomst') {
+      changeView('teamconnect_packing');
     } else if (currentView === 'teamconnect_video' || currentView === 'teamconnect_packing' || currentView === 'teamconnect_fejlsogning') {
       changeView('teamconnect');
     // TeamAction new back navigation
+    } else if (currentView === 'teamaction_packing_afgang' || currentView === 'teamaction_packing_hjemkomst') {
+      changeView('teamaction_packing');
     } else if (currentView === 'teamaction_packing' || currentView === 'teamaction_fejlsogning') {
       changeView('teamaction');
     // New fejlsogning back navigation
@@ -648,6 +692,18 @@ const App: React.FC = () => {
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'Editor';
       ViewIcon = Package;
+      break;
+    case 'job_input':
+      currentLinks = [];
+      viewTitle = 'JOB';
+      viewSubtitle = 'Indtast Opgave ID';
+      ViewIcon = Briefcase;
+      break;
+    case 'job_overview':
+      currentLinks = [];
+      viewTitle = 'JOB OVERSIGT';
+      viewSubtitle = activeJob?.client_name || '';
+      ViewIcon = Briefcase;
       break;
     case 'office':
       currentLinks = filterOfficeSectionsByRole(OFFICE_LINKS);
@@ -1010,16 +1066,40 @@ const App: React.FC = () => {
       ViewIcon = Zap;
       break;
     case 'teamlazer_packing':
-      currentLinks = [];
+      currentLinks = TEAMLAZER_PACKING_LINKS;
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'TeamLazer';
       ViewIcon = Package;
       break;
-    case 'teamsegway_packing':
+    case 'teamlazer_packing_afgang':
       currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamlazer_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
+      break;
+    case 'teamsegway_packing':
+      currentLinks = TEAMSEGWAY_PACKING_LINKS;
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'TeamSegway';
       ViewIcon = Package;
+      break;
+    case 'teamsegway_packing_afgang':
+      currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamsegway_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
       break;
     case 'teamlazer_scorecard':
       currentLinks = [];
@@ -1137,10 +1217,22 @@ const App: React.FC = () => {
       ViewIcon = Gamepad2;
       break;
     case 'teamplay_packing':
-      currentLinks = [];
+      currentLinks = TEAMPLAY_PACKING_LINKS;
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'TeamPlay';
       ViewIcon = Package;
+      break;
+    case 'teamplay_packing_afgang':
+      currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamplay_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
       break;
     case 'teamplay_fejlsogning':
       currentLinks = [];
@@ -1168,10 +1260,22 @@ const App: React.FC = () => {
       ViewIcon = Utensils;
       break;
     case 'teamtaste_packing':
-      currentLinks = [];
+      currentLinks = TEAMTASTE_PACKING_LINKS;
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'TeamTaste';
       ViewIcon = Package;
+      break;
+    case 'teamtaste_packing_afgang':
+      currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamtaste_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
       break;
     case 'teamtaste_fejlsogning':
       currentLinks = [];
@@ -1187,10 +1291,22 @@ const App: React.FC = () => {
       break;
     // TeamChallenge new views
     case 'teamchallenge_packing':
-      currentLinks = [];
+      currentLinks = TEAMCHALLENGE_PACKING_LINKS;
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'TeamChallenge';
       ViewIcon = Package;
+      break;
+    case 'teamchallenge_packing_afgang':
+      currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamchallenge_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
       break;
     case 'teamchallenge_fejlsogning':
       currentLinks = [];
@@ -1206,10 +1322,22 @@ const App: React.FC = () => {
       ViewIcon = Users;
       break;
     case 'teamconnect_packing':
-      currentLinks = [];
+      currentLinks = TEAMCONNECT_PACKING_LINKS;
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'TeamConnect';
       ViewIcon = Package;
+      break;
+    case 'teamconnect_packing_afgang':
+      currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamconnect_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
       break;
     case 'teamconnect_fejlsogning':
       currentLinks = [];
@@ -1219,10 +1347,22 @@ const App: React.FC = () => {
       break;
     // TeamAction new views
     case 'teamaction_packing':
-      currentLinks = [];
+      currentLinks = TEAMACTION_PACKING_LINKS;
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'TeamAction';
       ViewIcon = Package;
+      break;
+    case 'teamaction_packing_afgang':
+      currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamaction_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
       break;
     case 'teamaction_fejlsogning':
       currentLinks = [];
@@ -1560,10 +1700,14 @@ const App: React.FC = () => {
               title="TeamSegway Fejlsøgning"
               videoIndex={TEAMSEGWAY_FEJLSOGNING_VIDEO_INDEX}
             />
-          ) : currentView === 'teamlazer_packing' ? (
-            <DynamicPackingList activity="teamlazer" listType="before" />
-          ) : currentView === 'teamsegway_packing' ? (
-            <DynamicPackingList activity="teamsegway" listType="before" />
+          ) : currentView === 'teamlazer_packing_afgang' ? (
+            <DynamicPackingList activity="teamlazer" listType="afgang" />
+          ) : currentView === 'teamlazer_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamlazer" listType="hjemkomst" />
+          ) : currentView === 'teamsegway_packing_afgang' ? (
+            <DynamicPackingList activity="teamsegway" listType="afgang" />
+          ) : currentView === 'teamsegway_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamsegway" listType="hjemkomst" />
           ) : currentView === 'teamlazer_scorecard' ? (
             <LazerPointScoreboard />
           ) : currentView === 'fejlsogning_teamlazer' ? (
@@ -1631,8 +1775,10 @@ const App: React.FC = () => {
               title="TeamPlay Video Guides"
               videoIndex={TEAMPLAY_VIDEO_INDEX}
             />
-          ) : currentView === 'teamplay_packing' ? (
-            <DynamicPackingList activity="teamplay" listType="before" />
+          ) : currentView === 'teamplay_packing_afgang' ? (
+            <DynamicPackingList activity="teamplay" listType="afgang" />
+          ) : currentView === 'teamplay_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamplay" listType="hjemkomst" />
           ) : currentView === 'teamplay_fejlsogning' ? (
             <VideoPlayer
               title="TeamPlay Fejlsøgning"
@@ -1647,8 +1793,10 @@ const App: React.FC = () => {
               title="TeamTaste Video Guides"
               videoIndex={TEAMTASTE_VIDEO_INDEX}
             />
-          ) : currentView === 'teamtaste_packing' ? (
-            <DynamicPackingList activity="teamtaste" listType="before" />
+          ) : currentView === 'teamtaste_packing_afgang' ? (
+            <DynamicPackingList activity="teamtaste" listType="afgang" />
+          ) : currentView === 'teamtaste_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamtaste" listType="hjemkomst" />
           ) : currentView === 'teamtaste_fejlsogning' ? (
             <VideoPlayer
               title="TeamTaste Fejlsøgning"
@@ -1656,8 +1804,10 @@ const App: React.FC = () => {
             />
           ) : currentView === 'fejlsogning_teamtaste' ? (
             <FejlsogningReport activity="teamtaste" />
-          ) : currentView === 'teamchallenge_packing' ? (
-            <DynamicPackingList activity="teamchallenge" listType="before" />
+          ) : currentView === 'teamchallenge_packing_afgang' ? (
+            <DynamicPackingList activity="teamchallenge" listType="afgang" />
+          ) : currentView === 'teamchallenge_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamchallenge" listType="hjemkomst" />
           ) : currentView === 'teamchallenge_fejlsogning' ? (
             <VideoPlayer
               title="TeamChallenge Fejlsøgning"
@@ -1668,15 +1818,19 @@ const App: React.FC = () => {
               title="TeamConnect Video Guides"
               videoIndex={TEAMCONNECT_VIDEO_INDEX}
             />
-          ) : currentView === 'teamconnect_packing' ? (
-            <DynamicPackingList activity="teamconnect" listType="before" />
+          ) : currentView === 'teamconnect_packing_afgang' ? (
+            <DynamicPackingList activity="teamconnect" listType="afgang" />
+          ) : currentView === 'teamconnect_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamconnect" listType="hjemkomst" />
           ) : currentView === 'teamconnect_fejlsogning' ? (
             <VideoPlayer
               title="TeamConnect Fejlsøgning"
               videoIndex={TEAMCONNECT_FEJLSOGNING_VIDEO_INDEX}
             />
-          ) : currentView === 'teamaction_packing' ? (
-            <DynamicPackingList activity="teamaction" listType="before" />
+          ) : currentView === 'teamaction_packing_afgang' ? (
+            <DynamicPackingList activity="teamaction" listType="afgang" />
+          ) : currentView === 'teamaction_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamaction" listType="hjemkomst" />
           ) : currentView === 'teamaction_fejlsogning' ? (
             <VideoPlayer
               title="TeamAction Fejlsøgning"
@@ -1706,6 +1860,20 @@ const App: React.FC = () => {
             <AdminReports />
           ) : currentView === 'admin_packing_editor' ? (
             <PackingListEditor />
+          ) : currentView === 'job_input' ? (
+            <JobInput
+              onJobLoaded={(job, activities) => {
+                setActiveJob(job);
+                setActiveJobActivities(activities);
+                changeView('job_overview');
+              }}
+            />
+          ) : currentView === 'job_overview' && activeJob ? (
+            <JobOverview
+              job={activeJob}
+              activities={activeJobActivities}
+              onNavigateActivity={(viewState) => changeView(viewState as ViewState)}
+            />
           ) : currentView === 'office' ? (
             <div className="w-full max-w-4xl mx-auto px-1 mobile-landscape:px-2 tablet-portrait:px-4">
               <div className="grid grid-cols-2 gap-2 mobile-landscape:gap-1.5 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-4 responsive-office-grid">

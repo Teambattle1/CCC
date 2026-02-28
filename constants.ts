@@ -202,6 +202,26 @@ export const TEAMPLAY_LINKS: HubLink[] = [
   }
 ];
 
+// TeamPlay Packing Submenu Links
+export const TEAMPLAY_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tplayp1',
+    title: 'FØR OPGAVEN',
+    url: '#teamplay_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tplayp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamplay_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
+  }
+];
+
 // TeamTaste Submenu Links
 export const TEAMTASTE_LINKS: HubLink[] = [
   {
@@ -255,6 +275,26 @@ export const TEAMTASTE_LINKS: HubLink[] = [
     icon: Wrench,
     description: 'Rapporter fejl',
     color: 'yellow'
+  }
+];
+
+// TeamTaste Packing Submenu Links
+export const TEAMTASTE_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'ttastep1',
+    title: 'FØR OPGAVEN',
+    url: '#teamtaste_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'ttastep2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamtaste_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
   }
 ];
 
@@ -329,6 +369,26 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  }
+];
+
+// TeamChallenge Packing Submenu Links
+export const TEAMCHALLENGE_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tchp1',
+    title: 'FØR OPGAVEN',
+    url: '#teamchallenge_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tchp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamchallenge_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
   }
 ];
 
@@ -424,6 +484,26 @@ export const TEAMLAZER_LINKS: HubLink[] = [
   }
 ];
 
+// TeamLazer Packing Submenu Links
+export const TEAMLAZER_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tlp1',
+    title: 'FØR OPGAVEN',
+    url: '#teamlazer_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tlp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamlazer_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
+  }
+];
+
 // TeamLazer Fejl & Mangler Submenu
 export const TEAMLAZER_FEJLSOGNING_LINKS: HubLink[] = [
   {
@@ -489,6 +569,26 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  }
+];
+
+// TeamSegway Packing Submenu Links
+export const TEAMSEGWAY_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tsp1',
+    title: 'FØR OPGAVEN',
+    url: '#teamsegway_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tsp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamsegway_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
   }
 ];
 
@@ -782,6 +882,26 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
   }
 ];
 
+// TeamConnect Packing Submenu Links
+export const TEAMCONNECT_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tconp1',
+    title: 'FØR OPGAVEN',
+    url: '#teamconnect_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tconp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamconnect_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
+  }
+];
+
 // TeamRobin Submenu Links
 export const TEAMROBIN_LINKS: HubLink[] = [
   {
@@ -939,6 +1059,26 @@ export const TEAMACTION_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  }
+];
+
+// TeamAction Packing Submenu Links
+export const TEAMACTION_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tap1',
+    title: 'FØR OPGAVEN',
+    url: '#teamaction_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tap2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamaction_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
   }
 ];
 
@@ -1219,6 +1359,14 @@ export const HUB_LINKS: HubLink[] = [
     icon: AlertTriangle,
     description: 'Alle Fejlrapporter',
     color: 'pink'
+  },
+  {
+    id: 'job',
+    title: 'JOB',
+    url: '#job_input',
+    icon: ClipboardList,
+    description: 'Hent Opgave',
+    color: 'green'
   }
 ];
 
