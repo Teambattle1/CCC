@@ -1360,14 +1360,15 @@ export const HUB_LINKS: HubLink[] = [
     description: 'Alle Fejlrapporter',
     color: 'pink'
   },
-  {
-    id: 'job',
-    title: 'JOB',
-    url: '#job_input',
-    icon: ClipboardList,
-    description: 'Hent Opgave',
-    color: 'green'
-  }
+  // JOB button hidden - replaced by inline search on landing page
+  // {
+  //   id: 'job',
+  //   title: 'JOB',
+  //   url: '#job_input',
+  //   icon: ClipboardList,
+  //   description: 'Hent Opgave',
+  //   color: 'green'
+  // }
 ];
 
 // Activity Submenu Links

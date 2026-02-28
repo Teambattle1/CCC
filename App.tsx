@@ -95,7 +95,7 @@ import JobInput from './components/JobInput';
 import JobOverview from './components/JobOverview';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
-import { getUnreadFejlsogningCount, subscribeFejlsogningReports, TaskJob, ResolvedActivity } from './lib/supabase';
+import { getUnreadFejlsogningCount, subscribeFejlsogningReports, fetchTaskJobByCode, resolveActivities, TaskJob, ResolvedActivity } from './lib/supabase';
 import {
   ShieldCheck,
   House,
@@ -124,7 +124,8 @@ import {
   Map,
   Car,
   Users,
-  Utensils
+  Utensils,
+  Search
 } from 'lucide-react';
 import { HubLink } from './types';
 
@@ -1563,6 +1564,58 @@ const App: React.FC = () => {
             )}
             <div className="h-0.5 w-12 mobile-landscape:w-10 tablet-portrait:w-24 tablet-landscape:w-20 desktop:w-32 desktop:h-1 bg-battle-orange mx-auto mt-2 mobile-landscape:mt-1.5 tablet-portrait:mt-4 tablet-landscape:mt-3 desktop:mt-6 rounded-full shadow-[0_0_15px_rgba(255,102,0,1)]"></div>
           </div>
+
+          {/* Inline Job Search - only on main landing page */}
+          {currentView === 'main' && (
+            <div className="mt-3 mobile-landscape:mt-2 tablet-portrait:mt-4 w-full max-w-xs mx-auto">
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const input = (e.currentTarget.elements.namedItem('jobCode') as HTMLInputElement);
+                  const val = input.value.replace(/\D/g, '').trim();
+                  if (!val) return;
+                  const padded = val.padStart(4, '0');
+                  input.disabled = true;
+                  const result = await fetchTaskJobByCode(padded);
+                  input.disabled = false;
+                  if (!result.success || !result.data) {
+                    input.value = '';
+                    input.placeholder = `#${padded} ikke fundet`;
+                    setTimeout(() => { input.placeholder = 'Job ID...'; }, 2000);
+                    return;
+                  }
+                  const job = result.data;
+                  let acts: ResolvedActivity[] = [];
+                  if (job.activities && job.activities.length > 0) {
+                    acts = await resolveActivities(job.activities);
+                  }
+                  localStorage.setItem('ccc_last_job_code', val);
+                  setActiveJob(job);
+                  setActiveJobActivities(acts);
+                  changeView('job_overview');
+                }}
+                className="flex items-center gap-2 bg-black/30 border border-white/10 rounded-xl px-3 py-2 focus-within:border-battle-orange/40 transition-colors"
+              >
+                <Search size={16} className="text-gray-500 shrink-0" />
+                <input
+                  name="jobCode"
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={4}
+                  placeholder="Job ID..."
+                  className="bg-transparent text-white text-sm font-mono tracking-wider w-full outline-none placeholder-gray-600"
+                  onChange={(e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); }}
+                />
+                <button
+                  type="submit"
+                  className="text-battle-orange hover:text-white text-xs font-bold uppercase tracking-wider shrink-0 transition-colors"
+                >
+                  Hent
+                </button>
+              </form>
+            </div>
+          )}
         </header>
 
         {/* content */}
@@ -1570,9 +1623,9 @@ const App: React.FC = () => {
           {currentView === 'distance_tool' ? (
             <DistanceTool />
           ) : currentView === 'teamrobin_packing_before' ? (
-            <DynamicPackingList activity="teamrobin" listType="before" title="FØR OPGAVEN" />
+            <DynamicPackingList activity="teamrobin" listType="afgang" title="FØR OPGAVEN" />
           ) : currentView === 'teamrobin_packing_after' ? (
-            <DynamicPackingList activity="teamrobin" listType="after" title="EFTER OPGAVEN" />
+            <DynamicPackingList activity="teamrobin" listType="hjemkomst" title="EFTER OPGAVEN" />
           ) : currentView === 'teamlazer_justering' ? (
             <VideoPlayer
               title="TeamLazer Justering"
