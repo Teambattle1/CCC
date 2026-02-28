@@ -93,6 +93,7 @@ import TeamSegwayVideoGrid from './components/TeamSegwayVideoGrid';
 import ActivityGuide from './components/ActivityGuide';
 import JobInput from './components/JobInput';
 import JobOverview from './components/JobOverview';
+import InstructorSelect from './components/InstructorSelect';
 import TopbarJobSearch from './components/TopbarJobSearch';
 import TodayJobsButton from './components/TodayJobsButton';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
@@ -130,7 +131,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'job_overview' | 'edit_packing';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -144,6 +145,7 @@ const App: React.FC = () => {
   const [fejlsogningCount, setFejlsogningCount] = useState(0);
   const [activeJob, setActiveJob] = useState<TaskJob | null>(null);
   const [activeJobActivities, setActiveJobActivities] = useState<ResolvedActivity[]>([]);
+  const [activeInstructor, setActiveInstructor] = useState<{ name: string; id?: string } | null>(null);
   const [editPackingActivity, setEditPackingActivity] = useState<string>('');
 
   // Device Preview State
@@ -471,8 +473,10 @@ const App: React.FC = () => {
     // Nested navigation logic
     if (currentView === 'job_input') {
       changeView('main');
-    } else if (currentView === 'job_overview') {
+    } else if (currentView === 'instructor_select') {
       changeView('job_input');
+    } else if (currentView === 'job_overview') {
+      changeView('instructor_select');
     } else if (currentView === 'economy') {
       changeView('office');
     } else if (currentView === 'team_challenge') {
@@ -730,6 +734,12 @@ const App: React.FC = () => {
       viewTitle = 'JOB';
       viewSubtitle = 'Indtast Opgave ID';
       ViewIcon = Briefcase;
+      break;
+    case 'instructor_select':
+      currentLinks = [];
+      viewTitle = 'INSTRUKTØR';
+      viewSubtitle = activeJob?.client_name || 'Vælg Instruktør';
+      ViewIcon = Users;
       break;
     case 'job_overview':
       currentLinks = [];
@@ -1472,10 +1482,9 @@ const App: React.FC = () => {
         ></div>
       </div>
 
-      {/* Top Left Zone - Back button + Job search + Today's jobs */}
-      <div className="absolute top-2 left-2 mobile-landscape:top-1.5 mobile-landscape:left-1.5 tablet-portrait:top-4 tablet-portrait:left-4 tablet-landscape:top-3 tablet-landscape:left-3 desktop:top-8 desktop:left-8 z-50 flex items-center gap-1.5 mobile-landscape:gap-1 tablet-portrait:gap-2 tablet-landscape:gap-2 desktop:gap-3 safe-area-top safe-area-left">
-        {/* Back button - only on sub-pages */}
-        {currentView !== 'main' && (
+      {/* Top Left Back Button - Responsive for all 5 modes */}
+      {currentView !== 'main' && (
+        <div className="absolute top-2 left-2 mobile-landscape:top-1.5 mobile-landscape:left-1.5 tablet-portrait:top-4 tablet-portrait:left-4 tablet-landscape:top-3 tablet-landscape:left-3 desktop:top-8 desktop:left-8 z-50 safe-area-top safe-area-left">
           <button
             onClick={handleBackClick}
             className="group flex items-center justify-center w-10 h-10 mobile-landscape:w-9 mobile-landscape:h-9 tablet-portrait:w-12 tablet-portrait:h-12 tablet-landscape:w-11 tablet-landscape:h-11 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
@@ -1483,34 +1492,36 @@ const App: React.FC = () => {
           >
             <House className="w-5 h-5 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-6 tablet-portrait:h-6 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-battle-orange group-active:text-battle-orange transition-colors" />
           </button>
-        )}
-
-        {/* Job ID search - always visible */}
-        <TopbarJobSearch
-          onJobLoaded={(job, activities) => {
-            setActiveJob(job);
-            setActiveJobActivities(activities);
-            changeView('job_overview');
-          }}
-        />
-
-        {/* Today's jobs button - always visible */}
-        <TodayJobsButton
-          onSelectJob={(job, activities) => {
-            setActiveJob(job);
-            setActiveJobActivities(activities);
-            changeView('job_overview');
-          }}
-        />
-      </div>
+        </div>
+      )}
 
       {/* Center Top Clock */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
         <Clock showVersion={profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER'} />
       </div>
 
-      {/* Top Right User Info and Calendar - Responsive for all 5 modes */}
+      {/* Top Right - All controls */}
       <div className="absolute top-2 right-2 mobile-landscape:top-1.5 mobile-landscape:right-1.5 tablet-portrait:top-4 tablet-portrait:right-4 tablet-landscape:top-3 tablet-landscape:right-3 desktop:top-8 desktop:right-8 z-50 flex items-center gap-1.5 mobile-landscape:gap-1 tablet-portrait:gap-2 tablet-landscape:gap-2 desktop:gap-3 safe-area-top safe-area-right">
+        {/* Job ID search - always visible */}
+        <TopbarJobSearch
+          onJobLoaded={(job, activities) => {
+            setActiveJob(job);
+            setActiveJobActivities(activities);
+            setActiveInstructor(null);
+            changeView('instructor_select');
+          }}
+        />
+
+        {/* Today's jobs button */}
+        <TodayJobsButton
+          onSelectJob={(job, activities) => {
+            setActiveJob(job);
+            setActiveJobActivities(activities);
+            setActiveInstructor(null);
+            changeView('instructor_select');
+          }}
+        />
+
         {/* Claude AI Button - Admin Only */}
         {profile?.role === 'ADMIN' && (
           <button
@@ -1919,6 +1930,16 @@ const App: React.FC = () => {
               onJobLoaded={(job, activities) => {
                 setActiveJob(job);
                 setActiveJobActivities(activities);
+                setActiveInstructor(null);
+                changeView('instructor_select');
+              }}
+            />
+          ) : currentView === 'instructor_select' && activeJob ? (
+            <InstructorSelect
+              jobId={activeJob.id}
+              jobTitle={`${activeJob.short_code || ''} — ${activeJob.client_name || 'Opgave'}`}
+              onSelect={(instructor) => {
+                setActiveInstructor(instructor);
                 changeView('job_overview');
               }}
             />

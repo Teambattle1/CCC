@@ -175,7 +175,13 @@ Regler:
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `API fejl: ${response.status}`);
+        const errMsg = errorData.error?.message || `HTTP ${response.status}`;
+        if (response.status === 401) {
+          throw new Error('Ugyldig API nøgle - opdater VITE_ANTHROPIC_API_KEY i .env');
+        } else if (response.status === 403) {
+          throw new Error('API nøgle har ikke adgang - tjek at nøglen er aktiv');
+        }
+        throw new Error(`API fejl: ${errMsg}`);
       }
 
       const data = await response.json();
