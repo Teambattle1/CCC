@@ -340,7 +340,12 @@ const App: React.FC = () => {
   };
 
   const handleLinkClick = (link: HubLink) => {
-    if (link.title === 'OPGAVER') changeView('opgaver');
+    // URL-based navigation takes priority over title-based (e.g. scorecard links in Games view)
+    if (link.url === '#teamlazer_scorecard') changeView('teamlazer_scorecard');
+    else if (link.url === '#teamconstruct_scorecard') changeView('teamconstruct_scorecard');
+    else if (link.url === '#teamrace_scorecard') changeView('teamrace_scorecard');
+    // Title-based navigation for hub/activity links
+    else if (link.title === 'OPGAVER') changeView('opgaver');
     else if (link.title === 'AKTIVITETER') changeView('activities');
     else if (link.title === 'GAMES') changeView('games');
     else if (link.title === 'ACTIVITIES') changeView('activities');
@@ -2007,7 +2012,7 @@ const App: React.FC = () => {
                     : [
                         { name: 'Spil', borderColor: 'border-blue-500', bgColor: 'bg-blue-500/10', titleColor: 'text-blue-400' },
                         { name: 'Loquiz', borderColor: 'border-purple-500', bgColor: 'bg-purple-500/10', titleColor: 'text-purple-400' },
-                        { name: 'Scorecards', borderColor: 'border-yellow-500', bgColor: 'bg-yellow-500/10', titleColor: 'text-yellow-400' },
+                        { name: 'Online Scoreboard', borderColor: 'border-yellow-500', bgColor: 'bg-yellow-500/10', titleColor: 'text-yellow-400' },
                       ];
                   return sections.map((section) => {
                     const sectionLinks = currentLinks.filter(l => l.section === section.name);
@@ -2090,7 +2095,7 @@ const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 text-center text-battle-grey text-xs uppercase tracking-widest mt-auto">
-        <p>&copy; {new Date().getFullYear()} TeamBattle Systems. Authorized Personnel Only.</p>
+        <p>&copy; {new Date().getFullYear()} TeamBattle Systems.</p>
       </footer>
 
     </div>

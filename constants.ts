@@ -1462,13 +1462,26 @@ export const OPGAVER_LINKS: HubLink[] = [
 
 // Games Submenu Links (Game platforms)
 export const GAMES_LINKS: HubLink[] = [
-  { id: 'g1', title: 'TEAMPLAY', url: 'https://play.eventday.dk', icon: Play, description: 'TeamPlay Game', color: 'green', section: 'Spil' },
-  { id: 'g2', title: 'TEAMTASTE', url: 'https://taste.eventday.dk', icon: Utensils, description: 'TeamTaste Game', color: 'gold', section: 'Spil' },
+  // Spil section
+  { id: 'g1', title: 'PLAY', url: 'https://play.eventday.dk', icon: Play, description: 'TeamPlay Game', color: 'green', section: 'Spil' },
+  { id: 'g2', title: 'TASTE', url: 'https://taste.eventday.dk', icon: Utensils, description: 'TeamTaste Game', color: 'gold', section: 'Spil' },
+  { id: 'g8', title: 'TRACK', url: 'https://track.eventday.dk', icon: Navigation, description: 'Live Tracking', color: 'lightblue', section: 'Spil' },
+  // Loquiz section
   { id: 'g3', title: 'LOQUIZ RESULTS', url: 'https://service-2026-loquiz-results-viewer-476701928390.us-west1.run.app/', icon: ListChecks, description: 'Game Standings', color: 'blue', section: 'Loquiz' },
   { id: 'g4', title: 'LOQUIZ SETUP', url: 'https://beta.loquiz.com/dashboard', icon: Wrench, description: 'Game Configuration', color: 'purple', section: 'Loquiz' },
-  { id: 'g5', title: 'LAZERPOINT', url: '#teamlazer_scorecard', icon: Zap, description: 'Scoreboard', color: 'blue', section: 'Scorecards' },
-  { id: 'g6', title: 'CONSTRUCT', url: '#teamconstruct_scorecard', icon: Hammer, description: 'Scorecard', color: 'yellow', section: 'Scorecards' },
-  { id: 'g7', title: 'RACE', url: '#teamrace_scorecard', icon: Car, description: 'Scorecard', color: 'orange', section: 'Scorecards' },
+  // Scorecards section - one per activity (links to scorecard if exists)
+  { id: 'gs1', title: 'PLAY', url: '#', icon: Users, description: 'Kommer snart', color: 'orange', section: 'Online Scoreboard' },
+  { id: 'gs2', title: 'CHALLENGE', url: '#', icon: Trophy, description: 'Kommer snart', color: 'hotpink', section: 'Online Scoreboard' },
+  { id: 'gs3', title: 'TASTE', url: '#', icon: Utensils, description: 'Kommer snart', color: 'gold', section: 'Online Scoreboard' },
+  { id: 'gs4', title: 'LAZER', url: '#teamlazer_scorecard', icon: Zap, description: 'LazerPoint', color: 'blue', section: 'Online Scoreboard' },
+  { id: 'gs5', title: 'ROBIN', url: '#', icon: Target, description: 'Kommer snart', color: 'lightgreen', section: 'Online Scoreboard' },
+  { id: 'gs6', title: 'SEGWAY', url: '#', icon: Navigation, description: 'Kommer snart', color: 'red', section: 'Online Scoreboard' },
+  { id: 'gs7', title: 'CONNECT', url: '#', icon: CircleDot, description: 'Kommer snart', color: 'purple', section: 'Online Scoreboard' },
+  { id: 'gs8', title: 'BOX', url: '#', icon: Package, description: 'Kommer snart', color: 'gray', section: 'Online Scoreboard' },
+  { id: 'gs9', title: 'CONTROL', url: '#', icon: Gamepad2, description: 'Kommer snart', color: 'white', section: 'Online Scoreboard' },
+  { id: 'gs10', title: 'ACTION', url: '#', icon: Swords, description: 'Kommer snart', color: 'lightblue', section: 'Online Scoreboard' },
+  { id: 'gs11', title: 'CONSTRUCT', url: '#teamconstruct_scorecard', icon: Hammer, description: 'Scorecard', color: 'yellow', section: 'Online Scoreboard' },
+  { id: 'gs12', title: 'RACE', url: '#teamrace_scorecard', icon: Car, description: 'Scorecard', color: 'orange', section: 'Online Scoreboard' },
 ];
 
 // Activity Submenu Links
