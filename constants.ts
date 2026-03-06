@@ -1415,15 +1415,31 @@ export const GOOGLE_TOOLS_LINKS: HubLink[] = [
   }
 ];
 
-// Main Hub Links (2-button landing page)
+// Main Hub Links (4-button landing page)
 export const HUB_LINKS: HubLink[] = [
   {
-    id: '1',
-    title: 'CONTROLCENTER',
-    url: '#controlcenter',
-    icon: LayoutDashboard,
-    description: 'Crew Control',
+    id: 'hub_opgaver',
+    title: 'OPGAVER',
+    url: '#opgaver',
+    icon: ClipboardList,
+    description: 'Tasks & Admin',
+    color: 'green'
+  },
+  {
+    id: 'hub_aktiviteter',
+    title: 'AKTIVITETER',
+    url: '#aktiviteter',
+    icon: Gamepad2,
+    description: 'Alle Aktiviteter',
     color: 'orange'
+  },
+  {
+    id: 'hub_games',
+    title: 'GAMES',
+    url: '#games',
+    icon: Trophy,
+    description: 'Spil Platforme',
+    color: 'blue'
   },
   {
     id: 'cat3',
@@ -1435,26 +1451,24 @@ export const HUB_LINKS: HubLink[] = [
   }
 ];
 
-// ControlCenter Submenu Links (sectioned: Activities, Admin, Code)
-export const CONTROLCENTER_LINKS: HubLink[] = [
-  // Activities section
-  { id: 'a1', title: 'TEAMPLAY', url: '#teamplay', icon: Users, description: 'Cooperation', badge: 'ACTIVE', section: 'Activities' },
-  { id: 'a2', title: 'TEAMCHALLENGE', url: '#team_challenge', icon: Trophy, description: 'Competition', badge: 'ACTIVE', color: 'hotpink', section: 'Activities' },
-  { id: 'a3', title: 'TEAMTASTE', url: '#teamtaste', icon: Utensils, description: 'Culinary', badge: 'ACTIVE', color: 'gold', section: 'Activities' },
-  { id: 'a4', title: 'TEAMLAZER', url: '#teamlazer', icon: Zap, description: 'Laser Combat', color: 'blue', section: 'Activities' },
-  { id: 'a5', title: 'TEAMROBIN', url: '#teamrobin', icon: Target, description: 'Archery', color: 'lightgreen', badge: 'new', section: 'Activities' },
-  { id: 'a6', title: 'TEAMSEGWAY', url: '#teamsegway', icon: Navigation, description: 'Transporters', color: 'red', section: 'Activities' },
-  { id: 'a7', title: 'TEAMCONNECT', url: '#teamconnect', icon: CircleDot, description: 'Networking', color: 'purple', section: 'Activities' },
-  { id: 'a8', title: 'TEAMBOX', url: '#teambox', icon: Package, description: 'Portable Events', color: 'gray', section: 'Activities' },
-  { id: 'a9', title: 'TEAMCONTROL', url: '#teamcontrol', icon: Gamepad2, description: 'Strategy', color: 'white', section: 'Activities' },
-  { id: 'a10', title: 'TEAMACTION', url: '#teamaction', icon: Swords, description: 'High Intensity', color: 'lightblue', section: 'Activities' },
-  { id: 'a11', title: 'TEAMCONSTRUCT', url: '#teamconstruct', icon: Hammer, description: 'Building', color: 'yellow', section: 'Activities' },
-  { id: 'a12', title: 'TEAMRACE', url: '#teamrace', icon: Car, description: 'Racing', color: 'orange', section: 'Activities' },
-  // Admin section
+// Opgaver Submenu Links (Job flow + Admin)
+export const OPGAVER_LINKS: HubLink[] = [
+  { id: 'opg_job', title: 'HENT OPGAVE', url: '#job_input', icon: ClipboardList, description: 'Indtast Job ID', color: 'green', section: 'Job' },
   { id: 't2', title: 'CODE', url: '#code', icon: Code, description: 'Development Tools', color: 'purple', section: 'Admin' },
   { id: '15', title: 'USERS', url: '#users', icon: Users, description: 'User Management', color: 'red', section: 'Admin' },
   { id: 'ar1', title: 'FEJLRAPPORTER', url: '#admin_reports', icon: Wrench, description: 'Alle Fejlrapporter', color: 'yellow', badge: 'new', section: 'Admin' },
   { id: 'ar2', title: 'PAKKELISTER', url: '#admin_packing_editor', icon: Package, description: 'Rediger Pakkelister', color: 'green', badge: 'new', section: 'Admin' },
+];
+
+// Games Submenu Links (Game platforms)
+export const GAMES_LINKS: HubLink[] = [
+  { id: 'g1', title: 'TEAMPLAY', url: 'https://play.eventday.dk', icon: Play, description: 'TeamPlay Game', color: 'green', section: 'Spil' },
+  { id: 'g2', title: 'TEAMTASTE', url: 'https://taste.eventday.dk', icon: Utensils, description: 'TeamTaste Game', color: 'gold', section: 'Spil' },
+  { id: 'g3', title: 'LOQUIZ RESULTS', url: 'https://service-2026-loquiz-results-viewer-476701928390.us-west1.run.app/', icon: ListChecks, description: 'Game Standings', color: 'blue', section: 'Loquiz' },
+  { id: 'g4', title: 'LOQUIZ SETUP', url: 'https://beta.loquiz.com/dashboard', icon: Wrench, description: 'Game Configuration', color: 'purple', section: 'Loquiz' },
+  { id: 'g5', title: 'LAZERPOINT', url: '#teamlazer_scorecard', icon: Zap, description: 'Scoreboard', color: 'blue', section: 'Scorecards' },
+  { id: 'g6', title: 'CONSTRUCT', url: '#teamconstruct_scorecard', icon: Hammer, description: 'Scorecard', color: 'yellow', section: 'Scorecards' },
+  { id: 'g7', title: 'RACE', url: '#teamrace_scorecard', icon: Car, description: 'Scorecard', color: 'orange', section: 'Scorecards' },
 ];
 
 // Activity Submenu Links
