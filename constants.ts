@@ -34,6 +34,8 @@ import {
   Camera,
   Play,
   Download,
+  Upload,
+  Printer,
   Car,
   AlertTriangle,
   Edit3,
@@ -1482,6 +1484,10 @@ export const GAMES_LINKS: HubLink[] = [
   { id: 'gs10', title: 'ACTION', url: '#', icon: Swords, description: 'Kommer snart', color: 'lightblue', section: 'Online Scoreboard' },
   { id: 'gs11', title: 'CONSTRUCT', url: '#teamconstruct_scorecard', icon: Hammer, description: 'Scorecard', color: 'yellow', section: 'Online Scoreboard' },
   { id: 'gs12', title: 'RACE', url: '#teamrace_scorecard', icon: Car, description: 'Scorecard', color: 'orange', section: 'Online Scoreboard' },
+  // Upload / Download section
+  { id: 'gud1', title: 'UPLOAD BILLEDER', url: '#upload_photos', icon: Upload, description: 'Upload fotos', color: 'green', section: 'Upload / Download' },
+  { id: 'gud2', title: 'DOWNLOAD', url: '#download_materials', icon: Download, description: 'Materialer', color: 'green', section: 'Upload / Download' },
+  { id: 'gud3', title: 'PRINT', url: '#print_materials', icon: Printer, description: 'Print filer', color: 'green', section: 'Upload / Download' },
 ];
 
 // Activity Submenu Links

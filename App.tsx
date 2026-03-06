@@ -2013,6 +2013,7 @@ const App: React.FC = () => {
                         { name: 'Spil', borderColor: 'border-blue-500', bgColor: 'bg-blue-500/10', titleColor: 'text-blue-400' },
                         { name: 'Loquiz', borderColor: 'border-purple-500', bgColor: 'bg-purple-500/10', titleColor: 'text-purple-400' },
                         { name: 'Online Scoreboard', borderColor: 'border-yellow-500', bgColor: 'bg-yellow-500/10', titleColor: 'text-yellow-400' },
+                        { name: 'Upload / Download', borderColor: 'border-green-500', bgColor: 'bg-green-500/10', titleColor: 'text-green-400' },
                       ];
                   return sections.map((section) => {
                     const sectionLinks = currentLinks.filter(l => l.section === section.name);
