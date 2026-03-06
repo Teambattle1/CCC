@@ -39,6 +39,10 @@ import {
   Car,
   AlertTriangle,
   Edit3,
+  FolderOpen,
+  Ruler,
+  Calendar,
+  Lightbulb,
   LucideProps
 } from 'lucide-react';
 import { HubLink } from './types';
@@ -202,6 +206,22 @@ export const TEAMPLAY_LINKS: HubLink[] = [
     icon: Wrench,
     description: 'Rapporter fejl',
     color: 'yellow'
+  },
+  {
+    id: 'tplay7',
+    title: 'SCORECARD',
+    url: '#',
+    icon: ListChecks,
+    description: 'Kommer snart',
+    color: 'red'
+  },
+  {
+    id: 'tplay8',
+    title: 'FILER',
+    url: '#teamplay_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -286,6 +306,22 @@ export const TEAMTASTE_LINKS: HubLink[] = [
     icon: Wrench,
     description: 'Rapporter fejl',
     color: 'yellow'
+  },
+  {
+    id: 'ttaste7',
+    title: 'SCORECARD',
+    url: '#',
+    icon: ListChecks,
+    description: 'Kommer snart',
+    color: 'red'
+  },
+  {
+    id: 'ttaste8',
+    title: 'FILER',
+    url: '#teamtaste_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -388,6 +424,22 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'tc9',
+    title: 'SCORECARD',
+    url: '#',
+    icon: ListChecks,
+    description: 'Kommer snart',
+    color: 'red'
+  },
+  {
+    id: 'tc10',
+    title: 'FILER',
+    url: '#teamchallenge_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -508,6 +560,14 @@ export const TEAMLAZER_LINKS: HubLink[] = [
     icon: Radio,
     description: 'Frekvens Guide',
     color: 'purple'
+  },
+  {
+    id: 'tl9',
+    title: 'FILER',
+    url: '#teamlazer_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -604,6 +664,14 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'ts7',
+    title: 'FILER',
+    url: '#teamsegway_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -681,10 +749,10 @@ export const TEAMBOX_LINKS: HubLink[] = [
   },
   {
     id: 'tb6',
-    title: 'DOWNLOAD',
-    url: '#teambox_downloads',
-    icon: Download,
-    description: 'Billeder & Filer',
+    title: 'FILER',
+    url: '#teambox_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
     color: 'purple'
   },
   {
@@ -695,6 +763,14 @@ export const TEAMBOX_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'tb8',
+    title: 'SCORECARD',
+    url: '#',
+    icon: ListChecks,
+    description: 'Kommer snart',
+    color: 'red'
   }
 ];
 
@@ -779,6 +855,14 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'tcons7',
+    title: 'FILER',
+    url: '#teamconstruct_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -842,6 +926,22 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'tctrl8',
+    title: 'SCORECARD',
+    url: '#',
+    icon: ListChecks,
+    description: 'Kommer snart',
+    color: 'red'
+  },
+  {
+    id: 'tctrl9',
+    title: 'FILER',
+    url: '#teamcontrol_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -938,6 +1038,22 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'tc6',
+    title: 'SCORECARD',
+    url: '#',
+    icon: ListChecks,
+    description: 'Kommer snart',
+    color: 'red'
+  },
+  {
+    id: 'tc7',
+    title: 'FILER',
+    url: '#teamconnect_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -1023,6 +1139,14 @@ export const TEAMROBIN_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'tr7',
+    title: 'FILER',
+    url: '#teamrobin_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -1142,6 +1266,22 @@ export const TEAMACTION_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'ta7',
+    title: 'SCORECARD',
+    url: '#',
+    icon: ListChecks,
+    description: 'Kommer snart',
+    color: 'red'
+  },
+  {
+    id: 'ta8',
+    title: 'FILER',
+    url: '#teamaction_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -1243,6 +1383,14 @@ export const TEAMRACE_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'trace9',
+    title: 'FILER',
+    url: '#teamrace_files',
+    icon: FolderOpen,
+    description: 'Upload & Download',
+    color: 'purple'
   }
 ];
 
@@ -1421,10 +1569,10 @@ export const GOOGLE_TOOLS_LINKS: HubLink[] = [
 export const HUB_LINKS: HubLink[] = [
   {
     id: 'hub_opgaver',
-    title: 'OPGAVER',
+    title: 'MINE SESSIONS',
     url: '#opgaver',
     icon: ClipboardList,
-    description: 'Tasks & Admin',
+    description: 'Mine Opgaver',
     color: 'green'
   },
   {
@@ -1444,22 +1592,21 @@ export const HUB_LINKS: HubLink[] = [
     color: 'blue'
   },
   {
-    id: 'cat3',
-    title: 'OFFICE',
-    url: '#office',
-    icon: Briefcase,
-    description: 'Communication',
-    color: 'red'
+    id: 'hub_ideas',
+    title: 'IDÉER',
+    url: '#ideas',
+    icon: Lightbulb,
+    description: 'Indsend forslag',
+    color: 'gold'
   }
 ];
 
 // Opgaver Submenu Links (Job flow + Admin)
 export const OPGAVER_LINKS: HubLink[] = [
-  { id: 'opg_job', title: 'HENT OPGAVE', url: '#job_input', icon: ClipboardList, description: 'Indtast Job ID', color: 'green', section: 'Job' },
-  { id: 't2', title: 'CODE', url: '#code', icon: Code, description: 'Development Tools', color: 'purple', section: 'Admin' },
-  { id: '15', title: 'USERS', url: '#users', icon: Users, description: 'User Management', color: 'red', section: 'Admin' },
-  { id: 'ar1', title: 'FEJLRAPPORTER', url: '#admin_reports', icon: Wrench, description: 'Alle Fejlrapporter', color: 'yellow', badge: 'new', section: 'Admin' },
-  { id: 'ar2', title: 'PAKKELISTER', url: '#admin_packing_editor', icon: Package, description: 'Rediger Pakkelister', color: 'green', badge: 'new', section: 'Admin' },
+  { id: 'opg_job', title: 'HENT OPGAVE', url: '#job_input', icon: ClipboardList, description: 'Indtast Session ID', color: 'green', section: 'Session' },
+  { id: 'opg_mine', title: 'VIS MINE OPGAVER', url: '#my_jobs', icon: ListChecks, description: 'Mine sessioner', color: 'blue', badge: 'beta', badgeColor: 'blue', section: 'Session' },
+  { id: 'opg_distance', title: 'AFSTANDSBEREGNER', url: '#distance_tool', icon: Ruler, description: 'Beregn Afstand', color: 'lightblue', section: 'Session' },
+  { id: 'opg_calendar', title: 'UGEKALENDER', url: '#calendar', icon: Calendar, description: 'Ugeoversigt', color: 'orange', section: 'Session' },
 ];
 
 // Games Submenu Links (Game platforms)
@@ -1471,23 +1618,6 @@ export const GAMES_LINKS: HubLink[] = [
   // Loquiz section
   { id: 'g3', title: 'LOQUIZ RESULTS', url: 'https://service-2026-loquiz-results-viewer-476701928390.us-west1.run.app/', icon: ListChecks, description: 'Game Standings', color: 'blue', section: 'Loquiz' },
   { id: 'g4', title: 'LOQUIZ SETUP', url: 'https://beta.loquiz.com/dashboard', icon: Wrench, description: 'Game Configuration', color: 'purple', section: 'Loquiz' },
-  // Scorecards section - one per activity (links to scorecard if exists)
-  { id: 'gs1', title: 'PLAY', url: '#', icon: Users, description: 'Kommer snart', color: 'orange', section: 'Online Scoreboard' },
-  { id: 'gs2', title: 'CHALLENGE', url: '#', icon: Trophy, description: 'Kommer snart', color: 'hotpink', section: 'Online Scoreboard' },
-  { id: 'gs3', title: 'TASTE', url: '#', icon: Utensils, description: 'Kommer snart', color: 'gold', section: 'Online Scoreboard' },
-  { id: 'gs4', title: 'LAZER', url: '#teamlazer_scorecard', icon: Zap, description: 'LazerPoint', color: 'blue', section: 'Online Scoreboard' },
-  { id: 'gs5', title: 'ROBIN', url: '#', icon: Target, description: 'Kommer snart', color: 'lightgreen', section: 'Online Scoreboard' },
-  { id: 'gs6', title: 'SEGWAY', url: '#', icon: Navigation, description: 'Kommer snart', color: 'red', section: 'Online Scoreboard' },
-  { id: 'gs7', title: 'CONNECT', url: '#', icon: CircleDot, description: 'Kommer snart', color: 'purple', section: 'Online Scoreboard' },
-  { id: 'gs8', title: 'BOX', url: '#', icon: Package, description: 'Kommer snart', color: 'gray', section: 'Online Scoreboard' },
-  { id: 'gs9', title: 'CONTROL', url: '#', icon: Gamepad2, description: 'Kommer snart', color: 'white', section: 'Online Scoreboard' },
-  { id: 'gs10', title: 'ACTION', url: '#', icon: Swords, description: 'Kommer snart', color: 'lightblue', section: 'Online Scoreboard' },
-  { id: 'gs11', title: 'CONSTRUCT', url: '#teamconstruct_scorecard', icon: Hammer, description: 'Scorecard', color: 'yellow', section: 'Online Scoreboard' },
-  { id: 'gs12', title: 'RACE', url: '#teamrace_scorecard', icon: Car, description: 'Scorecard', color: 'orange', section: 'Online Scoreboard' },
-  // Upload / Download section
-  { id: 'gud1', title: 'UPLOAD BILLEDER', url: '#upload_photos', icon: Upload, description: 'Upload fotos', color: 'green', section: 'Upload / Download' },
-  { id: 'gud2', title: 'DOWNLOAD', url: '#download_materials', icon: Download, description: 'Materialer', color: 'green', section: 'Upload / Download' },
-  { id: 'gud3', title: 'PRINT', url: '#print_materials', icon: Printer, description: 'Print filer', color: 'green', section: 'Upload / Download' },
 ];
 
 // Activity Submenu Links

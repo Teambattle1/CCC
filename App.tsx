@@ -96,6 +96,10 @@ import ActivityGuide from './components/ActivityGuide';
 import JobInput from './components/JobInput';
 import JobOverview from './components/JobOverview';
 import InstructorSelect from './components/InstructorSelect';
+import SessionReport from './components/SessionReport';
+import MyJobs from './components/MyJobs';
+import ActivityFileManager from './components/ActivityFileManager';
+import SitemapModal from './components/SitemapModal';
 import TopbarJobSearch from './components/TopbarJobSearch';
 import TodayJobsButton from './components/TodayJobsButton';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
@@ -122,18 +126,18 @@ import {
   Gamepad2,
   Hammer,
   Bot,
-  Ruler,
+  Settings,
   Package,
   ListChecks,
-  HelpCircle,
   Map,
   Car,
   Users,
-  Utensils
+  Utensils,
+  FolderOpen
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing';
+type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -144,6 +148,7 @@ const App: React.FC = () => {
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
   const [isIdeasOpen, setIsIdeasOpen] = useState(false);
+  const [isSitemapOpen, setIsSitemapOpen] = useState(false);
   const [fejlsogningCount, setFejlsogningCount] = useState(0);
   const [activeJob, setActiveJob] = useState<TaskJob | null>(null);
   const [activeJobActivities, setActiveJobActivities] = useState<ResolvedActivity[]>([]);
@@ -229,7 +234,7 @@ const App: React.FC = () => {
 
     return links.filter(link => {
       // Landing page items
-      if (link.title === 'OPGAVER') return rolePerms.landing_admin;
+      if (link.title === 'MINE SESSIONS') return rolePerms.landing_admin;
       if (link.title === 'OFFICE') return rolePerms.landing_office;
       if (link.title === 'AKTIVITETER') return rolePerms.landing_activities;
       if (link.title === 'GAMES') return rolePerms.landing_activities;
@@ -345,7 +350,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamconstruct_scorecard') changeView('teamconstruct_scorecard');
     else if (link.url === '#teamrace_scorecard') changeView('teamrace_scorecard');
     // Title-based navigation for hub/activity links
-    else if (link.title === 'OPGAVER') changeView('opgaver');
+    else if (link.title === 'MINE SESSIONS') changeView('opgaver');
     else if (link.title === 'AKTIVITETER') changeView('activities');
     else if (link.title === 'GAMES') changeView('games');
     else if (link.title === 'ACTIVITIES') changeView('activities');
@@ -366,7 +371,9 @@ const App: React.FC = () => {
     else if (link.title === 'TEAMRACE') changeView('teamrace');
     else if (link.title === 'TEAMPLAY') changeView('teamplay');
     else if (link.title === 'TEAMTASTE') changeView('teamtaste');
-    else if (link.title === 'DISTANCE') changeView('distance_tool');
+    else if (link.title === 'DISTANCE' || link.url === '#distance_tool') changeView('distance_tool');
+    else if (link.url === '#calendar' || link.title === 'UGEKALENDER') setIsCalendarOpen(true);
+    else if (link.url === '#ideas') setIsIdeasOpen(true);
     else if (link.url === '#teamrobin_packing') changeView('teamrobin_packing');
     else if (link.url === '#teamrobin_packing_before') changeView('teamrobin_packing_before');
     else if (link.url === '#teamrobin_packing_after') changeView('teamrobin_packing_after');
@@ -467,7 +474,21 @@ const App: React.FC = () => {
     else if (link.url === '#teamcontrol_fejlsogning') changeView('teamcontrol_fejlsogning');
     else if (link.url === '#teamconstruct_fejlsogning') changeView('teamconstruct_fejlsogning');
     else if (link.url === '#teamrace_fejlsogning') changeView('teamrace_fejlsogning');
+    // Activity file manager views
+    else if (link.url === '#teamplay_files') changeView('teamplay_files');
+    else if (link.url === '#teamtaste_files') changeView('teamtaste_files');
+    else if (link.url === '#teamchallenge_files') changeView('teamchallenge_files');
+    else if (link.url === '#teamlazer_files') changeView('teamlazer_files');
+    else if (link.url === '#teamrobin_files') changeView('teamrobin_files');
+    else if (link.url === '#teamsegway_files') changeView('teamsegway_files');
+    else if (link.url === '#teamconnect_files') changeView('teamconnect_files');
+    else if (link.url === '#teambox_files') changeView('teambox_files');
+    else if (link.url === '#teamcontrol_files') changeView('teamcontrol_files');
+    else if (link.url === '#teamaction_files') changeView('teamaction_files');
+    else if (link.url === '#teamconstruct_files') changeView('teamconstruct_files');
+    else if (link.url === '#teamrace_files') changeView('teamrace_files');
     else if (link.url === '#job_input') changeView('job_input');
+    else if (link.url === '#my_jobs') changeView('my_jobs');
     // Edit packing list - extract activity name from URL
     else if (link.url?.startsWith('#edit_packing_')) {
       setEditPackingActivity(link.url.replace('#edit_packing_', ''));
@@ -483,6 +504,10 @@ const App: React.FC = () => {
   const handleBackClick = () => {
     // Nested navigation logic
     if (currentView === 'job_input') {
+      changeView('opgaver');
+    } else if (currentView === 'session_report') {
+      changeView('opgaver');
+    } else if (currentView === 'my_jobs') {
       changeView('opgaver');
     } else if (currentView === 'instructor_select') {
       changeView('job_input');
@@ -525,7 +550,7 @@ const App: React.FC = () => {
     } else if (currentView === 'teamrace_packing_afgang' || currentView === 'teamrace_packing_hjemkomst' || currentView === 'teamrace_packing_taske') {
       changeView('teamrace_packing');
     } else if (currentView === 'distance_tool') {
-      changeView('tools');
+      changeView('opgaver');
     } else if (currentView === 'task_control') {
       changeView('opgaver');
     } else if (currentView === 'code') {
@@ -668,6 +693,31 @@ const App: React.FC = () => {
       changeView('teamconstruct');
     } else if (currentView === 'teamrace_fejlsogning') {
       changeView('teamrace');
+    // Activity file manager back navigation
+    } else if (currentView === 'teamplay_files') {
+      changeView('teamplay');
+    } else if (currentView === 'teamtaste_files') {
+      changeView('teamtaste');
+    } else if (currentView === 'teamchallenge_files') {
+      changeView('team_challenge');
+    } else if (currentView === 'teamlazer_files') {
+      changeView('teamlazer');
+    } else if (currentView === 'teamrobin_files') {
+      changeView('teamrobin');
+    } else if (currentView === 'teamsegway_files') {
+      changeView('teamsegway');
+    } else if (currentView === 'teamconnect_files') {
+      changeView('teamconnect');
+    } else if (currentView === 'teambox_files') {
+      changeView('teambox');
+    } else if (currentView === 'teamcontrol_files') {
+      changeView('teamcontrol');
+    } else if (currentView === 'teamaction_files') {
+      changeView('teamaction');
+    } else if (currentView === 'teamconstruct_files') {
+      changeView('teamconstruct');
+    } else if (currentView === 'teamrace_files') {
+      changeView('teamrace');
     // Edit packing back navigation - go to the activity's packing submenu
     } else if (currentView === 'edit_packing') {
       const activity = editPackingActivity;
@@ -700,8 +750,8 @@ const App: React.FC = () => {
   switch (currentView) {
     case 'opgaver':
       currentLinks = OPGAVER_LINKS;
-      viewTitle = 'OPGAVER';
-      viewSubtitle = 'Tasks & Admin';
+      viewTitle = 'MINE SESSIONS';
+      viewSubtitle = 'Mine Opgaver';
       ViewIcon = ClipboardList;
       break;
     case 'games':
@@ -760,8 +810,20 @@ const App: React.FC = () => {
       break;
     case 'job_input':
       currentLinks = [];
-      viewTitle = 'OPGAVE';
-      viewSubtitle = 'Indtast Opgave ID';
+      viewTitle = 'SESSION';
+      viewSubtitle = 'Indtast Session ID';
+      ViewIcon = Briefcase;
+      break;
+    case 'session_report':
+      currentLinks = [];
+      viewTitle = 'SESSION RAPPORT';
+      viewSubtitle = activeJob?.client_name ? `#${activeJob.short_code} — ${activeJob.client_name}` : '';
+      ViewIcon = Briefcase;
+      break;
+    case 'my_jobs':
+      currentLinks = [];
+      viewTitle = 'MINE OPGAVER';
+      viewSubtitle = 'Tildelte sessioner';
       ViewIcon = Briefcase;
       break;
     case 'instructor_select':
@@ -853,6 +915,79 @@ const App: React.FC = () => {
       viewTitle = 'DOWNLOADS';
       viewSubtitle = 'TeamBox Filer';
       ViewIcon = Package;
+      break;
+    // Activity File Manager views
+    case 'teamplay_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamPlay';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamtaste_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamTaste';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamchallenge_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamChallenge';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamlazer_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamLazer';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamrobin_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamRobin';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamsegway_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamSegway';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamconnect_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamConnect';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teambox_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamBox';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamcontrol_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamControl';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamaction_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamAction';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamconstruct_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamConstruct';
+      ViewIcon = FolderOpen;
+      break;
+    case 'teamrace_files':
+      currentLinks = [];
+      viewTitle = 'FILER';
+      viewSubtitle = 'TeamRace';
+      ViewIcon = FolderOpen;
       break;
     case 'teamsegway':
       currentLinks = TEAMSEGWAY_LINKS;
@@ -1481,10 +1616,13 @@ const App: React.FC = () => {
   let gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-3 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-5xl mx-auto responsive-activities-grid";
 
   if (currentView === 'main') {
-    // Main view: 4-button centered layout
-    gridClass = "flex flex-wrap justify-center gap-3 mobile-landscape:gap-3 tablet-portrait:gap-6 tablet-landscape:gap-5 desktop:gap-8 max-w-4xl mx-auto";
-  } else if (currentView === 'opgaver' || currentView === 'games') {
-    // Opgaver/Games: sectioned layout (handled in custom render)
+    // Main view: 2x2 grid layout
+    gridClass = "grid grid-cols-2 gap-3 mobile-landscape:gap-3 tablet-portrait:gap-6 tablet-landscape:gap-5 desktop:gap-8 max-w-md tablet-portrait:max-w-xl tablet-landscape:max-w-2xl desktop:max-w-3xl mx-auto justify-items-center";
+  } else if (currentView === 'opgaver') {
+    // Opgaver: standard button grid like activities
+    gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-4 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-3xl mx-auto";
+  } else if (currentView === 'games') {
+    // Games: sectioned layout (handled in custom render)
     gridClass = "";
   } else if (currentView === 'activities') {
     // Activities: responsive grid for 11 items
@@ -1514,9 +1652,32 @@ const App: React.FC = () => {
         ></div>
       </div>
 
-      {/* Top Left Back Button + Instructor Badge */}
-      {currentView !== 'main' && (
-        <div className="absolute top-2 left-2 mobile-landscape:top-1.5 mobile-landscape:left-1.5 tablet-portrait:top-4 tablet-portrait:left-4 tablet-landscape:top-3 tablet-landscape:left-3 desktop:top-8 desktop:left-8 z-50 safe-area-top safe-area-left flex items-center gap-1.5">
+      {/* Top Left - Back Button + User Info + Logout */}
+      <div className="absolute top-2 left-2 mobile-landscape:top-1.5 mobile-landscape:left-1.5 tablet-portrait:top-4 tablet-portrait:left-4 tablet-landscape:top-3 tablet-landscape:left-3 desktop:top-8 desktop:left-8 z-50 safe-area-top safe-area-left flex items-center gap-1.5">
+        {/* Logout Button - leftmost */}
+        <button
+          onClick={signOut}
+          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-red-500/20 active:bg-red-500/30 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
+          title="Log ud"
+        >
+          <LogOut className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-red-500 group-active:text-red-400 transition-colors" />
+        </button>
+
+        {/* User Info */}
+        <div className="hidden tablet-portrait:flex items-center gap-2 bg-battle-grey/50 border border-white/10 rounded-full px-3 py-1.5 tablet-portrait:px-4 tablet-portrait:py-2">
+          <User className="w-3.5 h-3.5 tablet-portrait:w-4 tablet-portrait:h-4 text-gray-400" />
+          <span className="text-xs tablet-portrait:text-sm text-gray-300 max-w-[100px] tablet-portrait:max-w-[150px] truncate">{profile?.name || profile?.email}</span>
+          <span className={`text-[10px] tablet-portrait:text-xs px-1.5 tablet-portrait:px-2 py-0.5 rounded-full ${
+            profile?.role === 'ADMIN' ? 'bg-red-500/20 text-white' :
+            profile?.role === 'GAMEMASTER' ? 'bg-purple-500/20 text-purple-400' :
+            'bg-blue-500/20 text-blue-400'
+          }`}>
+            {profile?.role}
+          </span>
+        </div>
+
+        {/* Back button - only when not on main */}
+        {currentView !== 'main' && (
           <button
             onClick={handleBackClick}
             className="group flex items-center justify-center w-10 h-10 mobile-landscape:w-9 mobile-landscape:h-9 tablet-portrait:w-12 tablet-portrait:h-12 tablet-landscape:w-11 tablet-landscape:h-11 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
@@ -1524,16 +1685,18 @@ const App: React.FC = () => {
           >
             <House className="w-5 h-5 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-6 tablet-portrait:h-6 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-battle-orange group-active:text-battle-orange transition-colors" />
           </button>
-          {activeInstructor && (
-            <div className="flex items-center gap-1 bg-battle-orange/15 border border-battle-orange/30 rounded-full px-2 py-1 tablet-portrait:px-3 tablet-portrait:py-1.5">
-              <User className="w-3 h-3 tablet-portrait:w-4 tablet-portrait:h-4 text-battle-orange" />
-              <span className="text-[10px] tablet-portrait:text-xs text-battle-orange font-bold uppercase truncate max-w-[80px] tablet-portrait:max-w-[120px]">
-                {activeInstructor.name}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+
+        {/* Instructor Badge */}
+        {activeInstructor && (
+          <div className="flex items-center gap-1 bg-battle-orange/15 border border-battle-orange/30 rounded-full px-2 py-1 tablet-portrait:px-3 tablet-portrait:py-1.5">
+            <User className="w-3 h-3 tablet-portrait:w-4 tablet-portrait:h-4 text-battle-orange" />
+            <span className="text-[10px] tablet-portrait:text-xs text-battle-orange font-bold uppercase truncate max-w-[80px] tablet-portrait:max-w-[120px]">
+              {activeInstructor.name}
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Center Top Clock */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
@@ -1542,25 +1705,27 @@ const App: React.FC = () => {
 
       {/* Top Right - All controls */}
       <div className="absolute top-2 right-2 mobile-landscape:top-1.5 mobile-landscape:right-1.5 tablet-portrait:top-4 tablet-portrait:right-4 tablet-landscape:top-3 tablet-landscape:right-3 desktop:top-8 desktop:right-8 z-50 flex items-center gap-1.5 mobile-landscape:gap-1 tablet-portrait:gap-2 tablet-landscape:gap-2 desktop:gap-3 safe-area-top safe-area-right">
-        {/* Job ID search - always visible */}
-        <TopbarJobSearch
-          onJobLoaded={(job, activities) => {
-            setActiveJob(job);
-            setActiveJobActivities(activities);
-            setActiveInstructor(null);
-            changeView('instructor_select');
-          }}
-        />
+        {/* Sitemap Button - Admin Only */}
+        {profile?.role === 'ADMIN' && (
+          <button
+            onClick={() => setIsSitemapOpen(true)}
+            className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-emerald-500/20 active:bg-emerald-500/30 border border-white/10 hover:border-emerald-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
+            title="Sitemap"
+          >
+            <MapPin className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-emerald-400 group-active:text-emerald-300 transition-colors" />
+          </button>
+        )}
 
-        {/* Today's jobs button */}
-        <TodayJobsButton
-          onSelectJob={(job, activities) => {
-            setActiveJob(job);
-            setActiveJobActivities(activities);
-            setActiveInstructor(null);
-            changeView('instructor_select');
-          }}
-        />
+        {/* Admin Panel Button - Admin Only */}
+        {profile?.role === 'ADMIN' && (
+          <button
+            onClick={() => changeView('task_control')}
+            className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-red-500/20 active:bg-red-500/30 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
+            title="Admin"
+          >
+            <Settings className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-red-400 group-active:text-red-300 transition-colors" />
+          </button>
+        )}
 
         {/* Claude AI Button - Admin Only */}
         {profile?.role === 'ADMIN' && (
@@ -1573,53 +1738,25 @@ const App: React.FC = () => {
           </button>
         )}
 
-        {/* User Info - Only visible on desktop */}
-        <div className="hidden desktop:flex items-center gap-2 bg-battle-grey/50 border border-white/10 rounded-full px-4 py-2">
-          <User className="w-4 h-4 text-gray-400" />
-          <span className="text-sm text-gray-300">{profile?.name || profile?.email}</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${
-            profile?.role === 'ADMIN' ? 'bg-red-500/20 text-white' :
-            profile?.role === 'GAMEMASTER' ? 'bg-purple-500/20 text-purple-400' :
-            'bg-blue-500/20 text-blue-400'
-          }`}>
-            {profile?.role}
-          </span>
-        </div>
+        {/* Today's jobs button */}
+        <TodayJobsButton
+          onSelectJob={(job, activities) => {
+            setActiveJob(job);
+            setActiveJobActivities(activities);
+            setActiveInstructor(null);
+            changeView('session_report');
+          }}
+        />
 
-        {/* Logout Button */}
-        <button
-          onClick={signOut}
-          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-red-500/20 active:bg-red-500/30 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
-          title="Log ud"
-        >
-          <LogOut className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-red-500 group-active:text-red-400 transition-colors" />
-        </button>
-
-        {/* Ideas Button */}
-        <button
-          onClick={() => setIsIdeasOpen(true)}
-          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-yellow-500/20 active:bg-yellow-500/30 border border-white/10 hover:border-yellow-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
-          title="Ideer & Forslag"
-        >
-          <HelpCircle className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-yellow-400 group-active:text-yellow-300 transition-colors" />
-        </button>
-
-        {/* Distance Button */}
-        <button
-          onClick={() => changeView('distance_tool')}
-          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-blue-500/20 active:bg-blue-500/30 border border-white/10 hover:border-blue-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
-          title="Afstandsberegner"
-        >
-          <Ruler className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-blue-400 group-active:text-blue-300 transition-colors" />
-        </button>
-
-        {/* Calendar Button */}
-        <button
-          onClick={() => setIsCalendarOpen(true)}
-          className="group flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
-        >
-          <Calendar className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-battle-orange group-active:text-battle-orangeLight transition-colors" />
-        </button>
+        {/* Job ID search - far right */}
+        <TopbarJobSearch
+          onJobLoaded={(job, activities) => {
+            setActiveJob(job);
+            setActiveJobActivities(activities);
+            setActiveInstructor(null);
+            changeView('session_report');
+          }}
+        />
       </div>
 
       <CalendarModal isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} />
@@ -1627,6 +1764,7 @@ const App: React.FC = () => {
       <UsersManagement isOpen={isUsersOpen} onClose={() => setIsUsersOpen(false)} />
       <ClaudeAssistant isOpen={isClaudeAssistantOpen} onClose={() => setIsClaudeAssistantOpen(false)} />
       <IdeasModal isOpen={isIdeasOpen} onClose={() => setIsIdeasOpen(false)} />
+      <SitemapModal isOpen={isSitemapOpen} onClose={() => setIsSitemapOpen(false)} onNavigate={(view) => changeView(view as ViewState)} currentView={currentView} />
 
       {/* Main Content Container - Responsive for all 5 modes */}
       <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-14 mobile-landscape:pt-10 tablet-portrait:pt-16 tablet-landscape:pt-12 desktop:pt-20 px-2 mobile-landscape:px-3 tablet-portrait:px-4 tablet-landscape:px-4 desktop:px-6 responsive-top-spacing safe-area-top">
@@ -1639,7 +1777,7 @@ const App: React.FC = () => {
 
             <div className="relative flex items-center justify-center mb-0.5 mobile-landscape:mb-0.5 tablet-portrait:mb-2 tablet-landscape:mb-1 desktop:mb-2">
                {/* Icon Positioned Absolute Left of the Title */}
-               <div className="absolute right-full mr-2 mobile-landscape:mr-2 tablet-portrait:mr-4 tablet-landscape:mr-3 desktop:mr-6 text-battle-orange drop-shadow-[0_0_10px_rgba(255,102,0,0.5)] flex items-center">
+               <div className={`absolute right-full mr-2 mobile-landscape:mr-2 tablet-portrait:mr-4 tablet-landscape:mr-3 desktop:mr-6 flex items-center ${viewTitle === 'FEJLRAPPORT' || viewTitle === 'FEJLRAPPORTER' ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-battle-orange drop-shadow-[0_0_10px_rgba(255,102,0,0.5)]'}`}>
                  <ViewIcon className="w-6 h-6 mobile-landscape:w-5 mobile-landscape:h-5 tablet-portrait:w-10 tablet-portrait:h-10 tablet-landscape:w-8 tablet-landscape:h-8 desktop:w-14 desktop:h-14" />
                </div>
 
@@ -1651,17 +1789,30 @@ const App: React.FC = () => {
                   </>
                 ) : viewTitle === 'OFFICE' || viewTitle === 'ADMIN' ? (
                   <span className="text-white">{viewTitle}</span>
+                ) : viewTitle === 'FEJLRAPPORT' || viewTitle === 'FEJLRAPPORTER' ? (
+                  <span className="text-yellow-400">{viewTitle}</span>
                 ) : (
                   <span className="text-battle-orange">{viewTitle}</span>
                 )}
               </h1>
             </div>
 
-            <DateDisplay />
-            {viewSubtitle && (
-              <p className="text-battle-white/50 text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-lg tracking-[0.2em] uppercase mt-0.5 mobile-landscape:mt-0.5 tablet-portrait:mt-1 responsive-subtitle">
-                {viewSubtitle}
-              </p>
+            {currentView === 'main' ? (
+              <>
+                <DateDisplay />
+                <p className="text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-lg tracking-[0.2em] uppercase mt-0.5 mobile-landscape:mt-0.5 tablet-portrait:mt-1 responsive-subtitle">
+                  <span className="text-white">CREW COM</span><span className="text-battle-orange">MAND CENTER</span>
+                </p>
+              </>
+            ) : (
+              <>
+                <DateDisplay />
+                {viewSubtitle && (
+                  <p className="text-battle-white/50 text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-lg tracking-[0.2em] uppercase mt-0.5 mobile-landscape:mt-0.5 tablet-portrait:mt-1 responsive-subtitle">
+                    {viewSubtitle}
+                  </p>
+                )}
+              </>
             )}
             <div className="h-0.5 w-12 mobile-landscape:w-10 tablet-portrait:w-24 tablet-landscape:w-20 desktop:w-32 desktop:h-1 bg-battle-orange mx-auto mt-2 mobile-landscape:mt-1.5 tablet-portrait:mt-4 tablet-landscape:mt-3 desktop:mt-6 rounded-full shadow-[0_0_15px_rgba(255,102,0,1)]"></div>
           </div>
@@ -1959,6 +2110,30 @@ const App: React.FC = () => {
               title="TeamRace Fejlsøgning"
               videoIndex={TEAMRACE_FEJLSOGNING_VIDEO_INDEX}
             />
+          ) : currentView === 'teamplay_files' ? (
+            <ActivityFileManager activity="teamplay" onBack={() => changeView('teamplay')} />
+          ) : currentView === 'teamtaste_files' ? (
+            <ActivityFileManager activity="teamtaste" onBack={() => changeView('teamtaste')} />
+          ) : currentView === 'teamchallenge_files' ? (
+            <ActivityFileManager activity="teamchallenge" onBack={() => changeView('team_challenge')} />
+          ) : currentView === 'teamlazer_files' ? (
+            <ActivityFileManager activity="teamlazer" onBack={() => changeView('teamlazer')} />
+          ) : currentView === 'teamrobin_files' ? (
+            <ActivityFileManager activity="teamrobin" onBack={() => changeView('teamrobin')} />
+          ) : currentView === 'teamsegway_files' ? (
+            <ActivityFileManager activity="teamsegway" onBack={() => changeView('teamsegway')} />
+          ) : currentView === 'teamconnect_files' ? (
+            <ActivityFileManager activity="teamconnect" onBack={() => changeView('teamconnect')} />
+          ) : currentView === 'teambox_files' ? (
+            <ActivityFileManager activity="teambox" onBack={() => changeView('teambox')} />
+          ) : currentView === 'teamcontrol_files' ? (
+            <ActivityFileManager activity="teamcontrol" onBack={() => changeView('teamcontrol')} />
+          ) : currentView === 'teamaction_files' ? (
+            <ActivityFileManager activity="teamaction" onBack={() => changeView('teamaction')} />
+          ) : currentView === 'teamconstruct_files' ? (
+            <ActivityFileManager activity="teamconstruct" onBack={() => changeView('teamconstruct')} />
+          ) : currentView === 'teamrace_files' ? (
+            <ActivityFileManager activity="teamrace" onBack={() => changeView('teamrace')} />
           ) : currentView === 'admin_reports' ? (
             <AdminReports />
           ) : currentView === 'admin_packing_editor' ? (
@@ -1971,7 +2146,22 @@ const App: React.FC = () => {
                 setActiveJob(job);
                 setActiveJobActivities(activities);
                 setActiveInstructor(null);
-                changeView('instructor_select');
+                changeView('session_report');
+              }}
+            />
+          ) : currentView === 'session_report' && activeJob ? (
+            <SessionReport
+              job={activeJob}
+              activities={activeJobActivities}
+              onNavigateActivity={(viewState) => changeView(viewState as ViewState)}
+            />
+          ) : currentView === 'my_jobs' ? (
+            <MyJobs
+              onJobSelected={(job, activities) => {
+                setActiveJob(job);
+                setActiveJobActivities(activities);
+                setActiveInstructor(null);
+                changeView('session_report');
               }}
             />
           ) : currentView === 'instructor_select' && activeJob ? (
@@ -2000,16 +2190,11 @@ const App: React.FC = () => {
                 />
               ))}
             </div>
-          ) : (currentView === 'opgaver' || currentView === 'games') ? (
+          ) : (currentView === 'games') ? (
             <div className="w-full max-w-4xl mx-auto px-1 mobile-landscape:px-2 tablet-portrait:px-4">
               <div className="grid grid-cols-1 tablet-portrait:grid-cols-2 gap-2 mobile-landscape:gap-1.5 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-4">
                 {(() => {
-                  const sections = currentView === 'opgaver'
-                    ? [
-                        { name: 'Job', borderColor: 'border-green-500', bgColor: 'bg-green-500/10', titleColor: 'text-green-400' },
-                        { name: 'Admin', borderColor: 'border-battle-orange', bgColor: 'bg-battle-orange/10', titleColor: 'text-battle-orange' },
-                      ]
-                    : [
+                  const sections = [
                         { name: 'Spil', borderColor: 'border-blue-500', bgColor: 'bg-blue-500/10', titleColor: 'text-blue-400' },
                         { name: 'Loquiz', borderColor: 'border-purple-500', bgColor: 'bg-purple-500/10', titleColor: 'text-purple-400' },
                         { name: 'Online Scoreboard', borderColor: 'border-yellow-500', bgColor: 'bg-yellow-500/10', titleColor: 'text-yellow-400' },

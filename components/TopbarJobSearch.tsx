@@ -32,7 +32,7 @@ const TopbarJobSearch: React.FC<TopbarJobSearchProps> = ({ onJobLoaded }) => {
       setHasValue(false);
       input.placeholder = `#${padded} ?`;
       setTimeout(() => {
-        input.placeholder = 'JOB #';
+        input.placeholder = 'SESSION ID';
         setHasError(false);
       }, 2000);
       return;
@@ -69,8 +69,8 @@ const TopbarJobSearch: React.FC<TopbarJobSearchProps> = ({ onJobLoaded }) => {
           inputMode="numeric"
           pattern="[0-9]*"
           maxLength={4}
-          placeholder="JOB #"
-          className="bg-transparent text-white text-sm mobile-landscape:text-sm tablet-portrait:text-base desktop:text-lg font-mono font-bold tracking-widest w-14 mobile-landscape:w-14 tablet-portrait:w-16 tablet-landscape:w-18 desktop:w-24 outline-none placeholder-gray-600"
+          placeholder="SESSION ID"
+          className="bg-transparent text-white text-sm mobile-landscape:text-sm tablet-portrait:text-base desktop:text-lg font-mono font-bold tracking-widest w-20 mobile-landscape:w-16 tablet-portrait:w-24 tablet-landscape:w-24 desktop:w-32 outline-none placeholder-gray-600"
           onChange={(e) => {
             e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
             setHasError(false);

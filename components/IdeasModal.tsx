@@ -1,137 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import {
-  HelpCircle,
   X,
   Send,
   Lightbulb,
-  ThumbsUp,
-  Trash2,
-  Clock
+  Clock,
+  CheckCircle2,
+  Loader2,
+  User
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-
-interface Idea {
-  id: string;
-  text: string;
-  author: string;
-  authorEmail: string;
-  timestamp: string;
-  votes: number;
-  votedBy: string[];
-}
+import { submitIdea, fetchIdeas, IdeaTodo } from '../lib/supabase';
 
 interface IdeasModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Load ideas from localStorage
-const loadIdeas = (): Idea[] => {
-  try {
-    const saved = localStorage.getItem('occ_ideas');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-  } catch (e) {
-    console.error('Failed to load ideas:', e);
-  }
-  return [];
-};
-
-// Save ideas to localStorage
-const saveIdeas = (ideas: Idea[]) => {
-  try {
-    localStorage.setItem('occ_ideas', JSON.stringify(ideas));
-  } catch (e) {
-    console.error('Failed to save ideas:', e);
-  }
-};
-
 const IdeasModal: React.FC<IdeasModalProps> = ({ isOpen, onClose }) => {
   const { profile, logAction } = useAuth();
-  const [ideas, setIdeas] = useState<Idea[]>(loadIdeas);
+  const [ideas, setIdeas] = useState<IdeaTodo[]>([]);
   const [newIdea, setNewIdea] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setIdeas(loadIdeas());
+      loadIdeas();
     }
   }, [isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const loadIdeas = async () => {
+    setIsLoading(true);
+    const data = await fetchIdeas();
+    setIdeas(data);
+    setIsLoading(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newIdea.trim() || !profile) return;
+    if (!newIdea.trim() || !profile || isSubmitting) return;
 
-    const idea: Idea = {
-      id: Date.now().toString(),
-      text: newIdea.trim(),
-      author: profile.name || profile.email,
-      authorEmail: profile.email,
-      timestamp: new Date().toISOString(),
-      votes: 0,
-      votedBy: []
-    };
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    const updatedIdeas = [idea, ...ideas];
-    setIdeas(updatedIdeas);
-    saveIdeas(updatedIdeas);
-    setNewIdea('');
-    logAction('SUBMIT_IDEA', `Submitted idea: ${idea.text.substring(0, 50)}...`);
+    const authorName = profile.name || profile.email;
+    const result = await submitIdea(newIdea.trim(), authorName, profile.email);
 
-    // Send email notification
-    const subject = encodeURIComponent(`Ny idé fra ${idea.author} - OCC`);
-    const body = encodeURIComponent(`Ny idé indsendt:\n\n"${idea.text}"\n\nFra: ${idea.author} (${idea.authorEmail})\nTidspunkt: ${new Date(idea.timestamp).toLocaleString('da-DK')}`);
+    if (result.success) {
+      setNewIdea('');
+      setShowSuccess(true);
+      logAction('SUBMIT_IDEA', `Submitted idea: ${newIdea.trim().substring(0, 50)}...`);
+      await loadIdeas();
+      setTimeout(() => setShowSuccess(false), 3000);
+    } else {
+      setSubmitError(result.error || 'Kunne ikke indsende idé');
+    }
 
-    // Open mailto link in background (hidden iframe approach won't work for mailto)
-    // Instead, we'll use a fetch to a webhook or just store locally
-    // For now, we'll create a mailto link that users can click if they want to share directly
-
-    // Alternative: Use a simple webhook/form service
-    // For simplicity, let's just show a toast that the idea was saved
-  };
-
-  const handleVote = (ideaId: string) => {
-    if (!profile) return;
-
-    const updatedIdeas = ideas.map(idea => {
-      if (idea.id === ideaId) {
-        const hasVoted = idea.votedBy.includes(profile.email);
-        if (hasVoted) {
-          // Remove vote
-          return {
-            ...idea,
-            votes: idea.votes - 1,
-            votedBy: idea.votedBy.filter(email => email !== profile.email)
-          };
-        } else {
-          // Add vote
-          return {
-            ...idea,
-            votes: idea.votes + 1,
-            votedBy: [...idea.votedBy, profile.email]
-          };
-        }
-      }
-      return idea;
-    });
-
-    setIdeas(updatedIdeas);
-    saveIdeas(updatedIdeas);
-  };
-
-  const handleDelete = (ideaId: string) => {
-    const idea = ideas.find(i => i.id === ideaId);
-    if (!idea) return;
-
-    // Only author or admin can delete
-    if (profile?.email !== idea.authorEmail && profile?.role !== 'ADMIN') return;
-
-    if (!confirm('Er du sikker på at du vil slette denne idé?')) return;
-
-    const updatedIdeas = ideas.filter(i => i.id !== ideaId);
-    setIdeas(updatedIdeas);
-    saveIdeas(updatedIdeas);
-    logAction('DELETE_IDEA', `Deleted idea: ${idea.text.substring(0, 50)}...`);
+    setIsSubmitting(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -144,8 +71,19 @@ const IdeasModal: React.FC<IdeasModalProps> = ({ isOpen, onClose }) => {
     });
   };
 
-  // Sort by votes (descending)
-  const sortedIdeas = [...ideas].sort((a, b) => b.votes - a.votes);
+  // Parse author from description HTML
+  const parseAuthor = (description: string | null): string => {
+    if (!description) return 'Ukendt';
+    const match = description.match(/<strong>Fra:<\/strong>\s*([^<(]+)/);
+    return match ? match[1].trim() : 'Ukendt';
+  };
+
+  // Parse idea text from description HTML
+  const parseIdeaText = (description: string | null, title: string): string => {
+    if (!description) return title.replace('💡 IDÉBOKS: ', '');
+    const match = description.match(/<strong>Idé:<\/strong>\s*([^<]+)/);
+    return match ? match[1].trim() : title.replace('💡 IDÉBOKS: ', '');
+  };
 
   if (!isOpen) return null;
 
@@ -171,86 +109,103 @@ const IdeasModal: React.FC<IdeasModalProps> = ({ isOpen, onClose }) => {
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Submit new idea */}
           <form onSubmit={handleSubmit} className="bg-battle-black rounded-xl p-4">
-            <h3 className="text-sm font-medium text-gray-400 mb-3">Har du en god idé til appen?</h3>
+            <h3 className="text-sm font-medium text-gray-400 mb-3">
+              Har du en god idé til appen? Skriv den her — den sendes direkte til Maria.
+            </h3>
             <div className="flex gap-3">
-              <input
-                type="text"
+              <textarea
                 value={newIdea}
                 onChange={(e) => setNewIdea(e.target.value)}
-                placeholder="Skriv din idé her..."
-                className="flex-1 bg-battle-grey border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-battle-orange"
+                placeholder="Beskriv din idé eller forslag..."
+                className="flex-1 bg-battle-grey border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-battle-orange resize-none"
                 maxLength={500}
+                rows={2}
               />
               <button
                 type="submit"
-                disabled={!newIdea.trim()}
-                className="px-4 py-3 bg-battle-orange hover:bg-battle-orange/80 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2"
+                disabled={!newIdea.trim() || isSubmitting}
+                className="px-4 py-3 bg-battle-orange hover:bg-battle-orange/80 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2 self-end"
               >
-                <Send className="w-4 h-4" />
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
                 <span className="hidden sm:inline">Send</span>
               </button>
             </div>
+
+            {/* Success message */}
+            {showSuccess && (
+              <div className="mt-3 flex items-center gap-2 text-green-400 text-sm">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Din idé er sendt til Maria — tak!</span>
+              </div>
+            )}
+
+            {/* Error message */}
+            {submitError && (
+              <div className="mt-3 text-red-400 text-sm">{submitError}</div>
+            )}
           </form>
 
           {/* Ideas list */}
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-gray-400">
-              {ideas.length > 0 ? `${ideas.length} idé${ideas.length !== 1 ? 'er' : ''}` : 'Ingen idéer endnu - vær den første!'}
+              {isLoading
+                ? 'Henter idéer...'
+                : ideas.length > 0
+                  ? `${ideas.length} idé${ideas.length !== 1 ? 'er' : ''} indsendt`
+                  : 'Ingen idéer endnu — vær den første!'}
             </h3>
 
-            {sortedIdeas.map(idea => {
-              const hasVoted = profile ? idea.votedBy.includes(profile.email) : false;
-              const canDelete = profile?.email === idea.authorEmail || profile?.role === 'ADMIN';
-
-              return (
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="w-6 h-6 text-battle-orange animate-spin" />
+              </div>
+            ) : (
+              ideas.map(idea => (
                 <div
                   key={idea.id}
-                  className="bg-battle-black rounded-xl p-4 flex gap-4"
+                  className={`bg-battle-black rounded-xl p-4 border-l-4 ${
+                    idea.resolved ? 'border-green-500/50 opacity-60' : 'border-yellow-500/50'
+                  }`}
                 >
-                  {/* Vote button */}
-                  <button
-                    onClick={() => handleVote(idea.id)}
-                    className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-                      hasVoted
-                        ? 'bg-battle-orange/20 text-battle-orange'
-                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <ThumbsUp className={`w-5 h-5 ${hasVoted ? 'fill-current' : ''}`} />
-                    <span className="text-sm font-bold">{idea.votes}</span>
-                  </button>
-
-                  {/* Idea content */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white">{idea.text}</p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                      <span className="font-medium text-gray-400">{idea.author}</span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {formatDate(idea.timestamp)}
-                      </span>
+                  <div className="flex items-start gap-3">
+                    <Lightbulb className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                      idea.resolved ? 'text-green-500' : 'text-yellow-400'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm leading-relaxed">
+                        {parseIdeaText(idea.description, idea.title)}
+                      </p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500 flex-wrap">
+                        <span className="flex items-center gap-1 text-gray-400">
+                          <User className="w-3 h-3" />
+                          {parseAuthor(idea.description)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {formatDate(idea.created_at)}
+                        </span>
+                        {idea.resolved && (
+                          <span className="flex items-center gap-1 text-green-400">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Behandlet
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-
-                  {/* Delete button */}
-                  {canDelete && (
-                    <button
-                      onClick={() => handleDelete(idea.id)}
-                      className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors self-start"
-                      title="Slet idé"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
-              );
-            })}
+              ))
+            )}
           </div>
         </div>
 
         {/* Footer */}
         <div className="p-4 border-t border-white/10 text-center text-xs text-gray-500">
-          Stem på de bedste idéer - de mest populære vil blive overvejet til fremtidige opdateringer
+          Alle idéer sendes som opgave til Maria — de bedste forslag bliver implementeret
         </div>
       </div>
     </div>

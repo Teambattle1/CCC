@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CalendarDays, Loader2 } from 'lucide-react';
 import { fetchTodayJobs, resolveActivities, TaskJob, ResolvedActivity } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 interface TodayJobsButtonProps {
   onSelectJob: (job: TaskJob, activities: ResolvedActivity[]) => void;
@@ -13,18 +14,21 @@ const formatTime = (dateStr: string | null) => {
 };
 
 const TodayJobsButton: React.FC<TodayJobsButtonProps> = ({ onSelectJob }) => {
+  const { profile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [jobs, setJobs] = useState<TaskJob[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectingId, setSelectingId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER';
+
   const loadJobs = useCallback(async () => {
     setIsLoading(true);
-    const result = await fetchTodayJobs();
+    const result = await fetchTodayJobs(profile?.email, isAdmin);
     setJobs(result);
     setIsLoading(false);
-  }, []);
+  }, [profile?.email, isAdmin]);
 
   // Load on mount + refresh every 5 min
   useEffect(() => {
@@ -63,6 +67,11 @@ const TodayJobsButton: React.FC<TodayJobsButtonProps> = ({ onSelectJob }) => {
     setIsOpen(!isOpen);
   };
 
+  // Don't show the button at all if non-admin has no jobs
+  if (!isAdmin && jobs.length === 0 && !isLoading) {
+    return null;
+  }
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Button */}
@@ -82,10 +91,10 @@ const TodayJobsButton: React.FC<TodayJobsButtonProps> = ({ onSelectJob }) => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-72 bg-[#1a1a1a] border border-battle-orange/30 rounded-xl shadow-[0_0_30px_rgba(255,102,0,0.15)] overflow-hidden z-[60]">
+        <div className="absolute top-full right-0 mt-2 w-72 bg-[#1a1a1a] border border-battle-orange/30 rounded-xl shadow-[0_0_30px_rgba(255,102,0,0.15)] overflow-hidden z-[60]">
           <div className="px-3 py-2.5 border-b border-white/10 flex items-center justify-between">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-              Opgaver i dag
+              {isAdmin ? 'Alle opgaver i dag' : 'Mine opgaver i dag'}
             </h3>
             <span className="text-[10px] text-gray-500">
               {new Date().toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })}
