@@ -1415,15 +1415,15 @@ export const GOOGLE_TOOLS_LINKS: HubLink[] = [
   }
 ];
 
-// Main Hub Links (Categories)
+// Main Hub Links (2-button landing page)
 export const HUB_LINKS: HubLink[] = [
   {
     id: '1',
-    title: 'ControlCenter',
-    url: 'https://eventday.dk',
+    title: 'CONTROLCENTER',
+    url: '#controlcenter',
     icon: LayoutDashboard,
     description: 'Crew Control',
-    color: 'blue'
+    color: 'orange'
   },
   {
     id: 'cat3',
@@ -1432,40 +1432,29 @@ export const HUB_LINKS: HubLink[] = [
     icon: Briefcase,
     description: 'Communication',
     color: 'red'
-  },
-  {
-    id: '2',
-    title: 'ACTIVITIES',
-    url: '#activities',
-    icon: Gamepad2,
-    description: 'Event Catalog',
-    color: 'yellow'
-  },
-  {
-    id: 'cat1',
-    title: 'ADMIN',
-    url: '#task_control',
-    icon: ClipboardList,
-    description: 'Admin & Ops',
-    color: 'green'
-  },
-  {
-    id: 'fejlrapporter',
-    title: 'FEJLRAPPORTER',
-    url: '#admin_reports',
-    icon: AlertTriangle,
-    description: 'Alle Fejlrapporter',
-    color: 'pink'
-  },
-  // JOB button hidden - replaced by inline search on landing page
-  // {
-  //   id: 'job',
-  //   title: 'JOB',
-  //   url: '#job_input',
-  //   icon: ClipboardList,
-  //   description: 'Hent Opgave',
-  //   color: 'green'
-  // }
+  }
+];
+
+// ControlCenter Submenu Links (sectioned: Activities, Admin, Code)
+export const CONTROLCENTER_LINKS: HubLink[] = [
+  // Activities section
+  { id: 'a1', title: 'TEAMPLAY', url: '#teamplay', icon: Users, description: 'Cooperation', badge: 'ACTIVE', section: 'Activities' },
+  { id: 'a2', title: 'TEAMCHALLENGE', url: '#team_challenge', icon: Trophy, description: 'Competition', badge: 'ACTIVE', color: 'hotpink', section: 'Activities' },
+  { id: 'a3', title: 'TEAMTASTE', url: '#teamtaste', icon: Utensils, description: 'Culinary', badge: 'ACTIVE', color: 'gold', section: 'Activities' },
+  { id: 'a4', title: 'TEAMLAZER', url: '#teamlazer', icon: Zap, description: 'Laser Combat', color: 'blue', section: 'Activities' },
+  { id: 'a5', title: 'TEAMROBIN', url: '#teamrobin', icon: Target, description: 'Archery', color: 'lightgreen', badge: 'new', section: 'Activities' },
+  { id: 'a6', title: 'TEAMSEGWAY', url: '#teamsegway', icon: Navigation, description: 'Transporters', color: 'red', section: 'Activities' },
+  { id: 'a7', title: 'TEAMCONNECT', url: '#teamconnect', icon: CircleDot, description: 'Networking', color: 'purple', section: 'Activities' },
+  { id: 'a8', title: 'TEAMBOX', url: '#teambox', icon: Package, description: 'Portable Events', color: 'gray', section: 'Activities' },
+  { id: 'a9', title: 'TEAMCONTROL', url: '#teamcontrol', icon: Gamepad2, description: 'Strategy', color: 'white', section: 'Activities' },
+  { id: 'a10', title: 'TEAMACTION', url: '#teamaction', icon: Swords, description: 'High Intensity', color: 'lightblue', section: 'Activities' },
+  { id: 'a11', title: 'TEAMCONSTRUCT', url: '#teamconstruct', icon: Hammer, description: 'Building', color: 'yellow', section: 'Activities' },
+  { id: 'a12', title: 'TEAMRACE', url: '#teamrace', icon: Car, description: 'Racing', color: 'orange', section: 'Activities' },
+  // Admin section
+  { id: 't2', title: 'CODE', url: '#code', icon: Code, description: 'Development Tools', color: 'purple', section: 'Admin' },
+  { id: '15', title: 'USERS', url: '#users', icon: Users, description: 'User Management', color: 'red', section: 'Admin' },
+  { id: 'ar1', title: 'FEJLRAPPORTER', url: '#admin_reports', icon: Wrench, description: 'Alle Fejlrapporter', color: 'yellow', badge: 'new', section: 'Admin' },
+  { id: 'ar2', title: 'PAKKELISTER', url: '#admin_packing_editor', icon: Package, description: 'Rediger Pakkelister', color: 'green', badge: 'new', section: 'Admin' },
 ];
 
 // Activity Submenu Links

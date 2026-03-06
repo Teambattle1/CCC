@@ -10,6 +10,7 @@ interface HubButtonProps {
   onDragOver?: (e: React.DragEvent, index: number) => void;
   onDrop?: (e: React.DragEvent, index: number) => void;
   compact?: boolean;
+  size?: 'default' | 'large';
 }
 
 const HubButton: React.FC<HubButtonProps> = ({
@@ -20,7 +21,8 @@ const HubButton: React.FC<HubButtonProps> = ({
   onDragStart,
   onDragOver,
   onDrop,
-  compact = false
+  compact = false,
+  size = 'default'
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isTouched, setIsTouched] = useState(false);
@@ -47,6 +49,23 @@ const HubButton: React.FC<HubButtonProps> = ({
   };
 
   const isActive = isHovered || isTouched;
+  const isLarge = size === 'large';
+
+  // Size classes for the orb
+  const orbSizeClass = compact
+    ? 'w-11 h-11 mobile-landscape:w-10 mobile-landscape:h-10 tablet-portrait:w-14 tablet-portrait:h-14 tablet-landscape:w-12 tablet-landscape:h-12 desktop:w-16 desktop:h-16'
+    : isLarge
+      ? 'w-28 h-28 mobile-landscape:w-24 mobile-landscape:h-24 tablet-portrait:w-36 tablet-portrait:h-36 tablet-landscape:w-32 tablet-landscape:h-32 desktop:w-44 desktop:h-44'
+      : 'w-[4.5rem] h-[4.5rem] mobile-landscape:w-16 mobile-landscape:h-16 tablet-portrait:w-24 tablet-portrait:h-24 tablet-landscape:w-[5.5rem] tablet-landscape:h-[5.5rem] desktop:w-32 desktop:h-32';
+
+  // Icon size classes
+  const iconSizeClass = compact
+    ? "w-5 h-5 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-6 tablet-portrait:h-6 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-6 desktop:h-6"
+    : isLarge
+      ? "w-10 h-10 mobile-landscape:w-9 mobile-landscape:h-9 tablet-portrait:w-14 tablet-portrait:h-14 tablet-landscape:w-12 tablet-landscape:h-12 desktop:w-16 desktop:h-16"
+      : "w-7 h-7 mobile-landscape:w-6 mobile-landscape:h-6 tablet-portrait:w-9 tablet-portrait:h-9 tablet-landscape:w-8 tablet-landscape:h-8 desktop:w-10 desktop:h-10";
+
+  const iconSize = compact ? (isActive ? 24 : 20) : isLarge ? (isActive ? 64 : 56) : (isActive ? 44 : 36);
 
   return (
     <a
@@ -69,22 +88,23 @@ const HubButton: React.FC<HubButtonProps> = ({
         WebkitTapHighlightColor: 'transparent'
       }}
     >
-      {/* The Glowing Orb Container - Responsive for all 5 modes */}
+      {/* The Glowing Orb Container */}
       <div
         className={`
           relative flex items-center justify-center
-          ${compact
-            ? 'w-11 h-11 mobile-landscape:w-10 mobile-landscape:h-10 tablet-portrait:w-14 tablet-portrait:h-14 tablet-landscape:w-12 tablet-landscape:h-12 desktop:w-16 desktop:h-16'
-            : 'w-[4.5rem] h-[4.5rem] mobile-landscape:w-16 mobile-landscape:h-16 tablet-portrait:w-24 tablet-portrait:h-24 tablet-landscape:w-[5.5rem] tablet-landscape:h-[5.5rem] desktop:w-32 desktop:h-32'
-          }
+          ${orbSizeClass}
           rounded-full border-2
           bg-battle-grey bg-opacity-40 backdrop-blur-sm
           transition-all duration-200 ease-out
           active:scale-90 active:shadow-inner
           touch-target
-          ${isActive
-            ? 'border-battle-orange shadow-neon-hover scale-105 tablet-landscape:scale-108 desktop:scale-110 -translate-y-1 desktop:-translate-y-2'
-            : 'border-white/10 shadow-neon hover:border-battle-orange/50'
+          ${isLarge
+            ? (isActive
+                ? 'border-battle-orange shadow-[0_0_30px_rgba(255,102,0,0.6),0_0_60px_rgba(255,102,0,0.3)] scale-105 -translate-y-2'
+                : 'border-battle-orange shadow-[0_0_20px_rgba(255,102,0,0.4),0_0_40px_rgba(255,102,0,0.2)] hover:shadow-[0_0_30px_rgba(255,102,0,0.5)]')
+            : (isActive
+                ? 'border-battle-orange shadow-neon-hover scale-105 tablet-landscape:scale-108 desktop:scale-110 -translate-y-1 desktop:-translate-y-2'
+                : 'border-white/10 shadow-neon hover:border-battle-orange/50')
           }
         `}
       >
@@ -107,50 +127,61 @@ const HubButton: React.FC<HubButtonProps> = ({
 
         {/* Inner glow pulse effect */}
         <div className={`
-          absolute inset-0 rounded-full opacity-0 transition-opacity duration-300
-          ${isActive ? 'opacity-20 bg-battle-orange blur-md' : ''}
+          absolute inset-0 rounded-full transition-opacity duration-300
+          ${isLarge
+            ? 'opacity-15 bg-battle-orange blur-lg'
+            : (isActive ? 'opacity-20 bg-battle-orange blur-md' : 'opacity-0')
+          }
         `} />
 
-        {/* Icon - Responsive for all 5 modes */}
+        {/* Icon */}
         <div className={`
           relative z-10 transition-all duration-200
-          ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' :
-            link.color === 'orange' ? 'text-battle-orange' :
-            link.color === 'blue' ? 'text-blue-500' :
-            link.color === 'lightblue' ? 'text-sky-400' :
-            link.color === 'green' ? 'text-green-700' :
-            link.color === 'lightgreen' ? 'text-green-400' :
-            link.color === 'red' ? 'text-red-800' :
-            link.color === 'gold' ? 'text-yellow-500' :
-            link.color === 'yellow' ? 'text-yellow-400' :
-            link.color === 'purple' ? 'text-purple-500' :
-            link.color === 'white' ? 'text-white' :
-            link.color === 'darkblue' ? 'text-blue-900' :
-            link.color === 'gray' ? 'text-gray-400' :
-            link.color === 'hotpink' ? 'text-pink-500' :
-            'text-battle-orange'}
+          ${isLarge
+            ? (isActive
+                ? 'text-white drop-shadow-[0_0_12px_rgba(255,255,255,0.9)]'
+                : 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]')
+            : (isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' :
+              link.color === 'orange' ? 'text-battle-orange' :
+              link.color === 'blue' ? 'text-blue-500' :
+              link.color === 'lightblue' ? 'text-sky-400' :
+              link.color === 'green' ? 'text-green-700' :
+              link.color === 'lightgreen' ? 'text-green-400' :
+              link.color === 'red' ? 'text-red-800' :
+              link.color === 'gold' ? 'text-yellow-500' :
+              link.color === 'yellow' ? 'text-yellow-400' :
+              link.color === 'purple' ? 'text-purple-500' :
+              link.color === 'white' ? 'text-white' :
+              link.color === 'darkblue' ? 'text-blue-900' :
+              link.color === 'gray' ? 'text-gray-400' :
+              link.color === 'hotpink' ? 'text-pink-500' :
+              'text-battle-orange')
+          }
         `}>
           <link.icon
-            size={compact ? (isActive ? 24 : 20) : (isActive ? 44 : 36)}
+            size={iconSize}
             strokeWidth={1.5}
-            className={compact
-              ? "w-5 h-5 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-6 tablet-portrait:h-6 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-6 desktop:h-6"
-              : "w-7 h-7 mobile-landscape:w-6 mobile-landscape:h-6 tablet-portrait:w-9 tablet-portrait:h-9 tablet-landscape:w-8 tablet-landscape:h-8 desktop:w-10 desktop:h-10"}
+            className={iconSizeClass}
           />
         </div>
       </div>
 
-      {/* Label - Responsive for all 5 modes */}
+      {/* Label */}
       <div className={`
-        ${compact ? 'mt-0.5 mobile-landscape:mt-0.5 tablet-portrait:mt-1' : 'mt-1 mobile-landscape:mt-1 tablet-portrait:mt-2 tablet-landscape:mt-1.5 desktop:mt-3'} text-center transition-all duration-200 transform
-        ${isActive ? 'opacity-100 translate-y-0' : 'opacity-80 tablet-portrait:opacity-90 translate-y-1'}
+        ${compact ? 'mt-0.5 mobile-landscape:mt-0.5 tablet-portrait:mt-1' : isLarge ? 'mt-2 mobile-landscape:mt-1.5 tablet-portrait:mt-3 tablet-landscape:mt-2 desktop:mt-4' : 'mt-1 mobile-landscape:mt-1 tablet-portrait:mt-2 tablet-landscape:mt-1.5 desktop:mt-3'} text-center transition-all duration-200 transform
+        ${isLarge ? 'opacity-100 translate-y-0' : (isActive ? 'opacity-100 translate-y-0' : 'opacity-80 tablet-portrait:opacity-90 translate-y-1')}
       `}>
         <h3 className={`
           ${compact
             ? 'text-[8px] mobile-landscape:text-[7px] tablet-portrait:text-[10px] tablet-landscape:text-[9px] desktop:text-xs'
-            : 'text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-base'
+            : isLarge
+              ? 'text-sm mobile-landscape:text-xs tablet-portrait:text-lg tablet-landscape:text-base desktop:text-xl'
+              : 'text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-base'
           } font-bold uppercase tracking-wider
-          ${isActive ? 'text-battle-orange drop-shadow-[0_0_5px_rgba(255,102,0,0.8)]' : 'text-gray-400'}
+          ${isLarge
+            ? 'text-battle-orange drop-shadow-[0_0_5px_rgba(255,102,0,0.8)]'
+            : (isActive ? 'text-battle-orange drop-shadow-[0_0_5px_rgba(255,102,0,0.8)]' : 'text-gray-400')
+          }
         `}>
           {link.title.startsWith('TEAM') ? (
             <>
@@ -163,8 +194,11 @@ const HubButton: React.FC<HubButtonProps> = ({
         </h3>
         {!compact && (
           <p className={`
-            text-[8px] mobile-landscape:text-[7px] tablet-portrait:text-[10px] tablet-landscape:text-[9px] desktop:text-xs text-gray-500 mt-0.5 h-3 tablet-portrait:h-4 transition-opacity duration-200
-            ${isActive ? 'opacity-100' : 'opacity-0 tablet-portrait:opacity-60'}
+            ${isLarge
+              ? 'text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-sm'
+              : 'text-[8px] mobile-landscape:text-[7px] tablet-portrait:text-[10px] tablet-landscape:text-[9px] desktop:text-xs'
+            } text-gray-500 mt-0.5 ${isLarge ? 'h-4 tablet-portrait:h-5' : 'h-3 tablet-portrait:h-4'} transition-opacity duration-200
+            ${isLarge ? 'opacity-100' : (isActive ? 'opacity-100' : 'opacity-0 tablet-portrait:opacity-60')}
           `}>
             {link.description}
           </p>

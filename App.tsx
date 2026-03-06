@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   HUB_LINKS,
+  CONTROLCENTER_LINKS,
   ACTIVITY_LINKS,
   ECONOMY_LINKS,
   TASK_CONTROL_LINKS,
@@ -131,7 +132,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing';
+type ViewState = 'main' | 'controlcenter' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -230,8 +231,8 @@ const App: React.FC = () => {
       if (link.title === 'ADMIN') return rolePerms.landing_admin;
       if (link.title === 'OFFICE') return rolePerms.landing_office;
       if (link.title === 'ACTIVITIES') return rolePerms.landing_activities;
-      if (link.title === 'ControlCenter') return rolePerms.landing_controlcenter;
-      if (link.title === 'FEJLRAPPORTER') return rolePerms.landing_admin; // Only show for admins
+      if (link.title === 'CONTROLCENTER') return rolePerms.landing_controlcenter;
+      if (link.title === 'FEJLRAPPORTER') return rolePerms.landing_admin;
       return true;
     });
   };
@@ -337,7 +338,8 @@ const App: React.FC = () => {
   };
 
   const handleLinkClick = (link: HubLink) => {
-    if (link.title === 'ACTIVITIES') changeView('activities');
+    if (link.title === 'CONTROLCENTER') changeView('controlcenter');
+    else if (link.title === 'ACTIVITIES') changeView('activities');
     else if (link.title === 'ECONOMY') changeView('economy');
     else if (link.title === 'ADMIN') changeView('task_control');
     else if (link.title === 'TOOLS') changeView('tools');
@@ -477,46 +479,52 @@ const App: React.FC = () => {
       changeView('job_input');
     } else if (currentView === 'job_overview') {
       changeView('instructor_select');
+    } else if (currentView === 'controlcenter') {
+      changeView('main');
+    } else if (currentView === 'activities') {
+      changeView('controlcenter');
     } else if (currentView === 'economy') {
       changeView('office');
     } else if (currentView === 'team_challenge') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'loquiz') {
       changeView('team_challenge');
     } else if (currentView === 'teamaction') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamlazer') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamrobin') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamconnect') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teambox') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamsegway') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamcontrol') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamconstruct') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamrace') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamplay') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamtaste') {
-      changeView('activities');
+      changeView('controlcenter');
     } else if (currentView === 'teamrace_scorecard' || currentView === 'teamrace_guide' || currentView === 'teamrace_packing' || currentView === 'teamrace_video' || currentView === 'fejlsogning_teamrace' || currentView === 'teamrace_rccars' || currentView === 'teamrace_instructions') {
       changeView('teamrace');
     } else if (currentView === 'teamrace_packing_afgang' || currentView === 'teamrace_packing_hjemkomst' || currentView === 'teamrace_packing_taske') {
       changeView('teamrace_packing');
     } else if (currentView === 'distance_tool') {
       changeView('tools');
+    } else if (currentView === 'task_control') {
+      changeView('controlcenter');
     } else if (currentView === 'code') {
-      changeView('task_control');
+      changeView('controlcenter');
     } else if (currentView === 'admin_reports') {
-      changeView('task_control');
+      changeView('controlcenter');
     } else if (currentView === 'admin_packing_editor') {
-      changeView('task_control');
+      changeView('controlcenter');
     } else if (currentView === 'teamrobin_packing') {
       changeView('teamrobin');
     } else if (currentView === 'teamrobin_packing_before' || currentView === 'teamrobin_packing_after') {
@@ -681,6 +689,19 @@ const App: React.FC = () => {
 
   // Determine content based on view
   switch (currentView) {
+    case 'controlcenter': {
+      // Filter activities within CC links
+      const activityIds = ACTIVITY_LINKS.map(a => a.id);
+      const adminIds = TASK_CONTROL_LINKS.map(a => a.id);
+      const ccActivities = CONTROLCENTER_LINKS.filter(l => activityIds.includes(l.id));
+      const ccAdmin = CONTROLCENTER_LINKS.filter(l => adminIds.includes(l.id));
+      const filteredActivities = filterActivitiesByRole(ccActivities);
+      currentLinks = [...filteredActivities, ...ccAdmin];
+      viewTitle = 'CONTROLCENTER';
+      viewSubtitle = 'Crew Control';
+      ViewIcon = ShieldCheck;
+      break;
+    }
     case 'activities':
       currentLinks = filterActivitiesByRole(ACTIVITY_LINKS);
       viewTitle = 'ACTIVITIES';
@@ -1439,8 +1460,8 @@ const App: React.FC = () => {
       break;
     case 'main':
     default:
-      // Use the state for main view to reflect drag and drop order, filtered by role, with dynamic badges
-      currentLinks = enhanceHubLinksWithBadges(filterLinksByRole(hubLinks));
+      // Main view: just 2 buttons (ControlCenter + Office), filtered by role
+      currentLinks = filterLinksByRole(HUB_LINKS);
       viewTitle = 'TEAMBATTLE';
       viewSubtitle = 'Crew Command Center';
       ViewIcon = ShieldCheck;
@@ -1452,8 +1473,11 @@ const App: React.FC = () => {
   let gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-3 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-5xl mx-auto responsive-activities-grid";
 
   if (currentView === 'main') {
-    // Main view: centered flex layout - responsive for all modes
-    gridClass = "flex flex-wrap justify-center gap-3 mobile-landscape:gap-3 tablet-portrait:gap-6 tablet-landscape:gap-5 desktop:gap-8 max-w-6xl mx-auto responsive-main-grid";
+    // Main view: 2-button centered layout
+    gridClass = "flex items-center justify-center gap-6 mobile-landscape:gap-6 tablet-portrait:gap-10 tablet-landscape:gap-10 desktop:gap-16 max-w-4xl mx-auto";
+  } else if (currentView === 'controlcenter') {
+    // ControlCenter: sectioned layout (handled in custom render)
+    gridClass = "";
   } else if (currentView === 'activities') {
     // Activities: responsive grid for 11 items
     gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-3 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-5xl mx-auto responsive-activities-grid";
@@ -1957,6 +1981,51 @@ const App: React.FC = () => {
               activities={activeJobActivities}
               onNavigateActivity={(viewState) => changeView(viewState as ViewState)}
             />
+          ) : currentView === 'main' ? (
+            <div className={gridClass}>
+              {currentLinks.map((link, index) => (
+                <HubButton
+                  key={link.id}
+                  link={link}
+                  index={index}
+                  onClick={handleLinkClick}
+                  size={link.title === 'CONTROLCENTER' ? 'large' : 'default'}
+                />
+              ))}
+            </div>
+          ) : currentView === 'controlcenter' ? (
+            <div className="w-full max-w-5xl mx-auto px-1 mobile-landscape:px-2 tablet-portrait:px-4">
+              <div className="grid grid-cols-1 tablet-portrait:grid-cols-2 gap-2 mobile-landscape:gap-1.5 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-4">
+                {[
+                  { name: 'Activities', color: 'orange', borderColor: 'border-battle-orange', bgColor: 'bg-battle-orange/10', titleColor: 'text-battle-orange' },
+                  { name: 'Admin', color: 'green', borderColor: 'border-green-500', bgColor: 'bg-green-500/10', titleColor: 'text-green-400' },
+                ].map((section) => {
+                  const sectionLinks = currentLinks.filter(l => l.section === section.name);
+                  if (sectionLinks.length === 0) return null;
+                  return (
+                    <div
+                      key={section.name}
+                      className={`rounded-lg border ${section.borderColor} ${section.bgColor} p-1.5 mobile-landscape:p-1 tablet-portrait:p-3 tablet-landscape:p-2 desktop:p-4 ${section.name === 'Activities' ? 'tablet-portrait:col-span-2' : ''}`}
+                    >
+                      <h3 className={`text-[10px] mobile-landscape:text-[9px] tablet-portrait:text-sm tablet-landscape:text-xs desktop:text-sm font-bold ${section.titleColor} uppercase tracking-widest mb-1.5 mobile-landscape:mb-1 tablet-portrait:mb-3 tablet-landscape:mb-2 desktop:mb-3 text-center`}>
+                        {section.name}
+                      </h3>
+                      <div className={`grid ${section.name === 'Activities' ? 'grid-cols-3 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-4 tablet-landscape:grid-cols-6 desktop:grid-cols-6' : 'grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-4 tablet-landscape:grid-cols-4 desktop:grid-cols-4'} gap-1 mobile-landscape:gap-0.5 tablet-portrait:gap-2 tablet-landscape:gap-1.5 desktop:gap-2 justify-items-center`}>
+                        {sectionLinks.map((link, idx) => (
+                          <HubButton
+                            key={link.id}
+                            link={link}
+                            index={idx}
+                            onClick={handleLinkClick}
+                            compact={true}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           ) : currentView === 'office' ? (
             <div className="w-full max-w-4xl mx-auto px-1 mobile-landscape:px-2 tablet-portrait:px-4">
               <div className="grid grid-cols-2 gap-2 mobile-landscape:gap-1.5 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-4 responsive-office-grid">
@@ -1967,7 +2036,6 @@ const App: React.FC = () => {
                   { name: 'Google Tools', color: 'blue', borderColor: 'border-blue-500', bgColor: 'bg-blue-500/10', titleColor: 'text-blue-400' }
                 ].map((section) => {
                   const sectionLinks = currentLinks.filter(l => l.section === section.name);
-                  // Hide sections with no links (e.g., Economy for non-admins)
                   if (sectionLinks.length === 0) return null;
                   return (
                     <div
@@ -1984,10 +2052,6 @@ const App: React.FC = () => {
                             link={link}
                             index={idx}
                             onClick={handleLinkClick}
-                            draggable={false}
-                            onDragStart={handleDragStart}
-                            onDragOver={handleDragOver}
-                            onDrop={handleDrop}
                             compact={true}
                           />
                         ))}
@@ -2005,10 +2069,6 @@ const App: React.FC = () => {
                   link={link}
                   index={index}
                   onClick={handleLinkClick}
-                  draggable={currentView === 'main'}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
                 />
               ))}
             </div>
