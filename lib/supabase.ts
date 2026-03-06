@@ -1013,6 +1013,8 @@ export interface TaskJob {
   aktiviteter_note: string | null;
   gear_note: string | null;
   transport_note: string | null;
+  location_note: string | null;
+  payment_note: string | null;
   bil_tankes: boolean | null;
   bil_oplades: boolean | null;
   bord_skaere_80: number | null;
@@ -1028,6 +1030,32 @@ export interface TaskJob {
   skal_evalueres: boolean | null;
   evaluation_score: number | null;
   evaluation_notes: string | null;
+  // Payment fields
+  payment_method: string | null;
+  payment_amount: string | null;
+  payment_card_fee: string | null;
+  payment_contact: string | null;
+  faktura_sendt: boolean | null;
+  mobilepay: boolean | null;
+  mobilepay_amount: string | null;
+  mobilepay_received: string | null;
+  mobilepay_note: string | null;
+  kontant_amount: string | null;
+  kontant_received: string | null;
+  kontant_note: string | null;
+  ub_note: string | null;
+  // Kontaktet fields
+  kunde_kontaktet: boolean | null;
+  kunde_kontaktet_dato: string | null;
+  kunde_kontaktet_note: string | null;
+  location_kontaktet: boolean | null;
+  location_kontaktet_dato: string | null;
+  hotel_kontaktet: string | null;
+  hotel_kontaktet_dato: string | null;
+  hotel_kontaktet_note: string | null;
+  // Extra
+  firma_info: string | null;
+  sms_sendt: string | null;
 }
 
 export interface ResolvedActivity {
@@ -1035,6 +1063,34 @@ export interface ResolvedActivity {
   name: string;
   viewState: string;
 }
+
+export interface ActivityInfo {
+  id: string;
+  name: string;
+  pack_time_minutes: number | null;
+  setup_time_minutes: number | null;
+  unpack_time_minutes: number | null;
+  default_duration: number | null;
+  default_rounds: number | null;
+}
+
+// Fetch activity logistics info (pack/setup/unpack times)
+export const fetchActivityInfo = async (
+  activityIds: string[]
+): Promise<ActivityInfo[]> => {
+  if (!activityIds.length) return [];
+  try {
+    const { data, error } = await supabase
+      .from('activities')
+      .select('id, name, pack_time_minutes, setup_time_minutes, unpack_time_minutes, default_duration, default_rounds')
+      .in('id', activityIds);
+
+    if (error || !data) return [];
+    return data as ActivityInfo[];
+  } catch {
+    return [];
+  }
+};
 
 export interface CrewAssignment {
   employee_name: string;
@@ -1142,7 +1198,7 @@ export const fetchAllEmployees = async (): Promise<Employee[]> => {
 };
 
 // Shared select fields for task_jobs queries
-const TASK_JOB_SELECT = 'id, short_code, client_name, client_contact_name, client_contact_phone, client_contact_email, client_logo_url, client_website, agency, customer_number, customer_type, language, kun_tilbud, privat, event_date, event_end, event_time, duration_minutes, activities, activity_counts, activity_sessions, location_name, location_address, location_city, guests_count, instructors_count, assistants_count, get_in_location, get_in_time_storage, get_in_time_location, get_back_location, vehicle_id, trailer_id, lane_setup, lane_teardown, notes, task_notes, timing_note, crew_note, aktiviteter_note, gear_note, transport_note, bil_tankes, bil_oplades, bord_skaere_80, bord_folde_180, bord_folde_240, hoeje_cafeborde, dug_180, dug_240, dug_rund_80, opgave_id, opgave_status, status, skal_evalueres, evaluation_score, evaluation_notes';
+const TASK_JOB_SELECT = 'id, short_code, client_name, client_contact_name, client_contact_phone, client_contact_email, client_logo_url, client_website, agency, customer_number, customer_type, language, kun_tilbud, privat, event_date, event_end, event_time, duration_minutes, activities, activity_counts, activity_sessions, location_name, location_address, location_city, guests_count, instructors_count, assistants_count, get_in_location, get_in_time_storage, get_in_time_location, get_back_location, vehicle_id, trailer_id, lane_setup, lane_teardown, notes, task_notes, timing_note, crew_note, aktiviteter_note, gear_note, transport_note, location_note, payment_note, bil_tankes, bil_oplades, bord_skaere_80, bord_folde_180, bord_folde_240, hoeje_cafeborde, dug_180, dug_240, dug_rund_80, opgave_id, opgave_status, status, skal_evalueres, evaluation_score, evaluation_notes, payment_method, payment_amount, payment_card_fee, payment_contact, faktura_sendt, mobilepay, mobilepay_amount, mobilepay_received, mobilepay_note, kontant_amount, kontant_received, kontant_note, ub_note, kunde_kontaktet, kunde_kontaktet_dato, kunde_kontaktet_note, location_kontaktet, location_kontaktet_dato, hotel_kontaktet, hotel_kontaktet_dato, hotel_kontaktet_note, firma_info, sms_sendt';
 
 // Fetch all jobs scheduled for today
 export const fetchTodayJobs = async (
