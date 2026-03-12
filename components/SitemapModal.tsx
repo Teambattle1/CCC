@@ -167,7 +167,7 @@ const buildSiteTree = (): TreeNode[] => [
         children: [
           { id: 'g_play', label: 'PLAY', url: 'https://play.eventday.dk', icon: Play },
           { id: 'g_taste', label: 'TASTE', url: 'https://taste.eventday.dk', icon: Utensils },
-          { id: 'g_track', label: 'TRACK', url: 'https://track.eventday.dk', icon: Navigation },
+          { id: 'g_track', label: 'LIVEGPS', url: 'https://app.livegps.dk/objects', icon: Navigation },
           { id: 'g_loquiz_results', label: 'LOQUIZ RESULTS', url: 'https://service-2026-loquiz-results-viewer-476701928390.us-west1.run.app/', icon: ListChecks },
           { id: 'g_loquiz_setup', label: 'LOQUIZ SETUP', url: 'https://beta.loquiz.com/dashboard', icon: Wrench },
         ]

@@ -568,6 +568,15 @@ export const TEAMLAZER_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tl10',
+    title: 'GEAR OVERSIGT',
+    url: '#teamlazer_gear',
+    icon: ClipboardList,
+    description: 'Display & Kaster',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -1511,7 +1520,7 @@ export const OFFICE_LINKS: HubLink[] = [
   {
     id: 't1',
     title: 'PHOTO',
-    url: 'https://photos.google.com/albums?pli=1',
+    url: '#google_photos',
     icon: Camera,
     description: 'Google Photos',
     color: 'red',
@@ -1614,7 +1623,7 @@ export const GAMES_LINKS: HubLink[] = [
   // Spil section
   { id: 'g1', title: 'PLAY', url: 'https://play.eventday.dk', icon: Play, description: 'TeamPlay Game', color: 'green', section: 'Spil' },
   { id: 'g2', title: 'TASTE', url: 'https://taste.eventday.dk', icon: Utensils, description: 'TeamTaste Game', color: 'gold', section: 'Spil' },
-  { id: 'g8', title: 'TRACK', url: 'https://track.eventday.dk', icon: Navigation, description: 'Live Tracking', color: 'lightblue', section: 'Spil' },
+  { id: 'g8', title: 'LIVEGPS', url: 'https://app.livegps.dk/objects', icon: Navigation, description: 'LiveGPS Tracking', color: 'orange', section: 'Spil' },
   // Loquiz section
   { id: 'g3', title: 'LOQUIZ RESULTS', url: 'https://service-2026-loquiz-results-viewer-476701928390.us-west1.run.app/', icon: ListChecks, description: 'Game Standings', color: 'blue', section: 'Loquiz' },
   { id: 'g4', title: 'LOQUIZ SETUP', url: 'https://beta.loquiz.com/dashboard', icon: Wrench, description: 'Game Configuration', color: 'purple', section: 'Loquiz' },

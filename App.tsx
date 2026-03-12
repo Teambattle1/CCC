@@ -100,6 +100,8 @@ import SessionReport from './components/SessionReport';
 import MyJobs from './components/MyJobs';
 import ActivityFileManager from './components/ActivityFileManager';
 import SitemapModal from './components/SitemapModal';
+import GooglePhotosView from './components/GooglePhotosView';
+import TeamLazerGearList from './components/TeamLazerGearList';
 import TopbarJobSearch from './components/TopbarJobSearch';
 import TodayJobsButton from './components/TodayJobsButton';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
@@ -133,11 +135,13 @@ import {
   Car,
   Users,
   Utensils,
-  FolderOpen
+  FolderOpen,
+  Printer,
+  Camera
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files';
+type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files' | 'google_photos' | 'teamlazer_gear';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -415,6 +419,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamlazer_scorecard') changeView('teamlazer_scorecard');
     else if (link.url === '#teamlazer_fejlsogning') changeView('teamlazer_fejlsogning');
     else if (link.url === '#teamlazer_frekvenser') changeView('teamlazer_frekvenser');
+    else if (link.url === '#teamlazer_gear') changeView('teamlazer_gear');
     else if (link.url === '#teamlazer_guide') changeView('teamlazer_guide');
     else if (link.url === '#teamrobin_guide') changeView('teamrobin_guide');
     else if (link.url === '#fejlsogning_teamlazer') changeView('fejlsogning_teamlazer');
@@ -497,6 +502,7 @@ const App: React.FC = () => {
     else if (link.url === '#code') changeView('code');
     else if (link.url === '#admin_reports') changeView('admin_reports');
     else if (link.url === '#admin_packing_editor') changeView('admin_packing_editor');
+    else if (link.url === '#google_photos') changeView('google_photos');
     else if (link.title === 'CLAUDE') setIsClaudeDevOpen(true);
     else if (link.title === 'USERS') setIsUsersOpen(true);
   };
@@ -559,6 +565,8 @@ const App: React.FC = () => {
       changeView('opgaver');
     } else if (currentView === 'admin_packing_editor') {
       changeView('opgaver');
+    } else if (currentView === 'google_photos') {
+      changeView('office');
     } else if (currentView === 'teamrobin_packing') {
       changeView('teamrobin');
     } else if (currentView === 'teamrobin_packing_before' || currentView === 'teamrobin_packing_after') {
@@ -568,6 +576,8 @@ const App: React.FC = () => {
     } else if (currentView === 'teamlazer_fejlsogning') {
       changeView('teamlazer');
     } else if (currentView === 'teamlazer_frekvenser') {
+      changeView('teamlazer');
+    } else if (currentView === 'teamlazer_gear') {
       changeView('teamlazer');
     } else if (currentView === 'teamrobin_video') {
       changeView('teamrobin');
@@ -801,6 +811,12 @@ const App: React.FC = () => {
       viewTitle = 'PAKKELISTER';
       viewSubtitle = 'Editor';
       ViewIcon = Package;
+      break;
+    case 'google_photos':
+      currentLinks = [];
+      viewTitle = 'GOOGLE PHOTOS';
+      viewSubtitle = 'Albums & Billeder';
+      ViewIcon = Camera;
       break;
     case 'edit_packing':
       currentLinks = [];
@@ -1126,6 +1142,12 @@ const App: React.FC = () => {
       viewTitle = 'FREKVENSER';
       viewSubtitle = 'TeamLazer Frekvens Guide';
       ViewIcon = Zap;
+      break;
+    case 'teamlazer_gear':
+      currentLinks = [];
+      viewTitle = 'GEAR OVERSIGT';
+      viewSubtitle = 'Display & Kaster';
+      ViewIcon = ClipboardList;
       break;
     case 'teamrobin_fejlsogning':
       currentLinks = [];
@@ -1927,21 +1949,132 @@ const App: React.FC = () => {
             <div className="w-full max-w-6xl mx-auto px-4 py-6">
               <div className="bg-battle-grey/50 rounded-2xl border border-white/10 p-6">
                 <h2 className="text-xl font-bold text-white uppercase tracking-wider mb-4 text-center">
-                  TeamLazer Frekvenser
+                  Gevær Frekvens - Dipswitch Indstillinger
                 </h2>
-                <p className="text-gray-400 text-center mb-6">
-                  Frekvensindstillinger til TeamLazer geværer - Set 1, Set 2 og Set 3
-                </p>
-                <div className="bg-white rounded-xl p-4 overflow-auto">
-                  <img
-                    src="https://kyvnqtmknirhpylhvxsv.supabase.co/storage/v1/object/public/guide-images/teamlazer/frekvenser.jpg"
-                    alt="TeamLazer Frekvenser"
-                    className="w-full h-auto max-w-4xl mx-auto"
-                  />
+                <div className="bg-white rounded-xl p-6 overflow-auto">
+                  {[
+                    { name: 'SET 1', gates: [
+                      { g: 'G1', rows: [[0,1],[1,0],[0,1],[0,1]] },
+                      { g: 'G2', rows: [[0,1],[0,1],[1,0],[0,1]] },
+                      { g: 'G3', rows: [[0,1],[1,0],[1,0],[0,1]] },
+                      { g: 'G4', rows: [[1,0],[0,1],[0,1],[1,0]] },
+                      { g: 'G5', rows: [[0,1],[1,0],[0,1],[1,0]] },
+                    ]},
+                    { name: 'SET 2', gates: [
+                      { g: 'G1', rows: [[0,1],[0,1],[0,1],[0,1]] },
+                      { g: 'G2', rows: [[1,0],[1,0],[1,0],[1,0]] },
+                      { g: 'G3', rows: [[1,0],[1,0],[0,1],[0,1]] },
+                      { g: 'G4', rows: [[0,1],[0,1],[1,0],[1,0]] },
+                      { g: 'G5', rows: [[1,0],[0,1],[1,0],[0,1]] },
+                    ]},
+                    { name: 'SET 3', gates: [
+                      { g: 'G1', rows: [[0,1],[0,1],[0,1],[1,0]] },
+                      { g: 'G2', rows: [[0,1],[1,0],[1,0],[1,0]] },
+                      { g: 'G3', rows: [[1,0],[1,0],[1,0],[0,1]] },
+                      { g: 'G4', rows: [[1,0],[1,0],[0,1],[1,0]] },
+                      { g: 'G5', rows: [[1,0],[0,1],[1,0],[1,0]] },
+                    ]},
+                  ].map((set) => (
+                    <div key={set.name} className="mb-8 last:mb-0">
+                      <div className="text-sm font-bold text-gray-800 mb-3 pb-1 border-b border-gray-300">
+                        {set.name}
+                      </div>
+                      <div className="flex gap-4 flex-wrap">
+                        {set.gates.map((gate) => (
+                          <div key={gate.g} className="flex flex-col items-center">
+                            <div className="text-xs font-bold text-gray-700 mb-1.5">{gate.g}</div>
+                            <div className="border-2 border-gray-800 rounded">
+                              {gate.rows.map((row, ri) => (
+                                <div key={ri} className="flex border-b border-gray-800 last:border-b-0">
+                                  {row.map((val, ci) => (
+                                    <div
+                                      key={ci}
+                                      className={`w-10 h-8 flex items-center justify-center text-sm font-bold border-r border-gray-800 last:border-r-0 ${
+                                        val === 1 ? 'bg-yellow-400 text-black' : 'bg-gray-200 text-gray-500'
+                                      }`}
+                                    >
+                                      {val}
+                                    </div>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-gray-500 text-sm text-center mt-4">
-                  Brug denne oversigt til at indstille geværer til de korrekte frekvenser
-                </p>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-gray-500 text-xs">
+                    GUL = 1 | GRÅ = 0
+                  </p>
+                  <button
+                    onClick={() => {
+                      const sets = [
+                        { name: 'SET 1', gates: [
+                          { g: 'G1', rows: [[0,1],[1,0],[0,1],[0,1]] },
+                          { g: 'G2', rows: [[0,1],[0,1],[1,0],[0,1]] },
+                          { g: 'G3', rows: [[0,1],[1,0],[1,0],[0,1]] },
+                          { g: 'G4', rows: [[1,0],[0,1],[0,1],[1,0]] },
+                          { g: 'G5', rows: [[0,1],[1,0],[0,1],[1,0]] },
+                        ]},
+                        { name: 'SET 2', gates: [
+                          { g: 'G1', rows: [[0,1],[0,1],[0,1],[0,1]] },
+                          { g: 'G2', rows: [[1,0],[1,0],[1,0],[1,0]] },
+                          { g: 'G3', rows: [[1,0],[1,0],[0,1],[0,1]] },
+                          { g: 'G4', rows: [[0,1],[0,1],[1,0],[1,0]] },
+                          { g: 'G5', rows: [[1,0],[0,1],[1,0],[0,1]] },
+                        ]},
+                        { name: 'SET 3', gates: [
+                          { g: 'G1', rows: [[0,1],[0,1],[0,1],[1,0]] },
+                          { g: 'G2', rows: [[0,1],[1,0],[1,0],[1,0]] },
+                          { g: 'G3', rows: [[1,0],[1,0],[1,0],[0,1]] },
+                          { g: 'G4', rows: [[1,0],[1,0],[0,1],[1,0]] },
+                          { g: 'G5', rows: [[1,0],[0,1],[1,0],[1,0]] },
+                        ]},
+                      ];
+                      const gateHtml = (gate: { g: string; rows: number[][] }) =>
+                        `<div style="display:flex;flex-direction:column;align-items:center">
+                          <div style="font-size:14px;font-weight:bold;color:#333;margin-bottom:4mm;text-align:center;min-width:30mm">${gate.g}</div>
+                          <div style="display:flex;flex-direction:column;border:2px solid #333">
+                            ${gate.rows.map((row, ri) =>
+                              `<div style="display:flex;${ri < gate.rows.length - 1 ? 'border-bottom:1px solid #333' : ''}">
+                                ${row.map((v, ci) =>
+                                  `<div style="width:15mm;height:12mm;${ci === 0 ? 'border-right:1px solid #333;' : ''}display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;background:${v === 1 ? '#FFD700' : '#e8e8e8'};color:${v === 1 ? '#000' : '#333'}">${v}</div>`
+                                ).join('')}
+                              </div>`
+                            ).join('')}
+                          </div>
+                        </div>`;
+                      const setsHtml = sets.map(set =>
+                        `<div style="margin-bottom:10mm">
+                          <div style="font-size:16px;font-weight:bold;color:#333;margin-bottom:6mm;padding-bottom:2mm;border-bottom:1px solid #999">${set.name}</div>
+                          <div style="display:flex;gap:8mm;align-items:flex-start;flex-wrap:wrap">
+                            ${set.gates.map(g => gateHtml(g)).join('')}
+                          </div>
+                        </div>`
+                      ).join('');
+                      const html = `<!DOCTYPE html><html lang="da"><head><meta charset="UTF-8"><title>Gevær Frekvens - Dipswitch Indstillinger</title><style>@page{size:A4 landscape;margin:8mm}*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}body{font-family:Arial,sans-serif;background:white;padding:8mm;width:277mm;height:190mm;overflow:hidden}</style></head><body>
+                        <div style="text-align:center;margin-bottom:8mm;border-bottom:2px solid #333;padding-bottom:4mm">
+                          <h1 style="font-size:20px;margin:0">Gevær Frekvens - Dipswitch Indstillinger</h1>
+                        </div>
+                        ${setsHtml}
+                        <div style="text-align:center;font-size:10px;color:#999;margin-top:6mm;padding-top:3mm;border-top:1px solid #ddd">GUL = 1 | GRÅ = 0 | A4 Landscape</div>
+                      </body></html>`;
+                      const w = window.open('', '_blank');
+                      if (w) {
+                        w.document.write(html);
+                        w.document.close();
+                        setTimeout(() => w.print(), 300);
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    <Printer className="w-4 h-4" />
+                    Print som PDF
+                  </button>
+                </div>
               </div>
             </div>
           ) : currentView === 'teamrobin_fejlsogning' ? (
@@ -2134,6 +2267,10 @@ const App: React.FC = () => {
             <ActivityFileManager activity="teamconstruct" onBack={() => changeView('teamconstruct')} />
           ) : currentView === 'teamrace_files' ? (
             <ActivityFileManager activity="teamrace" onBack={() => changeView('teamrace')} />
+          ) : currentView === 'google_photos' ? (
+            <GooglePhotosView />
+          ) : currentView === 'teamlazer_gear' ? (
+            <TeamLazerGearList />
           ) : currentView === 'admin_reports' ? (
             <AdminReports />
           ) : currentView === 'admin_packing_editor' ? (
