@@ -103,6 +103,15 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
     description: 'Rediger Pakkelister',
     color: 'green',
     badge: 'new'
+  },
+  {
+    id: 'ar3',
+    title: 'LIVEGPS',
+    url: '#livegps',
+    icon: Navigation,
+    description: 'GPS Tracking & Enheder',
+    color: 'orange',
+    badge: 'new'
   }
 ];
 

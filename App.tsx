@@ -84,6 +84,7 @@ import FlybrixManual from './components/FlybrixManual';
 import TeamControlPackingList from './components/TeamControlPackingList';
 import FejlsogningReport from './components/FejlsogningReport';
 import AdminReports from './components/AdminReports';
+import LiveGPSPanel from './components/LiveGPSPanel';
 import PackingListEditor from './components/PackingListEditor';
 import DynamicPackingList from './components/DynamicPackingList';
 import PDFViewer from './components/PDFViewer';
@@ -141,7 +142,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files' | 'google_photos' | 'teamlazer_gear';
+type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamlazer_packing_afgang' | 'teamlazer_packing_hjemkomst' | 'teamsegway_packing' | 'teamsegway_packing_afgang' | 'teamsegway_packing_hjemkomst' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_packing' | 'teamplay_packing_afgang' | 'teamplay_packing_hjemkomst' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_packing' | 'teamtaste_packing_afgang' | 'teamtaste_packing_hjemkomst' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_packing' | 'teamchallenge_packing_afgang' | 'teamchallenge_packing_hjemkomst' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_packing' | 'teamconnect_packing_afgang' | 'teamconnect_packing_hjemkomst' | 'teamconnect_fejlsogning' | 'teamaction_packing' | 'teamaction_packing_afgang' | 'teamaction_packing_hjemkomst' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'edit_packing' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files' | 'google_photos' | 'teamlazer_gear' | 'livegps';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -502,6 +503,7 @@ const App: React.FC = () => {
     else if (link.url === '#code') changeView('code');
     else if (link.url === '#admin_reports') changeView('admin_reports');
     else if (link.url === '#admin_packing_editor') changeView('admin_packing_editor');
+    else if (link.url === '#livegps') changeView('livegps');
     else if (link.url === '#google_photos') changeView('google_photos');
     else if (link.title === 'CLAUDE') setIsClaudeDevOpen(true);
     else if (link.title === 'USERS') setIsUsersOpen(true);
@@ -565,6 +567,8 @@ const App: React.FC = () => {
       changeView('opgaver');
     } else if (currentView === 'admin_packing_editor') {
       changeView('opgaver');
+    } else if (currentView === 'livegps') {
+      changeView('task_control');
     } else if (currentView === 'google_photos') {
       changeView('office');
     } else if (currentView === 'teamrobin_packing') {
@@ -817,6 +821,12 @@ const App: React.FC = () => {
       viewTitle = 'GOOGLE PHOTOS';
       viewSubtitle = 'Albums & Billeder';
       ViewIcon = Camera;
+      break;
+    case 'livegps':
+      currentLinks = [];
+      viewTitle = 'LIVEGPS';
+      viewSubtitle = 'GPS Tracking & Enheder';
+      ViewIcon = Navigation;
       break;
     case 'edit_packing':
       currentLinks = [];
@@ -2275,6 +2285,8 @@ const App: React.FC = () => {
             <AdminReports />
           ) : currentView === 'admin_packing_editor' ? (
             <PackingListEditor />
+          ) : currentView === 'livegps' ? (
+            <LiveGPSPanel />
           ) : currentView === 'edit_packing' ? (
             <PackingListEditor initialActivity={editPackingActivity} />
           ) : currentView === 'job_input' ? (

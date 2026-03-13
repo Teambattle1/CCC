@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown, Link2, Unlink, Monitor, Crosshair, AlertCircle, CheckCircle2, Loader, Pencil, X, Save, Navigation, Printer, Battery } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Link2, Unlink, Monitor, Crosshair, AlertCircle, CheckCircle2, Loader, Pencil, X, Save, Navigation, Printer, Battery, MapPin, Wifi, WifiOff, Gauge } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getAllDevices, categoriseDevices, timeAgo, type LiveGPSDevice } from '../lib/livegps';
 
 interface GearItem {
   id: string;
@@ -114,6 +115,23 @@ const TeamLazerGearList: React.FC = () => {
     emei_number: '', har_gps: false,
   });
   const [showPrintMenu, setShowPrintMenu] = useState(false);
+  const [gpsDevices, setGpsDevices] = useState<Record<string, LiveGPSDevice>>({});
+  const [gpsLoading, setGpsLoading] = useState(false);
+
+  // Fetch live GPS data keyed by IMEI
+  const fetchGpsData = useCallback(async () => {
+    setGpsLoading(true);
+    try {
+      const groups = await getAllDevices();
+      const { skydeanlæg } = categoriseDevices(groups);
+      const byImei: Record<string, LiveGPSDevice> = {};
+      for (const d of skydeanlæg) {
+        if (d.device_data?.imei) byImei[d.device_data.imei] = d;
+      }
+      setGpsDevices(byImei);
+    } catch { /* silent */ }
+    setGpsLoading(false);
+  }, []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -149,7 +167,7 @@ const TeamLazerGearList: React.FC = () => {
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => { fetchData(); fetchGpsData(); }, [fetchData, fetchGpsData]);
 
   const handleSort = (key: SortKey) => {
     if (editingId) return;
@@ -562,16 +580,41 @@ const TeamLazerGearList: React.FC = () => {
                       ) : <span className="text-gray-600">–</span>}
                     </td>
                     <td className="px-2 py-1.5 whitespace-nowrap">
-                      {item.har_gps && item.serial_numbers ? (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); openGpsTrack(); }}
-                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-orange-500/15 text-orange-400 border border-orange-500/30 hover:bg-orange-500/25 transition-colors cursor-pointer"
-                          title={`Åbn LiveGPS → find Sys ${item.serial_numbers} (IMEI: ${item.emei_number || '–'})`}
-                        >
-                          <Navigation className="w-2.5 h-2.5" />
-                          Sys {item.serial_numbers}
-                        </button>
-                      ) : <span className="text-gray-600">–</span>}
+                      {(() => {
+                        const gpsDevice = item.emei_number ? gpsDevices[item.emei_number] : null;
+                        if (!item.har_gps) return <span className="text-gray-600">–</span>;
+                        if (gpsLoading && !gpsDevice) return <Loader className="w-3 h-3 text-orange-400 animate-spin" />;
+                        if (gpsDevice) {
+                          const isOnline = gpsDevice.online === 'online';
+                          return (
+                            <div className="flex flex-col gap-0.5">
+                              <a
+                                href={`https://www.google.com/maps?q=${gpsDevice.lat},${gpsDevice.lng}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-orange-500/15 text-orange-400 border border-orange-500/30 hover:bg-orange-500/25 transition-colors cursor-pointer"
+                                title={`${gpsDevice.lat.toFixed(5)}, ${gpsDevice.lng.toFixed(5)} · ${gpsDevice.time}\n${gpsDevice.address || ''}`}
+                              >
+                                {isOnline ? <Wifi className="w-2.5 h-2.5 text-green-400" /> : <WifiOff className="w-2.5 h-2.5 text-red-400" />}
+                                <MapPin className="w-2.5 h-2.5" />
+                                Sys {item.serial_numbers}
+                              </a>
+                              <span className="text-[9px] text-gray-500 pl-1">{timeAgo(gpsDevice.timestamp)} · {gpsDevice.speed}km/t</span>
+                            </div>
+                          );
+                        }
+                        return (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openGpsTrack(); }}
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-orange-500/15 text-orange-400 border border-orange-500/30 hover:bg-orange-500/25 transition-colors cursor-pointer"
+                            title={`IMEI: ${item.emei_number || '–'}`}
+                          >
+                            <Navigation className="w-2.5 h-2.5" />
+                            Sys {item.serial_numbers}
+                          </button>
+                        );
+                      })()}
                     </td>
                     <td className="px-2 py-1.5 whitespace-nowrap">
                       {partner ? (
