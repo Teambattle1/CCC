@@ -119,17 +119,71 @@ const TeamLazerGearList: React.FC = () => {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'displays' | 'kasters' | 'linked' | 'gps'>('all');
 
-  // Fetch live GPS data keyed by IMEI
+  // Known base locations
+  const KNOWN_LOCATIONS: { name: string; lat: number; lng: number }[] = [
+    { name: 'Frederikssund', lat: 55.849472, lng: 12.065000 },
+    { name: 'Fredericia', lat: 55.531778, lng: 9.713694 },
+  ];
+
+  // Haversine distance in km
+  const haversineKm = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+
+  // Resolve location name from GPS coordinates
+  const resolveLocation = (lat: number, lng: number): string => {
+    for (const loc of KNOWN_LOCATIONS) {
+      if (haversineKm(lat, lng, loc.lat, loc.lng) < 10) return loc.name;
+    }
+    // Fallback: nearest Danish city approximation by address or coords
+    return `${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E`;
+  };
+
+  // Fetch live GPS data keyed by IMEI + auto-update location in DB
   const fetchGpsData = useCallback(async () => {
     setGpsLoading(true);
     try {
       const groups = await getAllDevices();
-      const { skydeanlæg } = categoriseDevices(groups);
+      const allDevices = groups.flatMap(g => g.items);
       const byImei: Record<string, LiveGPSDevice> = {};
-      for (const d of skydeanlæg) {
+      for (const d of allDevices) {
         if (d.device_data?.imei) byImei[d.device_data.imei] = d;
       }
       setGpsDevices(byImei);
+
+      // Auto-update location for GPS gear items
+      // We read current gear to compare (use latest from state or fresh fetch)
+      const { data: currentGear } = await supabase
+        .from('gear')
+        .select('id, emei_number, location, har_gps')
+        .eq('har_gps', true)
+        .not('emei_number', 'is', null);
+
+      if (currentGear) {
+        const updates: { id: string; location: string }[] = [];
+        for (const item of currentGear) {
+          const gpsDevice = item.emei_number ? byImei[item.emei_number] : null;
+          if (!gpsDevice || (gpsDevice.lat === 0 && gpsDevice.lng === 0)) continue;
+          const newLocation = resolveLocation(gpsDevice.lat, gpsDevice.lng);
+          if (newLocation && newLocation !== item.location) {
+            updates.push({ id: item.id, location: newLocation });
+          }
+        }
+        if (updates.length > 0) {
+          for (const u of updates) {
+            await supabase.from('gear').update({ location: u.location }).eq('id', u.id);
+          }
+          // Update local state directly to avoid refetch loop
+          setGear(prev => prev.map(g => {
+            const upd = updates.find(u => u.id === g.id);
+            return upd ? { ...g, location: upd.location } : g;
+          }));
+        }
+      }
     } catch { /* silent */ }
     setGpsLoading(false);
   }, []);
