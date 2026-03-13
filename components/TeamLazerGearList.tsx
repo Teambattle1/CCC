@@ -714,7 +714,7 @@ const TeamLazerGearList: React.FC = () => {
                                 <MapPin className="w-2.5 h-2.5" />
                                 Sys {item.serial_numbers}
                               </a>
-                              <span className="text-[9px] text-gray-500 pl-1">{timeAgo(gpsDevice.timestamp)} · {gpsDevice.speed}km/t</span>
+                              <span className="text-xs text-white pl-1">{timeAgo(gpsDevice.timestamp)} · {gpsDevice.speed}km/t</span>
                             </div>
                           );
                         }
