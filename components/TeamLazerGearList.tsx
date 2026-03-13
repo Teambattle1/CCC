@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown, Link2, Unlink, Monitor, Crosshair, AlertCircle, CheckCircle2, Loader, Pencil, X, Save, Navigation, Printer, Battery, MapPin, Wifi, WifiOff, Gauge } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Link2, Unlink, Monitor, Crosshair, AlertCircle, CheckCircle2, Loader, Pencil, X, Save, Navigation, Printer, Battery, MapPin, Wifi, WifiOff, Gauge, ShoppingCart } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getAllDevices, categoriseDevices, timeAgo, type LiveGPSDevice } from '../lib/livegps';
 
@@ -122,6 +122,9 @@ const TeamLazerGearList: React.FC = () => {
   const [gpsDevices, setGpsDevices] = useState<Record<string, LiveGPSDevice>>({});
   const [gpsLoading, setGpsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'displays' | 'kasters' | 'linked' | 'gps'>('all');
+  const [showShoppingNote, setShowShoppingNote] = useState(false);
+  const [shoppingNote, setShoppingNote] = useState('');
+  const [shoppingSaving, setShoppingSaving] = useState(false);
 
   // Known base locations
   const KNOWN_LOCATIONS: { name: string; lat: number; lng: number }[] = [
@@ -247,6 +250,18 @@ const TeamLazerGearList: React.FC = () => {
   }, []);
 
   useEffect(() => { fetchData(); fetchGpsData(); }, [fetchData, fetchGpsData]);
+
+  // Load shopping note on mount
+  useEffect(() => {
+    supabase.from('gear_shopping_notes').select('note').eq('activity_slug', 'teamlazer').single()
+      .then(({ data }) => { if (data) setShoppingNote(data.note || ''); });
+  }, []);
+
+  const saveShoppingNote = async () => {
+    setShoppingSaving(true);
+    await supabase.from('gear_shopping_notes').update({ note: shoppingNote, updated_at: new Date().toISOString() }).eq('activity_slug', 'teamlazer');
+    setShoppingSaving(false);
+  };
 
   const handleSort = (key: SortKey) => {
     if (editingId) return;
@@ -527,6 +542,12 @@ const TeamLazerGearList: React.FC = () => {
           <Navigation className="w-3.5 h-3.5" /> Åbn LiveGPS
         </button>
         <button
+          onClick={() => setShowShoppingNote(true)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-yellow-300 hover:text-white bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 rounded-lg transition-colors"
+        >
+          <ShoppingCart className="w-3.5 h-3.5" /> Indkøb
+        </button>
+        <button
           onClick={() => setShowPrintMenu(!showPrintMenu)}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-300 hover:text-white bg-battle-grey/50 hover:bg-battle-grey border border-white/10 rounded-lg transition-colors"
         >
@@ -799,6 +820,41 @@ const TeamLazerGearList: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Shopping note modal */}
+      {showShoppingNote && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowShoppingNote(false)}>
+          <div className="bg-gray-900 border border-yellow-500/30 rounded-xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-yellow-400" />
+                <h3 className="text-lg font-bold text-white">Indkøbsliste – TeamLazer</h3>
+              </div>
+              <button onClick={() => setShowShoppingNote(false)} className="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-4">
+              <textarea
+                value={shoppingNote}
+                onChange={(e) => setShoppingNote(e.target.value)}
+                placeholder="Skriv hvad der skal indkøbes..."
+                className="w-full h-64 bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/50 resize-none"
+              />
+              <div className="flex items-center justify-between mt-3">
+                <span className="text-[10px] text-gray-500">Gemmes i database – deles med alle</span>
+                <button
+                  onClick={saveShoppingNote}
+                  disabled={shoppingSaving}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-black bg-yellow-400 hover:bg-yellow-300 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  <Save className="w-3.5 h-3.5" /> {shoppingSaving ? 'Gemmer...' : 'Gem'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
