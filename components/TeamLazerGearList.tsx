@@ -19,6 +19,7 @@ interface GearItem {
   battery_change_date: string | null;
   maintenance_date: string | null;
   maintenance_note: string | null;
+  next_checkup: string | null;
 }
 
 interface GearLink {
@@ -39,6 +40,7 @@ interface EditForm {
   battery_change_date: string;
   maintenance_date: string;
   maintenance_note: string;
+  next_checkup: string;
   emei_number: string;
   har_gps: boolean;
 }
@@ -116,7 +118,7 @@ const TeamLazerGearList: React.FC = () => {
   const [editForm, setEditForm] = useState<EditForm>({
     name: '', location: '', color_code: '', frequency: '', out_of_service: false,
     out_of_service_reason: '', serial_numbers: '', description: '', battery_change_date: '',
-    maintenance_date: '', maintenance_note: '', emei_number: '', har_gps: false,
+    maintenance_date: '', maintenance_note: '', next_checkup: '', emei_number: '', har_gps: false,
   });
   const [showPrintMenu, setShowPrintMenu] = useState(false);
   const [gpsDevices, setGpsDevices] = useState<Record<string, LiveGPSDevice>>({});
@@ -218,7 +220,7 @@ const TeamLazerGearList: React.FC = () => {
     const [gearRes, linksRes] = await Promise.all([
       supabase
         .from('gear')
-        .select('id, name, geartype_id, location, color_code, frequency, out_of_service, out_of_service_reason, har_gps, emei_number, serial_numbers, description, battery_change_date, maintenance_date, maintenance_note, geartypes!left(name)')
+        .select('id, name, geartype_id, location, color_code, frequency, out_of_service, out_of_service_reason, har_gps, emei_number, serial_numbers, description, battery_change_date, maintenance_date, maintenance_note, next_checkup, geartypes!left(name)')
         .or('geartype_id.eq.aee1e9b3-5bae-4c02-ab5a-00dabae9240b,geartype_id.eq.724da061-16e2-4c63-8833-bb6cc7c5cf97')
         .order('name'),
       supabase.from('gear_links').select('*'),
@@ -242,6 +244,7 @@ const TeamLazerGearList: React.FC = () => {
           battery_change_date: g.battery_change_date || null,
           maintenance_date: g.maintenance_date || null,
           maintenance_note: g.maintenance_note || null,
+          next_checkup: g.next_checkup || null,
         }))
       );
     }
@@ -354,6 +357,7 @@ const TeamLazerGearList: React.FC = () => {
       battery_change_date: item.battery_change_date && item.battery_change_date !== '0001-01-01' ? item.battery_change_date : '',
       maintenance_date: item.maintenance_date && item.maintenance_date !== '0001-01-01' ? item.maintenance_date : '',
       maintenance_note: item.maintenance_note || '',
+      next_checkup: item.next_checkup && item.next_checkup !== '0001-01-01' ? item.next_checkup : '',
       emei_number: item.emei_number || '',
       har_gps: item.har_gps,
     });
@@ -379,6 +383,7 @@ const TeamLazerGearList: React.FC = () => {
       battery_change_date: editForm.battery_change_date || null,
       maintenance_date: editForm.maintenance_date || null,
       maintenance_note: editForm.maintenance_note || null,
+      next_checkup: editForm.next_checkup || null,
       emei_number: editForm.emei_number || null,
       har_gps: editForm.har_gps,
     }).eq('id', editingId);
@@ -424,7 +429,7 @@ const TeamLazerGearList: React.FC = () => {
         <td>${colorDotHtml(item.color_code)}${item.color_code || '–'}</td>
         <td>${item.frequency || '–'}</td>
         <td>${item.serial_numbers || '–'}</td>
-        <td>${formatDate(item.maintenance_date)}${item.maintenance_note ? '<br><small style="color:#888">' + item.maintenance_note + '</small>' : ''}${item.battery_change_date ? '<br><small style="color:#eab308">🔋 ' + formatDate(item.battery_change_date) + '</small>' : ''}</td>
+        <td>${formatDate(item.maintenance_date)}${item.next_checkup ? '<br><small style="color:#3b82f6">Checkup: ' + formatDate(item.next_checkup) + '</small>' : ''}${item.maintenance_note ? '<br><small style="color:#888">' + item.maintenance_note + '</small>' : ''}${item.battery_change_date ? '<br><small style="color:#eab308">🔋 ' + formatDate(item.battery_change_date) + '</small>' : ''}</td>
         <td style="color:#f97316">${item.har_gps && item.serial_numbers ? 'Sys ' + item.serial_numbers : '–'}</td>
         <td>${partner || '–'}</td>
       </tr>`;
@@ -653,6 +658,7 @@ const TeamLazerGearList: React.FC = () => {
                       <td className="px-2 py-1.5 whitespace-nowrap">
                         <div className="flex flex-col gap-0.5">
                           <input type="date" value={editForm.maintenance_date} onChange={(e) => setEditForm({ ...editForm, maintenance_date: e.target.value })} className={`${editInputCls} w-28`} title="Vedligeholdelsesdato" />
+                          <input type="date" value={editForm.next_checkup} onChange={(e) => setEditForm({ ...editForm, next_checkup: e.target.value })} className={`${editInputCls} w-28 text-[10px] text-blue-400`} title="Næste checkup" />
                           <input value={editForm.maintenance_note} onChange={(e) => setEditForm({ ...editForm, maintenance_note: e.target.value })} placeholder="Note..." className={`${editInputCls} w-28 text-[10px]`} title="Vedligeholdelsesnote" />
                           <input type="date" value={editForm.battery_change_date} onChange={(e) => setEditForm({ ...editForm, battery_change_date: e.target.value })} className={`${editInputCls} w-28 text-[10px]`} title="Batteriskift dato" />
                         </div>
@@ -727,7 +733,15 @@ const TeamLazerGearList: React.FC = () => {
                       {item.maintenance_date && item.maintenance_date !== '0001-01-01' ? (
                         <div className="flex flex-col">
                           <span className="text-white text-xs">{formatDate(item.maintenance_date)}</span>
+                          {item.next_checkup && <span className={`text-[10px] ${new Date(item.next_checkup) < new Date() ? 'text-red-400' : 'text-blue-400'}`}>Checkup: {formatDate(item.next_checkup)}</span>}
                           {item.maintenance_note && <span className="text-gray-400 text-[10px]">{item.maintenance_note}</span>}
+                          {item.battery_change_date && item.battery_change_date !== '0001-01-01' && (
+                            <span className="text-yellow-500/70 text-[10px] flex items-center gap-0.5"><Battery className="w-2.5 h-2.5" />{formatDate(item.battery_change_date)}</span>
+                          )}
+                        </div>
+                      ) : item.next_checkup ? (
+                        <div className="flex flex-col">
+                          <span className={`text-[10px] ${new Date(item.next_checkup) < new Date() ? 'text-red-400' : 'text-blue-400'}`}>Checkup: {formatDate(item.next_checkup)}</span>
                           {item.battery_change_date && item.battery_change_date !== '0001-01-01' && (
                             <span className="text-yellow-500/70 text-[10px] flex items-center gap-0.5"><Battery className="w-2.5 h-2.5" />{formatDate(item.battery_change_date)}</span>
                           )}

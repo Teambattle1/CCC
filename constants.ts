@@ -112,6 +112,24 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
     description: 'GPS Tracking & Enheder',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'ar4',
+    title: 'UDE AF DRIFT',
+    url: '#admin_oos',
+    icon: AlertTriangle,
+    description: 'Gear ude af drift',
+    color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'ar5',
+    title: 'VEDLIGEHOLD',
+    url: '#admin_maintenance',
+    icon: Wrench,
+    description: 'Vedligeholdelse',
+    color: 'yellow',
+    badge: 'new'
   }
 ];
 
@@ -231,6 +249,15 @@ export const TEAMPLAY_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tp_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamplay_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -331,6 +358,15 @@ export const TEAMTASTE_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tt_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamtaste_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -449,6 +485,15 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tc_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamchallenge_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -690,6 +735,15 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'ts_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamsegway_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -789,6 +843,15 @@ export const TEAMBOX_LINKS: HubLink[] = [
     icon: ListChecks,
     description: 'Kommer snart',
     color: 'red'
+  },
+  {
+    id: 'tb_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teambox_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -881,6 +944,15 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tcs_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamconstruct_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -960,6 +1032,15 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tcl_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamcontrol_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -1072,6 +1153,15 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tcon_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamconnect_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -1165,6 +1255,15 @@ export const TEAMROBIN_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'tr_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamrobin_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -1300,6 +1399,15 @@ export const TEAMACTION_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'ta_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamaction_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
@@ -1409,6 +1517,15 @@ export const TEAMRACE_LINKS: HubLink[] = [
     icon: FolderOpen,
     description: 'Upload & Download',
     color: 'purple'
+  },
+  {
+    id: 'trc_gear',
+    title: 'GEAR OVERSIGT',
+    url: '#teamrace_gear',
+    icon: ClipboardList,
+    description: 'Gear & Udstyr',
+    color: 'blue',
+    badge: 'new'
   }
 ];
 
