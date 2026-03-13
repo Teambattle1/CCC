@@ -155,29 +155,47 @@ const TeamLazerGearList: React.FC = () => {
       }
       setGpsDevices(byImei);
 
-      // Auto-update location for GPS gear items
-      // We read current gear to compare (use latest from state or fresh fetch)
-      const { data: currentGear } = await supabase
-        .from('gear')
-        .select('id, emei_number, location, har_gps')
-        .eq('har_gps', true)
-        .not('emei_number', 'is', null);
+      // Auto-update location for GPS gear items + sync linked kasters
+      const [gearRes, linksRes] = await Promise.all([
+        supabase.from('gear').select('id, emei_number, location, har_gps'),
+        supabase.from('gear_links').select('display_id, kaster_id'),
+      ]);
 
-      if (currentGear) {
+      if (gearRes.data) {
+        const allGear = gearRes.data;
+        const gearLinks = linksRes.data || [];
         const updates: { id: string; location: string }[] = [];
-        for (const item of currentGear) {
-          const gpsDevice = item.emei_number ? byImei[item.emei_number] : null;
+
+        // 1) Update GPS-equipped displays from live coordinates
+        for (const item of allGear) {
+          if (!item.har_gps || !item.emei_number) continue;
+          const gpsDevice = byImei[item.emei_number];
           if (!gpsDevice || (gpsDevice.lat === 0 && gpsDevice.lng === 0)) continue;
           const newLocation = resolveLocation(gpsDevice.lat, gpsDevice.lng);
           if (newLocation && newLocation !== item.location) {
             updates.push({ id: item.id, location: newLocation });
           }
         }
+
+        // 2) Sync linked kasters: kaster location always follows its display
+        for (const link of gearLinks) {
+          const display = allGear.find(g => g.id === link.display_id);
+          const kaster = allGear.find(g => g.id === link.kaster_id);
+          if (!display || !kaster) continue;
+          // Use updated display location if we just changed it, otherwise current DB value
+          const displayLoc = updates.find(u => u.id === display.id)?.location || display.location;
+          if (displayLoc && displayLoc !== kaster.location) {
+            // Avoid duplicate entries
+            if (!updates.find(u => u.id === kaster.id)) {
+              updates.push({ id: kaster.id, location: displayLoc });
+            }
+          }
+        }
+
         if (updates.length > 0) {
           for (const u of updates) {
             await supabase.from('gear').update({ location: u.location }).eq('id', u.id);
           }
-          // Update local state directly to avoid refetch loop
           setGear(prev => prev.map(g => {
             const upd = updates.find(u => u.id === g.id);
             return upd ? { ...g, location: upd.location } : g;
@@ -414,7 +432,7 @@ const TeamLazerGearList: React.FC = () => {
 
   const linkedKasterIds = new Set(links.map((l) => l.kaster_id));
   const linkedDisplayIds = new Set(links.map((l) => l.display_id));
-  const availableKasters = kasters.filter((k) => !linkedKasterIds.has(k.id) && !k.out_of_service);
+  const availableKasters = kasters.filter((k) => !linkedKasterIds.has(k.id));
 
   const SortIcon: React.FC<{ col: SortKey }> = ({ col }) => {
     if (sortKey !== col) return <ArrowUpDown className="w-3 h-3 opacity-30" />;
@@ -514,7 +532,7 @@ const TeamLazerGearList: React.FC = () => {
       {/* Table */}
       <div className="bg-battle-grey/50 rounded-xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/10">
                 {([
@@ -530,7 +548,7 @@ const TeamLazerGearList: React.FC = () => {
                   <th
                     key={key}
                     onClick={() => handleSort(key)}
-                    className="text-left px-2 py-2 text-gray-400 font-medium text-[11px] cursor-pointer hover:text-white transition-colors select-none whitespace-nowrap"
+                    className="text-left px-2 py-2 text-white font-medium text-xs cursor-pointer hover:text-battle-orange transition-colors select-none whitespace-nowrap"
                   >
                     <div className="flex items-center gap-0.5">
                       {label}
@@ -539,7 +557,7 @@ const TeamLazerGearList: React.FC = () => {
                   </th>
                 ))}
                 <th className="text-left px-2 py-2 text-orange-400 font-medium text-[11px] whitespace-nowrap">LiveGPS</th>
-                <th className="text-left px-2 py-2 text-gray-400 font-medium text-[11px] whitespace-nowrap">Linket til</th>
+                <th className="text-left px-2 py-2 text-white font-medium text-xs whitespace-nowrap">Linket til</th>
                 <th className="px-2 py-2"></th>
               </tr>
             </thead>
@@ -550,7 +568,7 @@ const TeamLazerGearList: React.FC = () => {
                 const isLinked = linkColor !== null;
                 const isDisplay = item.type === 'Display';
                 const isKaster = item.type === 'Kaster';
-                const isLinkTarget = linkingDisplayId && isKaster && !linkedKasterIds.has(item.id) && !item.out_of_service;
+                const isLinkTarget = linkingDisplayId && isKaster && !linkedKasterIds.has(item.id);
                 const rowColor = isLinked ? getLinkRowColor(linkColor) : '';
                 const isEditing = editingId === item.id;
 
@@ -560,7 +578,7 @@ const TeamLazerGearList: React.FC = () => {
                       <td className="px-2 py-1.5 whitespace-nowrap">
                         <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} className={`${editInputCls} w-28`} />
                       </td>
-                      <td className="px-2 py-1.5 text-gray-400 whitespace-nowrap">{item.type}</td>
+                      <td className="px-2 py-1.5 text-white whitespace-nowrap">{item.type}</td>
                       <td className="px-2 py-1.5 whitespace-nowrap">
                         <select
                           value={editForm.out_of_service ? 'true' : 'false'}
@@ -631,7 +649,7 @@ const TeamLazerGearList: React.FC = () => {
                         <span className="text-white font-medium">{item.name}</span>
                       </div>
                     </td>
-                    <td className="px-2 py-1.5 text-gray-400 whitespace-nowrap">{item.type}</td>
+                    <td className="px-2 py-1.5 text-white whitespace-nowrap">{item.type}</td>
                     <td className="px-2 py-1.5 whitespace-nowrap">
                       {item.out_of_service ? (
                         <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] bg-red-500/15 text-red-400 border border-red-500/30" title={item.out_of_service_reason || undefined}>
@@ -643,18 +661,18 @@ const TeamLazerGearList: React.FC = () => {
                         </span>
                       )}
                     </td>
-                    <td className="px-2 py-1.5 text-gray-400 whitespace-nowrap">{item.location || '–'}</td>
+                    <td className="px-2 py-1.5 text-white whitespace-nowrap">{item.location || '–'}</td>
                     <td className="px-2 py-1.5 whitespace-nowrap">
                       <span className="flex items-center text-gray-300">
                         {getColorDot(item.color_code)}
                         {item.color_code || '–'}
                       </span>
                     </td>
-                    <td className="px-2 py-1.5 text-gray-400 whitespace-nowrap">{item.frequency || '–'}</td>
-                    <td className="px-2 py-1.5 text-gray-400 whitespace-nowrap">{item.serial_numbers || '–'}</td>
+                    <td className="px-2 py-1.5 text-white whitespace-nowrap">{item.frequency || '–'}</td>
+                    <td className="px-2 py-1.5 text-white whitespace-nowrap">{item.serial_numbers || '–'}</td>
                     <td className="px-2 py-1.5 whitespace-nowrap">
                       {item.battery_change_date && item.battery_change_date !== '0001-01-01' ? (
-                        <span className="text-gray-400 text-[10px]">{formatDate(item.battery_change_date)}</span>
+                        <span className="text-white text-xs">{formatDate(item.battery_change_date)}</span>
                       ) : <span className="text-gray-600">–</span>}
                     </td>
                     <td className="px-2 py-1.5 whitespace-nowrap">
@@ -720,7 +738,7 @@ const TeamLazerGearList: React.FC = () => {
                           >
                             <Unlink className="w-3 h-3" />
                           </button>
-                        ) : isDisplay && !linkedDisplayIds.has(item.id) && !item.out_of_service ? (
+                        ) : isDisplay && !linkedDisplayIds.has(item.id) ? (
                           <button
                             onClick={(e) => { e.stopPropagation(); setLinkingDisplayId(item.id); }}
                             disabled={saving || availableKasters.length === 0}
