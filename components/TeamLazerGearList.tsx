@@ -496,8 +496,26 @@ const TeamLazerGearList: React.FC = () => {
         </div>
       )}
 
-      {/* Print button */}
-      <div className="flex justify-end mb-2 relative">
+      {/* Action buttons */}
+      <div className="flex justify-end gap-2 mb-2 relative">
+        <button
+          onClick={() => {
+            // Open LiveGPS in new window and auto-submit login form
+            const w = window.open('about:blank', '_blank');
+            if (w) {
+              w.document.write(`<!DOCTYPE html><html><body>
+                <form id="f" method="POST" action="https://app.livegps.dk/login">
+                  <input name="email" value="livegps-api@sunke.dk"/>
+                  <input name="password" value="m5MxBzWv"/>
+                </form>
+                <script>document.getElementById('f').submit();<\/script>
+              </body></html>`);
+            }
+          }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-orange-300 hover:text-white bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-lg transition-colors"
+        >
+          <Navigation className="w-3.5 h-3.5" /> Åbn LiveGPS
+        </button>
         <button
           onClick={() => setShowPrintMenu(!showPrintMenu)}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-300 hover:text-white bg-battle-grey/50 hover:bg-battle-grey border border-white/10 rounded-lg transition-colors"
