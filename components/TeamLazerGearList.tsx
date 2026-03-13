@@ -117,6 +117,7 @@ const TeamLazerGearList: React.FC = () => {
   const [showPrintMenu, setShowPrintMenu] = useState(false);
   const [gpsDevices, setGpsDevices] = useState<Record<string, LiveGPSDevice>>({});
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'displays' | 'kasters' | 'linked' | 'gps'>('all');
 
   // Fetch live GPS data keyed by IMEI
   const fetchGpsData = useCallback(async () => {
@@ -196,6 +197,16 @@ const TeamLazerGearList: React.FC = () => {
 
   const displays = gear.filter((g) => g.type === 'Display');
   const kasters = gear.filter((g) => g.type === 'Kaster');
+  const linkedIds = new Set(links.flatMap(l => [l.display_id, l.kaster_id]));
+
+  const filteredGear = sortedGear.filter(item => {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'displays') return item.type === 'Display';
+    if (activeFilter === 'kasters') return item.type === 'Kaster';
+    if (activeFilter === 'linked') return linkedIds.has(item.id);
+    if (activeFilter === 'gps') return item.har_gps;
+    return true;
+  });
 
   const getLinkedPartner = (gearId: string): { partnerId: string; linkId: string } | null => {
     const asDisplay = links.find((l) => l.display_id === gearId);
@@ -370,25 +381,38 @@ const TeamLazerGearList: React.FC = () => {
 
   return (
     <div className="w-full px-4 py-4">
-      {/* Stats */}
+      {/* Stats – clickable filters */}
       <div className="grid grid-cols-4 gap-2 mb-4">
-        <div className="bg-battle-grey/50 rounded-lg border border-white/10 p-2.5 text-center">
-          <div className="text-xl font-bold text-white">{displays.length}</div>
-          <div className="text-[10px] text-gray-400 flex items-center justify-center gap-1"><Monitor className="w-3 h-3" /> Displays</div>
-        </div>
-        <div className="bg-battle-grey/50 rounded-lg border border-white/10 p-2.5 text-center">
-          <div className="text-xl font-bold text-white">{kasters.length}</div>
-          <div className="text-[10px] text-gray-400 flex items-center justify-center gap-1"><Crosshair className="w-3 h-3" /> Kastere</div>
-        </div>
-        <div className="bg-battle-grey/50 rounded-lg border border-white/10 p-2.5 text-center">
-          <div className="text-xl font-bold text-battle-orange">{links.length}</div>
-          <div className="text-[10px] text-gray-400 flex items-center justify-center gap-1"><Link2 className="w-3 h-3" /> Linkede par</div>
-        </div>
-        <div className="bg-battle-grey/50 rounded-lg border border-white/10 p-2.5 text-center">
-          <div className="text-xl font-bold text-orange-400">{gear.filter(g => g.har_gps).length}</div>
-          <div className="text-[10px] text-gray-400 flex items-center justify-center gap-1"><Navigation className="w-3 h-3" /> LiveGPS</div>
-        </div>
+        {([
+          { key: 'displays' as const, count: displays.length, label: 'Displays', icon: <Monitor className="w-3 h-3" />, color: 'white' },
+          { key: 'kasters' as const, count: kasters.length, label: 'Kastere', icon: <Crosshair className="w-3 h-3" />, color: 'white' },
+          { key: 'linked' as const, count: links.length, label: 'Linkede par', icon: <Link2 className="w-3 h-3" />, color: 'battle-orange' },
+          { key: 'gps' as const, count: gear.filter(g => g.har_gps).length, label: 'LiveGPS', icon: <Navigation className="w-3 h-3" />, color: 'orange-400' },
+        ]).map(({ key, count, label, icon, color }) => {
+          const isActive = activeFilter === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setActiveFilter(isActive ? 'all' : key)}
+              className={`bg-battle-grey/50 rounded-lg border p-2.5 text-center transition-all cursor-pointer ${isActive ? 'border-battle-orange ring-1 ring-battle-orange/40 bg-battle-orange/10' : 'border-white/10 hover:border-white/20'}`}
+            >
+              <div className={`text-xl font-bold ${isActive ? 'text-battle-orange' : `text-${color}`}`}>{count}</div>
+              <div className={`text-[10px] flex items-center justify-center gap-1 ${isActive ? 'text-battle-orange' : 'text-gray-400'}`}>{icon} {label}</div>
+            </button>
+          );
+        })}
       </div>
+
+      {/* Active filter indicator */}
+      {activeFilter !== 'all' && (
+        <div className="flex items-center gap-2 mb-2 text-xs">
+          <span className="text-battle-orange font-medium">
+            Filtrerer: {activeFilter === 'displays' ? 'Displays' : activeFilter === 'kasters' ? 'Kastere' : activeFilter === 'linked' ? 'Linkede par' : 'LiveGPS'}
+          </span>
+          <span className="text-gray-500">({filteredGear.length} af {gear.length})</span>
+          <button onClick={() => setActiveFilter('all')} className="text-gray-400 hover:text-white underline">Vis alle</button>
+        </div>
+      )}
 
       {/* Linking mode banner */}
       {linkingDisplayId && (
@@ -466,7 +490,7 @@ const TeamLazerGearList: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedGear.map((item) => {
+              {filteredGear.map((item) => {
                 const partner = getPartnerName(item.id);
                 const linkColor = getLinkDisplayColor(item.id);
                 const isLinked = linkColor !== null;
