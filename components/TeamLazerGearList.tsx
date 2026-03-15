@@ -123,7 +123,7 @@ const TeamLazerGearList: React.FC = () => {
   const [showPrintMenu, setShowPrintMenu] = useState(false);
   const [gpsDevices, setGpsDevices] = useState<Record<string, LiveGPSDevice>>({});
   const [gpsLoading, setGpsLoading] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'displays' | 'kasters' | 'linked' | 'gps'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'displays' | 'kasters' | 'gevaer' | 'linked' | 'gps'>('all');
   const [showShoppingNote, setShowShoppingNote] = useState(false);
   const [shoppingNote, setShoppingNote] = useState('');
   const [shoppingSaving, setShoppingSaving] = useState(false);
@@ -221,7 +221,7 @@ const TeamLazerGearList: React.FC = () => {
       supabase
         .from('gear')
         .select('id, name, geartype_id, location, color_code, frequency, out_of_service, out_of_service_reason, har_gps, emei_number, serial_numbers, description, battery_change_date, maintenance_date, maintenance_note, next_checkup, geartypes!left(name)')
-        .or('geartype_id.eq.aee1e9b3-5bae-4c02-ab5a-00dabae9240b,geartype_id.eq.724da061-16e2-4c63-8833-bb6cc7c5cf97')
+        .or('geartype_id.eq.aee1e9b3-5bae-4c02-ab5a-00dabae9240b,geartype_id.eq.724da061-16e2-4c63-8833-bb6cc7c5cf97,geartype_id.eq.b3a7f1c2-9d4e-4a8b-bf12-6e5c3d2a1f09')
         .order('name'),
       supabase.from('gear_links').select('*'),
     ]);
@@ -293,12 +293,14 @@ const TeamLazerGearList: React.FC = () => {
 
   const displays = gear.filter((g) => g.type === 'Display');
   const kasters = gear.filter((g) => g.type === 'Kaster');
+  const gevaer = gear.filter((g) => g.type === 'Gevær');
   const linkedIds = new Set(links.flatMap(l => [l.display_id, l.kaster_id]));
 
   const filteredGear = sortedGear.filter(item => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'displays') return item.type === 'Display';
     if (activeFilter === 'kasters') return item.type === 'Kaster';
+    if (activeFilter === 'gevaer') return item.type === 'Gevær';
     if (activeFilter === 'linked') return linkedIds.has(item.id);
     if (activeFilter === 'gps') return item.har_gps;
     return true;
@@ -448,7 +450,7 @@ const TeamLazerGearList: React.FC = () => {
   tr:nth-child(even) { background: #f8f8f8; }
 </style></head><body>
 <h1>TeamLazer Gear Oversigt</h1>
-<div class="meta">Sorteret efter: ${sortLabels[pSortKey]} (${pSortDir === 'asc' ? 'stigende' : 'faldende'}) &bull; Udskrevet: ${new Date().toLocaleDateString('da-DK')} &bull; ${displays.length} Displays, ${kasters.length} Kastere, ${links.length} Links</div>
+<div class="meta">Sorteret efter: ${sortLabels[pSortKey]} (${pSortDir === 'asc' ? 'stigende' : 'faldende'}) &bull; Udskrevet: ${new Date().toLocaleDateString('da-DK')} &bull; ${displays.length} Displays, ${kasters.length} Kastere, ${gevaer.length} Gevær, ${links.length} Links</div>
 <table>
   <thead><tr><th>Navn</th><th>Type</th><th>Status</th><th>Sted</th><th>Farve</th><th>Freq</th><th>Serie#</th><th>Vedligehold</th><th>LiveGPS</th><th>Linket til</th></tr></thead>
   <tbody>${rows}</tbody>
@@ -484,10 +486,11 @@ const TeamLazerGearList: React.FC = () => {
   return (
     <div className="w-full px-4 py-4">
       {/* Stats – clickable filters */}
-      <div className="grid grid-cols-4 gap-2 mb-4">
+      <div className="grid grid-cols-5 gap-2 mb-4">
         {([
           { key: 'displays' as const, count: displays.length, label: 'Displays', icon: <Monitor className="w-3 h-3" />, color: 'white' },
           { key: 'kasters' as const, count: kasters.length, label: 'Kastere', icon: <Crosshair className="w-3 h-3" />, color: 'white' },
+          { key: 'gevaer' as const, count: gevaer.length, label: 'Gevær', icon: <Gauge className="w-3 h-3" />, color: 'white' },
           { key: 'linked' as const, count: links.length, label: 'Linkede par', icon: <Link2 className="w-3 h-3" />, color: 'battle-orange' },
           { key: 'gps' as const, count: gear.filter(g => g.har_gps).length, label: 'LiveGPS', icon: <Navigation className="w-3 h-3" />, color: 'orange-400' },
         ]).map(({ key, count, label, icon, color }) => {
@@ -509,7 +512,7 @@ const TeamLazerGearList: React.FC = () => {
       {activeFilter !== 'all' && (
         <div className="flex items-center gap-2 mb-2 text-xs">
           <span className="text-battle-orange font-medium">
-            Filtrerer: {activeFilter === 'displays' ? 'Displays' : activeFilter === 'kasters' ? 'Kastere' : activeFilter === 'linked' ? 'Linkede par' : 'LiveGPS'}
+            Filtrerer: {activeFilter === 'displays' ? 'Displays' : activeFilter === 'kasters' ? 'Kastere' : activeFilter === 'gevaer' ? 'Gevær' : activeFilter === 'linked' ? 'Linkede par' : 'LiveGPS'}
           </span>
           <span className="text-gray-500">({filteredGear.length} af {gear.length})</span>
           <button onClick={() => setActiveFilter('all')} className="text-gray-400 hover:text-white underline">Vis alle</button>

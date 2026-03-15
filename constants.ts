@@ -195,7 +195,7 @@ export const TEAMPLAY_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamplay_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'new'
   },
@@ -304,7 +304,7 @@ export const TEAMTASTE_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamtaste_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'new'
   },
@@ -405,7 +405,7 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamchallenge_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'beta',
     badgeColor: 'pink'
@@ -567,7 +567,7 @@ export const TEAMLAZER_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamlazer_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'beta',
     badgeColor: 'pink'
@@ -689,7 +689,7 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamsegway_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'new'
   },
@@ -782,7 +782,7 @@ export const TEAMBOX_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teambox_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue'
   },
   {
@@ -898,7 +898,7 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamconstruct_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'beta',
     badgeColor: 'pink'
@@ -963,7 +963,7 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamcontrol_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue'
   },
   {
@@ -1099,7 +1099,7 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamconnect_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'new'
   },
@@ -1208,7 +1208,7 @@ export const TEAMROBIN_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamrobin_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'beta',
     badgeColor: 'pink'
@@ -1329,7 +1329,7 @@ export const TEAMACTION_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamaction_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'new'
   },
@@ -1454,7 +1454,7 @@ export const TEAMRACE_LINKS: HubLink[] = [
     title: 'GUIDE',
     url: '#teamrace_guide',
     icon: Map,
-    description: 'Instructions',
+    description: 'Instruktioner',
     color: 'blue',
     badge: 'beta',
     badgeColor: 'pink'
