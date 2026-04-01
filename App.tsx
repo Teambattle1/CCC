@@ -104,6 +104,7 @@ import SessionReport from './components/SessionReport';
 import MyJobs from './components/MyJobs';
 import ActivityFileManager from './components/ActivityFileManager';
 import SitemapModal from './components/SitemapModal';
+import IntroAnimation from './components/IntroAnimation';
 import GooglePhotosView from './components/GooglePhotosView';
 import TeamLazerGearList from './components/TeamLazerGearList';
 import TopbarJobSearch from './components/TopbarJobSearch';
@@ -158,6 +159,10 @@ const App: React.FC = () => {
   const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
   const [isIdeasOpen, setIsIdeasOpen] = useState(false);
   const [isSitemapOpen, setIsSitemapOpen] = useState(false);
+  const [showIntro, setShowIntro] = useState(() => {
+    const seen = sessionStorage.getItem('introSeen');
+    return !seen;
+  });
   const [fejlsogningCount, setFejlsogningCount] = useState(0);
   const [activeJob, setActiveJob] = useState<TaskJob | null>(null);
   const [activeJobActivities, setActiveJobActivities] = useState<ResolvedActivity[]>([]);
@@ -361,7 +366,7 @@ const App: React.FC = () => {
     // Title-based navigation for hub/activity links
     else if (link.title === 'MINE SESSIONS') changeView('opgaver');
     else if (link.title === 'AKTIVITETER') changeView('activities');
-    else if (link.title === 'GAMES') changeView('games');
+    else if (link.title === 'GAMES') { window.open('https://games.eventday.dk', '_blank'); return; }
     else if (link.title === 'ACTIVITIES') changeView('activities');
     else if (link.title === 'ECONOMY') changeView('economy');
     else if (link.title === 'ADMIN') changeView('task_control');
@@ -1785,7 +1790,15 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full bg-battle-black text-white selection:bg-battle-orange selection:text-white overflow-x-hidden flex flex-col relative">
-      
+
+      {/* Intro Animation */}
+      {showIntro && (
+        <IntroAnimation onComplete={() => {
+          setShowIntro(false);
+          sessionStorage.setItem('introSeen', '1');
+        }} />
+      )}
+
       {/* Background Decorative Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         {/* Orange Glow Top Left */}
