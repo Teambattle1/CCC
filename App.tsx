@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   HUB_LINKS,
   OPGAVER_LINKS,
@@ -159,10 +159,11 @@ const App: React.FC = () => {
   const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
   const [isIdeasOpen, setIsIdeasOpen] = useState(false);
   const [isSitemapOpen, setIsSitemapOpen] = useState(false);
-  const [showIntro, setShowIntro] = useState(() => {
-    const seen = sessionStorage.getItem('introSeen');
-    return !seen;
-  });
+  const [showIntro, setShowIntro] = useState(() => !sessionStorage.getItem('introSeen'));
+  const handleIntroComplete = useCallback(() => {
+    setShowIntro(false);
+    sessionStorage.setItem('introSeen', '1');
+  }, []);
   const [fejlsogningCount, setFejlsogningCount] = useState(0);
   const [activeJob, setActiveJob] = useState<TaskJob | null>(null);
   const [activeJobActivities, setActiveJobActivities] = useState<ResolvedActivity[]>([]);
@@ -1792,12 +1793,7 @@ const App: React.FC = () => {
     <div className="min-h-screen w-full bg-battle-black text-white selection:bg-battle-orange selection:text-white overflow-x-hidden flex flex-col relative">
 
       {/* Intro Animation */}
-      {showIntro && (
-        <IntroAnimation onComplete={() => {
-          setShowIntro(false);
-          sessionStorage.setItem('introSeen', '1');
-        }} />
-      )}
+      {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
 
       {/* Background Decorative Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none">

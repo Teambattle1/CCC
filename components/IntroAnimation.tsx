@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ShieldCheck } from 'lucide-react';
 
 interface Particle {
-  angle: number;
-  distance: number;
   size: number;
   delay: number;
   color: string;
@@ -17,8 +15,6 @@ const generateParticles = (): Particle[] =>
     const distance = 150 + Math.random() * 200;
     const rad = (angle * Math.PI) / 180;
     return {
-      angle,
-      distance,
       size: 2 + Math.random() * 4,
       delay: Math.random() * 0.3,
       color: `rgba(255, ${80 + Math.floor(Math.random() * 60)}, 0, ${(0.6 + Math.random() * 0.4).toFixed(2)})`,
@@ -30,12 +26,15 @@ const generateParticles = (): Particle[] =>
 const IntroAnimation: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [phase, setPhase] = useState(0);
   const [particles] = useState<Particle[]>(generateParticles);
-  // phase 0: initial black (0-0.3s)
-  // phase 1: shield icon scales in (0.3-1.5s)
-  // phase 2: title slams in (1.5-2.5s)
-  // phase 3: subtitle fades in (2.5-3.2s)
-  // phase 4: particles burst (3.2-4.2s)
-  // phase 5: fade out (4.2-5s)
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  const finish = () => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onCompleteRef.current();
+  };
 
   useEffect(() => {
     const timers = [
@@ -44,20 +43,29 @@ const IntroAnimation: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
       setTimeout(() => setPhase(3), 2500),
       setTimeout(() => setPhase(4), 3200),
       setTimeout(() => setPhase(5), 4200),
-      setTimeout(() => onComplete(), 5000),
+      setTimeout(finish, 5000),
     ];
     return () => timers.forEach(clearTimeout);
-  }, [onComplete]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+      role="button"
+      tabIndex={0}
+      aria-label="Skip intro animation"
+      onClick={finish}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          finish();
+        }
+      }}
       style={{
         background: '#0a0a0a',
         opacity: phase >= 5 ? 0 : 1,
         transition: 'opacity 0.8s ease-out',
       }}
-      onClick={onComplete}
     >
       {/* Radial glow background */}
       <div
@@ -116,7 +124,7 @@ const IntroAnimation: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
       )}
 
       {/* Central content */}
-      <div className="relative flex flex-col items-center z-10">
+      <div className="relative flex flex-col items-center z-10 pointer-events-none">
         {/* Shield icon */}
         <div
           style={{
@@ -129,9 +137,7 @@ const IntroAnimation: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
           <ShieldCheck
             size={phase >= 2 ? 80 : 100}
             className="text-battle-orange"
-            style={{
-              transition: 'all 0.5s ease-out',
-            }}
+            style={{ transition: 'all 0.5s ease-out' }}
           />
         </div>
 
