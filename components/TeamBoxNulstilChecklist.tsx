@@ -480,7 +480,8 @@ const TeamBoxNulstilChecklist: React.FC<TeamBoxNulstilChecklistProps> = ({ onBac
                 {item.imageUrl && (
                   <img
                     src={item.imageUrl}
-                    alt=""
+                    alt={item.text || 'Checklist billede'}
+                    loading="lazy"
                     className="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0"
                   />
                 )}

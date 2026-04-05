@@ -47,6 +47,7 @@ const AlbumGrid: React.FC<AlbumGridProps> = ({ albums, onSelectAlbum, loading })
               <img
                 src={`${album.coverPhotoBaseUrl}=w400-h400-c`}
                 alt={album.title}
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (

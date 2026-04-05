@@ -3397,6 +3397,7 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                       <img
                         src={section.image_url}
                         alt={section.title}
+                        loading="lazy"
                         className="w-full h-48 tablet:h-64 object-cover"
                       />
                       {isAdmin && (

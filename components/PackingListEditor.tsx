@@ -618,7 +618,8 @@ const PackingListEditor: React.FC<PackingListEditorProps> = ({ initialActivity }
                               <div className="mt-2 relative">
                                 <img
                                   src={item.imageUrl}
-                                  alt=""
+                                  alt={item.text || 'Item billede'}
+                                  loading="lazy"
                                   className="h-20 rounded border border-white/10 object-cover"
                                 />
                                 <button

@@ -2,10 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://ilbjytyukicbssqftmma.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYmp5dHl1a2ljYnNzcWZ0bW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzA0NjEsImV4cCI6MjA3MDQwNjQ2MX0.I_PWByMPcOYhWgeq9MxXgOo-NCZYfEuzYmo35XnBFAY';
-// Service role key for admin operations (password reset)
-// Find this in Supabase Dashboard > Settings > API > service_role key
-// IMPORTANT: Replace this with your actual service role key
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYmp5dHl1a2ljYnNzcWZ0bW1hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDgzMDQ2MSwiZXhwIjoyMDcwNDA2NDYxfQ.eCy-vQByybGSFx5QdWQHMGo0LkGQk2LD5fU3oHXpSro';
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 

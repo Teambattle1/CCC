@@ -277,6 +277,7 @@ const TeamBoxDownloads: React.FC<TeamBoxDownloadsProps> = ({ onBack }) => {
                       <img
                         src={file.url}
                         alt={file.name}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     ) : (

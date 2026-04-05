@@ -724,7 +724,8 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({
                 {item.imageUrl && (
                   <img
                     src={item.imageUrl}
-                    alt=""
+                    alt={item.text || 'Pakkeliste billede'}
+                    loading="lazy"
                     className="w-16 h-16 tablet:w-20 tablet:h-20 rounded-lg object-cover border border-white/10 flex-shrink-0"
                   />
                 )}

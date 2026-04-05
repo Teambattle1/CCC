@@ -553,7 +553,7 @@ const ActivityFileManager: React.FC<ActivityFileManagerProps> = ({ activity, onB
               <div className="flex items-center gap-3 mb-6 p-3 bg-battle-black/50 rounded-xl border border-white/5">
                 <div className="w-12 h-12 rounded-lg overflow-hidden bg-battle-black/50 border border-white/10 flex items-center justify-center flex-shrink-0">
                   {file.type === 'image' ? (
-                    <img src={file.url} alt="" className="w-full h-full object-cover" />
+                    <img src={file.url} alt={file.name} loading="lazy" className="w-full h-full object-cover" />
                   ) : (
                     getFileIcon(file.type)
                   )}
@@ -869,6 +869,7 @@ const ActivityFileManager: React.FC<ActivityFileManagerProps> = ({ activity, onB
                       <img
                         src={file.url}
                         alt={file.name}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     ) : (

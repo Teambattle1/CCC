@@ -301,6 +301,7 @@ const FejlsogningReport: React.FC<FejlsogningReportProps> = ({ activity }) => {
                     <img
                       src={url}
                       alt={`Billede ${index + 1}`}
+                      loading="lazy"
                       className="w-full h-24 object-cover rounded-lg border border-yellow-500/30"
                     />
                     <button

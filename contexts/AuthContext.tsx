@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setProfile({
             id: initialSession.user.id,
             email: initialSession.user.email || '',
-            role: 'ADMIN' as UserRole,
+            role: 'INSTRUCTOR' as UserRole,
             created_at: new Date().toISOString()
           });
 
@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setProfile({
             id: newSession.user.id,
             email: newSession.user.email || '',
-            role: 'ADMIN' as UserRole,
+            role: 'INSTRUCTOR' as UserRole,
             created_at: new Date().toISOString()
           });
 
@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const fallbackProfile: OCCUser = {
           id: data.user.id,
           email: data.user.email || email,
-          role: 'ADMIN' as UserRole, // Default to ADMIN for now
+          role: 'INSTRUCTOR' as UserRole, // Default to ADMIN for now
           created_at: new Date().toISOString()
         };
         setProfile(fallbackProfile);

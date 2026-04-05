@@ -321,6 +321,7 @@ const AdminReports: React.FC = () => {
                             <img
                               src={report.image_url}
                               alt="Attached"
+                              loading="lazy"
                               className="w-full max-h-48 object-cover rounded-lg border border-white/10"
                             />
                           </a>

@@ -762,7 +762,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                   {currentEditorBox?.id && (
                     <img
                       src={getThumbnail(currentEditorBox.id)}
-                      alt=""
+                      alt={currentEditorBox?.title || 'Video thumbnail'}
                       className="w-12 h-8 object-cover rounded"
                     />
                   )}
@@ -787,7 +787,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                     >
                       <img
                         src={getThumbnail(video.id)}
-                        alt=""
+                        alt={video.title || 'Video thumbnail'}
                         className="w-10 h-7 object-cover rounded"
                       />
                       <span className="text-white">

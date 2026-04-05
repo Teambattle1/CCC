@@ -405,7 +405,7 @@ const SessionReport: React.FC<SessionReportProps> = ({ job, activities, onNaviga
             {job.client_logo_url && (
               <img
                 src={job.client_logo_url}
-                alt=""
+                alt="Client logo"
                 className="w-12 h-12 object-contain rounded-lg print:w-10 print:h-10"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
