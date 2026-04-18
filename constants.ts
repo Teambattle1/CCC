@@ -98,9 +98,9 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
   {
     id: 'ar2',
     title: 'PAKKELISTER',
-    url: '#admin_packing_editor',
+    url: 'https://check.eventday.dk/admin/pakkeliste',
     icon: Package,
-    description: 'Rediger Pakkelister',
+    description: 'Rediger Pakkelister (CHECK)',
     color: 'green',
     badge: 'new'
   },
@@ -211,7 +211,7 @@ export const TEAMPLAY_LINKS: HubLink[] = [
   {
     id: 'tplay4',
     title: 'PAKKELISTER',
-    url: '#teamplay_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamplay',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -262,32 +262,6 @@ export const TEAMPLAY_LINKS: HubLink[] = [
 ];
 
 // TeamPlay Packing Submenu Links
-export const TEAMPLAY_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tplayp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamplay_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tplayp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamplay_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tplayp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamplay',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamTaste Submenu Links
 export const TEAMTASTE_LINKS: HubLink[] = [
@@ -320,7 +294,7 @@ export const TEAMTASTE_LINKS: HubLink[] = [
   {
     id: 'ttaste4',
     title: 'PAKKELISTER',
-    url: '#teamtaste_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamtaste',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -371,32 +345,6 @@ export const TEAMTASTE_LINKS: HubLink[] = [
 ];
 
 // TeamTaste Packing Submenu Links
-export const TEAMTASTE_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'ttastep1',
-    title: 'FØR OPGAVEN',
-    url: '#teamtaste_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'ttastep2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamtaste_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'ttastep3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamtaste',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamChallenge Submenu Links
 export const TEAM_CHALLENGE_LINKS: HubLink[] = [
@@ -455,7 +403,7 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
   {
     id: 'tc7',
     title: 'PAKKELISTER',
-    url: '#teamchallenge_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamchallenge',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -498,32 +446,6 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
 ];
 
 // TeamChallenge Packing Submenu Links
-export const TEAMCHALLENGE_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tchp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamchallenge_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tchp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamchallenge_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tchp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamchallenge',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // Loquiz Submenu Links
 export const LOQUIZ_LINKS: HubLink[] = [
@@ -592,7 +514,7 @@ export const TEAMLAZER_LINKS: HubLink[] = [
   {
     id: 'tl4',
     title: 'PAKKELISTER',
-    url: '#teamlazer_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamlazer',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -635,32 +557,6 @@ export const TEAMLAZER_LINKS: HubLink[] = [
 ];
 
 // TeamLazer Packing Submenu Links
-export const TEAMLAZER_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tlp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamlazer_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tlp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamlazer_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tlp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamlazer',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamLazer Fejl & Mangler Submenu
 export const TEAMLAZER_FEJLSOGNING_LINKS: HubLink[] = [
@@ -696,7 +592,7 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
   {
     id: 'ts3',
     title: 'PAKKELISTE',
-    url: '#teamsegway_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamsegway',
     icon: Package,
     description: 'Packing List',
     color: 'green',
@@ -748,32 +644,6 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
 ];
 
 // TeamSegway Packing Submenu Links
-export const TEAMSEGWAY_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tsp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamsegway_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tsp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamsegway_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tsp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamsegway',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamBox Submenu Links
 export const TEAMBOX_LINKS: HubLink[] = [
@@ -788,7 +658,7 @@ export const TEAMBOX_LINKS: HubLink[] = [
   {
     id: 'tb2',
     title: 'PAKKELISTER',
-    url: '#teambox_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teambox',
     icon: ListChecks,
     description: 'Packing List',
     color: 'green'
@@ -796,7 +666,7 @@ export const TEAMBOX_LINKS: HubLink[] = [
   {
     id: 'tb3',
     title: 'NULSTIL BOX',
-    url: '#teambox_checklist',
+    url: 'https://check.eventday.dk/pakkeliste/teambox/nulstil',
     icon: Wrench,
     description: 'Reset Box',
     color: 'orange',
@@ -856,32 +726,6 @@ export const TEAMBOX_LINKS: HubLink[] = [
 ];
 
 // TeamBox Packing Submenu Links
-export const TEAMBOX_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tbp1',
-    title: 'FØR OPGAVEN',
-    url: '#teambox_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tbp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teambox_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tbp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teambox',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamConstruct Submenu Links
 export const TEAMCONSTRUCT_LINKS: HubLink[] = [
@@ -906,7 +750,7 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
   {
     id: 'tcons3',
     title: 'PAKKELISTE',
-    url: '#teamconstruct_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamconstruct',
     icon: Package,
     description: 'Packing List',
     color: 'green'
@@ -985,7 +829,7 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
   {
     id: 'tctrl3',
     title: 'PAKKELISTE',
-    url: '#teamcontrol_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamcontrol',
     icon: Package,
     description: 'Packing List',
     color: 'green',
@@ -1065,32 +909,6 @@ export const FLYBRIX_LINKS: HubLink[] = [
 ];
 
 // TeamControl Packing Submenu Links
-export const TEAMCONTROL_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tcpk1',
-    title: 'FØR OPGAVEN',
-    url: '#teamcontrol_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tcpk2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamcontrol_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tcpk3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamcontrol',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamConnect Submenu Links
 export const TEAMCONNECT_LINKS: HubLink[] = [
@@ -1106,7 +924,7 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
   {
     id: 'tc2',
     title: 'PAKKELISTER',
-    url: '#teamconnect_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamconnect',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -1166,32 +984,6 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
 ];
 
 // TeamConnect Packing Submenu Links
-export const TEAMCONNECT_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tconp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamconnect_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tconp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamconnect_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tconp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamconnect',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamRobin Submenu Links
 export const TEAMROBIN_LINKS: HubLink[] = [
@@ -1216,7 +1008,7 @@ export const TEAMROBIN_LINKS: HubLink[] = [
   {
     id: 'tr3',
     title: 'PAKKELISTER',
-    url: '#teamrobin_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamrobin',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -1268,59 +1060,7 @@ export const TEAMROBIN_LINKS: HubLink[] = [
 ];
 
 // TeamRobin Packing Submenu
-export const TEAMROBIN_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'trp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamrobin_packing_before',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'trp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamrobin_packing_after',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'trp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamrobin',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
-export const TEAMCONSTRUCT_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tcp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamconstruct_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tcp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamconstruct_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tcp3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamconstruct',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamAction Submenu Links
 export const TEAMACTION_LINKS: HubLink[] = [
@@ -1369,7 +1109,7 @@ export const TEAMACTION_LINKS: HubLink[] = [
   {
     id: 'ta5',
     title: 'PAKKELISTER',
-    url: '#teamaction_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamaction',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -1412,32 +1152,6 @@ export const TEAMACTION_LINKS: HubLink[] = [
 ];
 
 // TeamAction Packing Submenu Links
-export const TEAMACTION_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'tap1',
-    title: 'FØR OPGAVEN',
-    url: '#teamaction_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'tap2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamaction_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'tap3',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamaction',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // TeamRace Submenu Links
 export const TEAMRACE_LINKS: HubLink[] = [
@@ -1462,7 +1176,7 @@ export const TEAMRACE_LINKS: HubLink[] = [
   {
     id: 'trace3',
     title: 'PAKKELISTER',
-    url: '#teamrace_packing',
+    url: 'https://check.eventday.dk/pakkeliste/teamrace',
     icon: Package,
     description: 'Packing Lists',
     color: 'green',
@@ -1530,41 +1244,6 @@ export const TEAMRACE_LINKS: HubLink[] = [
 ];
 
 // TeamRace Packing Submenu Links
-export const TEAMRACE_PACKING_LINKS: HubLink[] = [
-  {
-    id: 'trp1',
-    title: 'FØR OPGAVEN',
-    url: '#teamrace_packing_afgang',
-    icon: Package,
-    description: 'Afgang',
-    color: 'green'
-  },
-  {
-    id: 'trp2',
-    title: 'EFTER OPGAVEN',
-    url: '#teamrace_packing_hjemkomst',
-    icon: ListChecks,
-    description: 'Hjemkomst',
-    color: 'blue'
-  },
-  {
-    id: 'trp3',
-    title: 'TASKE',
-    url: '#teamrace_packing_taske',
-    icon: Package,
-    description: 'Sæbekasse Pakkeliste',
-    color: 'orange',
-    badge: 'new'
-  },
-  {
-    id: 'trp4',
-    title: 'RET PAKKELISTE',
-    url: '#edit_packing_teamrace',
-    icon: Edit3,
-    description: 'Rediger pakkeliste',
-    color: 'orange'
-  }
-];
 
 // Office Submenu Links
 export const OFFICE_LINKS: HubLink[] = [
