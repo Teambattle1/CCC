@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useQueryState, parseAsString } from 'nuqs';
 import {
   HUB_LINKS,
   OPGAVER_LINKS,
@@ -151,7 +152,15 @@ type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
-  const [currentView, setCurrentView] = useState<ViewState>('main');
+  // URL-backed view state — hver viewskift pushes til history så browser-back navigerer i appen
+  const [currentViewRaw, setCurrentViewRaw] = useQueryState(
+    'view',
+    parseAsString.withDefault('main').withOptions({ history: 'push' })
+  );
+  const currentView = currentViewRaw as ViewState;
+  const setCurrentView = (view: ViewState) => {
+    setCurrentViewRaw(view === 'main' ? null : view);
+  };
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isClaudeDevOpen, setIsClaudeDevOpen] = useState(false);
