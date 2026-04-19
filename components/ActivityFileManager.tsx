@@ -968,12 +968,12 @@ const ActivityFileManager: React.FC<ActivityFileManagerProps> = ({ activity, onB
         <div className="mt-6 text-center text-xs text-gray-500">
           Klik på et billede for at se det i fuld størrelse. Klik på andre filer for at åbne dem.
         </div>
-      </div>
 
-      {/* Click outside to close context menu */}
-      {contextMenuFile && (
-        <div className="fixed inset-0 z-10" onClick={() => setContextMenuFile(null)} />
-      )}
+        {/* Click outside to close context menu - must be inside backdrop-blur container to share stacking context */}
+        {contextMenuFile && (
+          <div className="fixed inset-0 z-10" onClick={() => setContextMenuFile(null)} />
+        )}
+      </div>
     </div>
   );
 };

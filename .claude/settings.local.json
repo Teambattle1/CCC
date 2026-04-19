@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmit)",
+      "mcp__7bebd5f0-7d88-4fc0-b25a-0acd5e7e6f66__list_tables",
+      "mcp__Claude_Preview__preview_start",
+      "WebFetch(domain:app.livegps.dk)",
+      "Bash(grep -A 10 \"currentView === ''teamrace_rccars''\" /c/Users/ThomasSunke/Github/CCC/App.tsx)",
+      "WebSearch",
+      "WebFetch(domain:gps-trace.com)",
+      "Bash(npm run:*)",
+      "Bash(netlify deploy:*)",
+      "Bash(npx netlify:*)",
+      "Bash(grep -n \"currentView === ''games''\\\\|currentView === ''loquiz''\" \"C:\\\\Users\\\\ThomasSunke\\\\Github\\\\CCC\\\\App.tsx\")",
+      "Bash(grep -n \"renderPlayMenu\\\\|case ''PLAY_MENU''\" /c/Users/ThomasSunke/Github/Track/components/InitialLanding.tsx)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(ls C:/Users/ThomasSunke/Github/CCC/*.tsx C:/Users/ThomasSunke/Github/CCC/*.ts)",
+      "Bash(grep -i \"tailwind\" C:/Users/ThomasSunke/Github/CCC/index.html C:/Users/ThomasSunke/Github/CCC/postcss.config.*)"
+    ]
+  }
+}
