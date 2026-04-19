@@ -100,9 +100,9 @@ INSTRUKTØRKASSE:
     order_index: 3,
     icon: ClipboardList,
     color: 'yellow',
-    link: '#teambox_packing_afgang',
+    link: 'https://check.eventday.dk/pakkeliste/teambox/afgang',
     linkText: 'PAKKELISTE AFGANG',
-    isInternal: true
+    isInternal: false
   },
   {
     section_key: 'ankomst',

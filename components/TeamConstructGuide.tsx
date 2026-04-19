@@ -32,8 +32,7 @@ import {
   Palette,
   Type,
   CheckSquare,
-  Square,
-  RefreshCw
+  Square
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -41,8 +40,7 @@ import {
   saveGuideSection,
   deleteGuideSection,
   uploadGuideImage,
-  GuideSection,
-  supabase
+  GuideSection
 } from '../lib/supabase';
 
 // Category definitions
@@ -487,68 +485,6 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     setEditTitle('');
   };
 
-  // Fetch packing list from Supabase and format as text
-  const syncPackingList = async (listType: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('packing_lists')
-        .select('items')
-        .eq('activity', 'teamconstruct')
-        .eq('list_type', listType)
-        .single();
-
-      if (error || !data?.items) {
-        alert(`Ingen pakkeliste fundet for teamconstruct - ${listType}`);
-        return;
-      }
-
-      const items = data.items as Array<{
-        id: string;
-        text: string;
-        subtext?: string;
-        indent?: boolean;
-        isDivider?: boolean;
-      }>;
-
-      let formattedContent = '';
-      items.forEach(item => {
-        if (item.isDivider) {
-          formattedContent += `\n${item.text}:\n`;
-        } else if (item.indent) {
-          formattedContent += `  • ${item.text}${item.subtext ? ` (${item.subtext})` : ''}\n`;
-        } else {
-          formattedContent += `• ${item.text}${item.subtext ? ` (${item.subtext})` : ''}\n`;
-        }
-      });
-
-      setEditContent(formattedContent.trim());
-    } catch (err) {
-      console.error('Error syncing packing list:', err);
-      alert('Fejl ved sync af pakkeliste');
-    }
-  };
-
-  // Check if packing lists exist for this activity
-  const [availablePackingLists, setAvailablePackingLists] = useState<string[]>([]);
-
-  useEffect(() => {
-    const checkPackingLists = async () => {
-      try {
-        const { data } = await supabase
-          .from('packing_lists')
-          .select('list_type')
-          .eq('activity', 'teamconstruct');
-
-        if (data) {
-          setAvailablePackingLists(data.map(d => d.list_type));
-        }
-      } catch (err) {
-        console.error('Error checking packing lists:', err);
-      }
-    };
-    checkPackingLists();
-  }, []);
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, sectionKey: string) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -943,35 +879,9 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
 
                     {/* Content Textarea */}
                     <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs text-gray-400 uppercase tracking-wider">
-                          Indhold
-                        </label>
-                        {/* Sync Packing List Buttons */}
-                        {availablePackingLists.length > 0 && (
-                          <div className="flex items-center gap-1">
-                            <span className="text-[10px] text-gray-500 uppercase mr-1">Sync pakkeliste:</span>
-                            {availablePackingLists.map(listType => (
-                              <button
-                                key={listType}
-                                type="button"
-                                onClick={() => {
-                                  if (confirm(`Vil du erstatte indholdet med pakkeliste "${listType}"?`)) {
-                                    syncPackingList(listType);
-                                  }
-                                }}
-                                className="flex items-center gap-1 px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded text-purple-400 text-[10px] uppercase tracking-wider hover:bg-purple-500/30 transition-colors"
-                              >
-                                <RefreshCw className="w-3 h-3" />
-                                {listType === 'afgang' ? 'Afgang' :
-                                 listType === 'hjemkomst' ? 'Hjemkomst' :
-                                 listType === 'before' ? 'Før' :
-                                 listType === 'after' ? 'Efter' : listType}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">
+                        Indhold
+                      </label>
                       <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
@@ -1088,6 +998,10 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     const colorClasses = COLORS[colorName];
     const categoryInfo = CATEGORIES[categoryKey];
 
+    // Pakkeliste-deep-link til CHECK: before→afgang, after→hjemkomst. Ingen for during.
+    const packingType =
+      categoryKey === 'before' ? 'afgang' : categoryKey === 'after' ? 'hjemkomst' : null;
+
     return (
       <div className={`rounded-2xl border ${colorClasses.border} ${colorClasses.bg} p-3 tablet:p-4`}>
         <div className="flex items-center justify-between mb-4">
@@ -1100,15 +1014,30 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
             </h2>
             <span className={`text-xs ${colorClasses.text}/50`}>({categorySections.length} sektioner)</span>
           </div>
-          {isAdmin && (
-            <button
-              onClick={() => openNewSectionModal(categoryKey)}
-              className={`flex items-center gap-2 px-3 py-1.5 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
-            >
-              <Plus className="w-4 h-4" />
-              TILFØJ
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {packingType && (
+              <a
+                href={`https://check.eventday.dk/pakkeliste/teamconstruct/${packingType}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-2 px-3 py-1.5 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
+                title="Åbn pakkeliste i CHECK"
+              >
+                <PackageCheck className="w-4 h-4" />
+                Pakkeliste
+                <ExternalLink className="w-3 h-3 opacity-60" />
+              </a>
+            )}
+            {isAdmin && (
+              <button
+                onClick={() => openNewSectionModal(categoryKey)}
+                className={`flex items-center gap-2 px-3 py-1.5 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
+              >
+                <Plus className="w-4 h-4" />
+                TILFØJ
+              </button>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-1 tablet:grid-cols-2 tablet:landscape:grid-cols-3 desktop:grid-cols-3 gap-3">
           {categorySections.map((s, idx) => renderSection(s, colorName, idx, categorySections.length))}

@@ -112,9 +112,9 @@ TEAMRACE – Pakkeliste ved AFGANG:
     order_index: 3,
     icon: ClipboardList,
     color: 'yellow',
-    link: '#teamrace_packing_afgang',
+    link: 'https://check.eventday.dk/pakkeliste/teamrace/afgang',
     linkText: 'PAKKELISTE AFGANG',
-    isInternal: true
+    isInternal: false
   },
   {
     section_key: 'ankomst',

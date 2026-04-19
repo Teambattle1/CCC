@@ -462,7 +462,6 @@ const App: React.FC = () => {
     else if (link.url === '#teamrace_files') changeView('teamrace_files');
     else if (link.url === '#job_input') changeView('job_input');
     else if (link.url === '#my_jobs') changeView('my_jobs');
-    // Edit packing list - extract activity name from URL
     else if (link.url === '#code') changeView('code');
     else if (link.url === '#admin_reports') changeView('admin_reports');
     else if (link.url === '#livegps') changeView('livegps');

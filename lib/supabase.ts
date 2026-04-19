@@ -915,40 +915,6 @@ export const subscribeFejlsogningReports = (
   return channel;
 };
 
-// ============ Packing List Email Notification ============
-
-export const sendPackingEmail = async (data: {
-  activity: string;
-  listType: string;
-  completedBy: string;
-  completedByName: string;
-  durationSeconds: number;
-  itemsChecked: number;
-  itemsTotal: number;
-  instructorName?: string | null;
-  jobShortCode?: string | null;
-  startedAt?: string | null;
-  completedAt?: string;
-  notes?: string | null;
-  urgent?: boolean;
-}): Promise<{ success: boolean; warning?: string }> => {
-  try {
-    const { data: result, error } = await supabase.functions.invoke('send-packing-email', {
-      body: data
-    });
-
-    if (error) {
-      console.warn('Email notification failed:', error);
-      return { success: false, warning: error.message };
-    }
-
-    return { success: result?.success ?? false, warning: result?.warning };
-  } catch (err) {
-    console.warn('Email notification error:', err);
-    return { success: false, warning: 'Network error' };
-  }
-};
-
 // ============ OCC Task Job Integration ============
 
 // OCC Activity ID → CCC ViewState mapping

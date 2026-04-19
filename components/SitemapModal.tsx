@@ -102,7 +102,7 @@ const buildSiteTree = (): TreeNode[] => [
               },
               { id: 'users_mgmt', label: 'USERS', icon: Users, isModal: true },
               { id: 'admin_reports', label: 'FEJLRAPPORTER', view: 'admin_reports', icon: Wrench },
-              { id: 'admin_packing', label: 'PAKKELISTER', view: 'admin_packing_editor', icon: Package },
+              { id: 'admin_packing_check', label: 'PAKKELISTER (CHECK)', url: 'https://check.eventday.dk/admin/pakkeliste', icon: Package },
             ]
           },
         ]
@@ -205,11 +205,11 @@ function buildActivityNode(
     { id: `${key}_guide`, label: 'GUIDE', view: `${prefix}_guide`, icon: Map },
     { id: `${key}_video`, label: 'VIDEO', view: `${prefix}_video`, icon: Play },
     {
-      id: `${key}_packing`, label: 'PAKKELISTER', view: `${prefix}_packing`, icon: Package,
+      id: `${key}_packing`, label: 'PAKKELISTER', icon: Package,
       children: [
-        { id: `${key}_pack_af`, label: 'FØR OPGAVEN', view: `${prefix}_packing_afgang`, icon: Package },
-        { id: `${key}_pack_hj`, label: 'EFTER OPGAVEN', view: `${prefix}_packing_hjemkomst`, icon: ListChecks },
-        { id: `${key}_pack_edit`, label: 'RET PAKKELISTE', view: 'edit_packing', icon: Wrench },
+        { id: `${key}_pack_af`, label: 'FØR OPGAVEN', url: `https://check.eventday.dk/pakkeliste/${prefix}/afgang`, icon: Package },
+        { id: `${key}_pack_hj`, label: 'EFTER OPGAVEN', url: `https://check.eventday.dk/pakkeliste/${prefix}/hjemkomst`, icon: ListChecks },
+        { id: `${key}_pack_edit`, label: 'RET PAKKELISTE', url: 'https://check.eventday.dk/admin/pakkeliste', icon: Wrench },
       ]
     },
     { id: `${key}_fejlsogning`, label: 'FEJLSØGNING', view: `${prefix}_fejlsogning`, icon: Wrench },

@@ -74,47 +74,9 @@ CREATE POLICY "Allow authenticated delete fejlsogning_reports" ON fejlsogning_re
 GRANT ALL ON fejlsogning_reports TO authenticated;
 GRANT ALL ON fejlsogning_reports TO service_role;
 
--- =====================================================
--- PACKING_LISTS (may already have RLS)
--- =====================================================
-ALTER TABLE packing_lists ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies first (ignore errors if they don't exist)
-DROP POLICY IF EXISTS "Allow authenticated users to read" ON packing_lists;
-DROP POLICY IF EXISTS "Allow authenticated users to insert" ON packing_lists;
-DROP POLICY IF EXISTS "Allow authenticated users to update" ON packing_lists;
-
-CREATE POLICY "Allow authenticated read packing_lists" ON packing_lists
-  FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Allow authenticated insert packing_lists" ON packing_lists
-  FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Allow authenticated update packing_lists" ON packing_lists
-  FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
-
-GRANT ALL ON packing_lists TO authenticated;
-GRANT ALL ON packing_lists TO service_role;
-
--- =====================================================
--- PACKING_LIST_COMPLETIONS (may already have RLS)
--- =====================================================
-ALTER TABLE packing_list_completions ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Allow authenticated users to read" ON packing_list_completions;
-DROP POLICY IF EXISTS "Allow authenticated users to insert" ON packing_list_completions;
-
-CREATE POLICY "Allow authenticated read packing_list_completions" ON packing_list_completions
-  FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Allow authenticated insert packing_list_completions" ON packing_list_completions
-  FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Allow authenticated delete packing_list_completions" ON packing_list_completions
-  FOR DELETE TO authenticated USING (true);
-
-GRANT ALL ON packing_list_completions TO authenticated;
-GRANT ALL ON packing_list_completions TO service_role;
+-- NOTE: packing_lists og packing_list_completions RLS er flyttet til CHECK-repoet
+-- (CHECK/supabase/packing_lists.sql + packing_list_completions.sql).
+-- CCC læser ikke længere disse tabeller.
 
 -- =====================================================
 -- STORAGE POLICIES FOR TEAMBOX-FILES BUCKET

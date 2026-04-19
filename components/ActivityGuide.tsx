@@ -51,8 +51,7 @@ import {
   saveGuideSection,
   deleteGuideSection,
   uploadGuideImage,
-  GuideSection,
-  supabase
+  GuideSection
 } from '../lib/supabase';
 
 // Category definitions
@@ -537,186 +536,6 @@ const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ section, onSave }) => {
         </div>
       )}
     </div>
-  );
-};
-
-// Packing item data with optional image
-interface PackingItemData {
-  text: string;
-  imageUrl?: string;
-}
-
-// Linked Packing List Checklist Component
-interface LinkedPackingListChecklistProps {
-  linkedKey: string;
-  sectionKey: string;
-  fetchItems: (linkedKey: string) => Promise<PackingItemData[]>;
-  cachedItems?: PackingItemData[];
-  colorClasses: { bg: string; border: string; text: string; icon: string };
-}
-
-const LinkedPackingListChecklist: React.FC<LinkedPackingListChecklistProps> = ({
-  linkedKey,
-  sectionKey,
-  fetchItems,
-  cachedItems,
-  colorClasses
-}) => {
-  const [items, setItems] = useState<PackingItemData[]>(cachedItems || []);
-  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-  const [isLoading, setIsLoading] = useState(!cachedItems);
-  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  // Load checked state from localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(`checklist_${sectionKey}`);
-      if (stored) {
-        setCheckedItems(JSON.parse(stored));
-      }
-    } catch {
-      // Ignore errors
-    }
-  }, [sectionKey]);
-
-  // Fetch items if not cached
-  useEffect(() => {
-    if (!cachedItems) {
-      setIsLoading(true);
-      fetchItems(linkedKey).then(fetchedItems => {
-        setItems(fetchedItems);
-        setIsLoading(false);
-      });
-    } else {
-      setItems(cachedItems);
-    }
-  }, [linkedKey, cachedItems, fetchItems]);
-
-  const handleToggle = (itemName: string) => {
-    const newChecked = { ...checkedItems, [itemName]: !checkedItems[itemName] };
-    setCheckedItems(newChecked);
-    // Save to localStorage
-    try {
-      localStorage.setItem(`checklist_${sectionKey}`, JSON.stringify(newChecked));
-    } catch {
-      // Ignore errors
-    }
-  };
-
-  const checkedCount = Object.values(checkedItems).filter(Boolean).length;
-  const totalCount = items.length;
-
-  if (isLoading) {
-    return (
-      <div className="mt-4 bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-        <div className="text-sm text-purple-400">Henter pakkeliste...</div>
-      </div>
-    );
-  }
-
-  if (items.length === 0) {
-    return null;
-  }
-
-  const listType = linkedKey.split(':')[1] || '';
-  const listTitle = listType === 'afgang' ? 'Pakkeliste: Afgang' :
-                    listType === 'hjemkomst' ? 'Pakkeliste: Hjemkomst' :
-                    listType === 'before' ? 'Pakkeliste: Før' :
-                    listType === 'after' ? 'Pakkeliste: Efter' :
-                    listType === 'nulstil' ? 'Pakkeliste: Nulstil' :
-                    listType === 'taske' ? 'Pakkeliste: Taske' :
-                    `Pakkeliste: ${listType}`;
-
-  return (
-    <>
-      <div className="mt-4 bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <ClipboardList className="w-5 h-5 text-purple-400" />
-            <span className="text-sm font-medium text-purple-300 uppercase tracking-wider">{listTitle}</span>
-          </div>
-          <span className={`text-xs px-2 py-1 rounded-full ${
-            checkedCount === totalCount ? 'bg-green-500/20 text-green-400' : 'bg-purple-500/20 text-purple-400'
-          }`}>
-            {checkedCount}/{totalCount}
-          </span>
-        </div>
-        <div className="space-y-2">
-          {items.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors group">
-              <label className="flex items-center gap-3 cursor-pointer flex-1">
-                <input
-                  type="checkbox"
-                  checked={checkedItems[item.text] || false}
-                  onChange={() => handleToggle(item.text)}
-                  className="sr-only peer"
-                />
-                <div className="w-5 h-5 rounded border-2 border-purple-400/50 flex items-center justify-center peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-colors flex-shrink-0">
-                  {checkedItems[item.text] && <CheckSquare className="w-3 h-3 text-white" />}
-                </div>
-                <span className={`text-sm transition-all ${
-                  checkedItems[item.text] ? 'text-gray-500 line-through' : 'text-gray-300'
-                }`}>
-                  {item.text}
-                </span>
-              </label>
-              {/* Image indicator with hover preview */}
-              {item.imageUrl && (
-                <div className="relative">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedImage(item.imageUrl || null);
-                    }}
-                    onMouseEnter={() => setHoveredImage(item.imageUrl || null)}
-                    onMouseLeave={() => setHoveredImage(null)}
-                    className="p-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition-colors"
-                    title="Vis billede"
-                  >
-                    <Image className="w-4 h-4 text-purple-400" />
-                  </button>
-                  {/* Hover preview tooltip */}
-                  {hoveredImage === item.imageUrl && (
-                    <div className="absolute right-0 bottom-full mb-2 z-50 pointer-events-none">
-                      <div className="bg-battle-grey border border-purple-500/30 rounded-lg p-1 shadow-xl">
-                        <img
-                          src={item.imageUrl}
-                          alt="Preview"
-                          className="w-32 h-32 object-cover rounded"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Full-size image modal */}
-      {selectedImage && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh]">
-            <img
-              src={selectedImage}
-              alt="Pakkeliste billede"
-              className="max-w-full max-h-[90vh] object-contain rounded-lg"
-            />
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
-          </div>
-        </div>
-      )}
-    </>
   );
 };
 
@@ -2733,7 +2552,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
   const [editIcon, setEditIcon] = useState('file');
   const [editCategory, setEditCategory] = useState<CategoryKey>('before');
   const [editVideoUrl, setEditVideoUrl] = useState('');
-  const [editLinkedPackingList, setEditLinkedPackingList] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -2760,9 +2578,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
 
   // Category modal state
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
-
-  // Linked packing list data cache
-  const [linkedPackingListData, setLinkedPackingListData] = useState<Record<string, PackingItemData[]>>({});
 
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER';
   const activityConfig = ACTIVITY_CONFIG[activity] || { icon: Settings, color: 'blue', title: activity };
@@ -2866,7 +2681,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
     setEditIcon(section.iconKey || 'file');
     setEditCategory(section.category);
     setEditVideoUrl(section.video_url || '');
-    setEditLinkedPackingList(section.linked_packing_list || '');
   };
 
   const handleSaveEdit = async (section: SectionWithMeta) => {
@@ -2889,7 +2703,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
         image_url: section.image_url,
         video_url: editVideoUrl || undefined,
         icon_key: editIcon,
-        linked_packing_list: editLinkedPackingList || undefined,
         order_index: newOrderIndex,
         category: editCategory
       };
@@ -2907,7 +2720,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                 title: editTitle,
                 content: editContent,
                 video_url: editVideoUrl || undefined,
-                linked_packing_list: editLinkedPackingList || undefined,
                 icon: getIconByKey(editIcon),
                 iconKey: editIcon,
                 category: editCategory,
@@ -2934,106 +2746,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
     setEditTitle('');
     setEditVideoUrl('');
   };
-
-  // Fetch packing list items for linked checklist display
-  const fetchLinkedPackingList = async (linkedKey: string): Promise<PackingItemData[]> => {
-    // Check cache first
-    if (linkedPackingListData[linkedKey]) {
-      return linkedPackingListData[linkedKey];
-    }
-
-    try {
-      const [packingActivity, listType] = linkedKey.split(':');
-      const { data, error } = await supabase
-        .from('packing_lists')
-        .select('items')
-        .eq('activity', packingActivity)
-        .eq('list_type', listType)
-        .single();
-
-      if (error || !data?.items) {
-        return [];
-      }
-
-      const items: PackingItemData[] = Array.isArray(data.items)
-        ? data.items.map((item: { text?: string; name?: string; imageUrl?: string }) => ({
-            text: item.text || item.name || '',
-            imageUrl: item.imageUrl
-          }))
-        : [];
-
-      // Cache the result
-      setLinkedPackingListData(prev => ({ ...prev, [linkedKey]: items }));
-      return items;
-    } catch (err) {
-      console.error('Error fetching linked packing list:', err);
-      return [];
-    }
-  };
-
-  // Fetch packing list from Supabase and format as text
-  const syncPackingList = async (listType: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('packing_lists')
-        .select('items')
-        .eq('activity', activity)
-        .eq('list_type', listType)
-        .single();
-
-      if (error || !data?.items) {
-        alert(`Ingen pakkeliste fundet for ${activity} - ${listType}`);
-        return;
-      }
-
-      // Format items as text content
-      const items = data.items as Array<{
-        id: string;
-        text: string;
-        subtext?: string;
-        indent?: boolean;
-        isDivider?: boolean;
-      }>;
-
-      let formattedContent = '';
-      items.forEach(item => {
-        if (item.isDivider) {
-          formattedContent += `\n${item.text}:\n`;
-        } else if (item.indent) {
-          formattedContent += `  • ${item.text}${item.subtext ? ` (${item.subtext})` : ''}\n`;
-        } else {
-          formattedContent += `• ${item.text}${item.subtext ? ` (${item.subtext})` : ''}\n`;
-        }
-      });
-
-      // Update edit content with synced packing list
-      setEditContent(formattedContent.trim());
-    } catch (err) {
-      console.error('Error syncing packing list:', err);
-      alert('Fejl ved sync af pakkeliste');
-    }
-  };
-
-  // Check if packing lists exist for this activity
-  const [availablePackingLists, setAvailablePackingLists] = useState<string[]>([]);
-
-  useEffect(() => {
-    const checkPackingLists = async () => {
-      try {
-        const { data } = await supabase
-          .from('packing_lists')
-          .select('list_type')
-          .eq('activity', activity);
-
-        if (data) {
-          setAvailablePackingLists(data.map(d => d.list_type));
-        }
-      } catch (err) {
-        console.error('Error checking packing lists:', err);
-      }
-    };
-    checkPackingLists();
-  }, [activity]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, sectionKey: string) => {
     const file = e.target.files?.[0];
@@ -3520,7 +3232,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                               image_url: section.image_url,
                               video_url: url,
                               icon_key: section.iconKey,
-                              linked_packing_list: section.linked_packing_list,
                               order_index: section.order_index,
                               category: section.category
                             };
@@ -3541,40 +3252,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                           }
                         }}
                       />
-                    )}
-                  </div>
-                )}
-
-                {/* Linked Packing List Selector - below image in edit mode */}
-                {isEditing && availablePackingLists.length > 0 && (
-                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3">
-                    <label className="block text-xs text-purple-300 uppercase tracking-wider mb-2">
-                      <span className="flex items-center gap-2">
-                        <ClipboardList className="w-4 h-4" />
-                        Link Pakkeliste
-                      </span>
-                    </label>
-                    <select
-                      value={editLinkedPackingList}
-                      onChange={(e) => setEditLinkedPackingList(e.target.value)}
-                      className="w-full bg-battle-black/50 border border-purple-500/30 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
-                    >
-                      <option value="">Ingen pakkeliste</option>
-                      {availablePackingLists.map(listType => (
-                        <option key={listType} value={`${activity}:${listType}`}>
-                          {listType === 'afgang' ? 'Afgang' :
-                           listType === 'hjemkomst' ? 'Hjemkomst' :
-                           listType === 'before' ? 'Før' :
-                           listType === 'after' ? 'Efter' :
-                           listType === 'nulstil' ? 'Nulstil' :
-                           listType === 'taske' ? 'Taske' : listType}
-                        </option>
-                      ))}
-                    </select>
-                    {editLinkedPackingList && (
-                      <p className="mt-2 text-[10px] text-purple-400">
-                        Vises som tjekliste i afsnittet
-                      </p>
                     )}
                   </div>
                 )}
@@ -3735,8 +3412,8 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                       );
                     })()}
 
-                    {/* Linked Packing List Button */}
-                    {section.linked_packing_list && onNavigate && (() => {
+                    {/* Linked Packing List — deep-link til CHECK */}
+                    {section.linked_packing_list && (() => {
                       const [packingActivity, listType] = section.linked_packing_list!.split(':');
                       const buttonText = listType === 'afgang' ? 'PAKKELISTE AFGANG' :
                                          listType === 'hjemkomst' ? 'PAKKELISTE HJEMKOMST' :
@@ -3746,16 +3423,15 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                                          listType === 'taske' ? 'PAKKELISTE TASKE' : `PAKKELISTE ${listType.toUpperCase()}`;
                       return (
                         <div className="mt-4">
-                          <button
-                            onClick={() => {
-                              const view = `${packingActivity}_packing_${listType}`;
-                              onNavigate(view);
-                            }}
+                          <a
+                            href={`https://check.eventday.dk/pakkeliste/${packingActivity}/${listType}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
                           >
                             <ClipboardList className="w-4 h-4" />
                             {buttonText}
-                          </button>
+                          </a>
                         </div>
                       );
                     })()}
