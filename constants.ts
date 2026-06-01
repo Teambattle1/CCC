@@ -1421,6 +1421,7 @@ export const OPGAVER_LINKS: HubLink[] = [
   { id: 'opg_mine', title: 'VIS MINE OPGAVER', url: '#my_jobs', icon: ListChecks, description: 'Mine sessioner', color: 'blue', badge: 'beta', badgeColor: 'blue', section: 'Session' },
   { id: 'opg_distance', title: 'AFSTANDSBEREGNER', url: '#distance_tool', icon: Ruler, description: 'Beregn Afstand', color: 'lightblue', section: 'Session' },
   { id: 'opg_calendar', title: 'UGEKALENDER', url: '#calendar', icon: Calendar, description: 'Ugeoversigt', color: 'orange', section: 'Session' },
+  { id: 'opg_zapier', title: 'ZAPIER', url: '#zapier_integration', icon: Zap, description: 'Data Integration', color: 'purple', badge: 'ny', badgeColor: 'orange', section: 'Admin' },
 ];
 
 // Games Submenu Links (Game platforms)
