@@ -3,7 +3,9 @@
 // into the public.task_jobs table.
 //
 // Auth:   Zapier must send the shared secret in the `x-zapier-secret` header.
-//         The secret is stored as the ZAPIER_WEBHOOK_SECRET function secret.
+//         The secret is read from the ZAPIER_WEBHOOK_SECRET function secret if
+//         set, otherwise from public.integration_config (key
+//         'zapier_webhook_secret').
 // Body:   A single job object, an array of jobs, or { jobs: [...] }.
 //         Keys may use task_jobs column names directly or the friendly aliases
 //         defined in ALIASES below.
@@ -187,7 +189,6 @@ Deno.serve(async (req: Request) => {
 
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
   const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const SECRET = Deno.env.get('ZAPIER_WEBHOOK_SECRET');
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, {
     auth: { persistSession: false },
@@ -202,9 +203,28 @@ Deno.serve(async (req: Request) => {
     }
   };
 
+  // Resolve the shared secret. Env var takes precedence; otherwise fall back to
+  // the integration_config table (so the secret can be managed without
+  // redeploying the function).
+  const resolveSecret = async (): Promise<string | null> => {
+    const fromEnv = Deno.env.get('ZAPIER_WEBHOOK_SECRET');
+    if (fromEnv) return fromEnv;
+    try {
+      const { data } = await supabase
+        .from('integration_config')
+        .select('value')
+        .eq('key', 'zapier_webhook_secret')
+        .maybeSingle();
+      return data?.value ?? null;
+    } catch (_) {
+      return null;
+    }
+  };
+
   // ── Auth ──
+  const SECRET = await resolveSecret();
   if (!SECRET) {
-    return json({ error: 'ZAPIER_WEBHOOK_SECRET not configured' }, 500);
+    return json({ error: 'Webhook secret not configured' }, 500);
   }
   const provided = req.headers.get('x-zapier-secret');
   if (provided !== SECRET) {

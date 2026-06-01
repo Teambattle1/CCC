@@ -29,8 +29,16 @@ Opretter `zapier_webhook_log` + et index på `task_jobs(opgave_id)`.
 
 ## 2. Sæt den hemmelige nøgle
 
+To muligheder (env-var har forrang over DB-værdien):
+
 ```bash
+# A) som function secret (anbefalet i produktion)
 supabase secrets set ZAPIER_WEBHOOK_SECRET="<en-lang-tilfældig-streng>"
+
+# B) eller i databasen (kan styres uden redeploy):
+#    INSERT INTO public.integration_config (key, value)
+#    VALUES ('zapier_webhook_secret', '<streng>')
+#    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 ```
 
 `SUPABASE_URL` og `SUPABASE_SERVICE_ROLE_KEY` er automatisk tilgængelige i

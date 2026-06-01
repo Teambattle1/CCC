@@ -1,6 +1,19 @@
 -- Zapier inbound integration
 -- 1) Delivery log for the zapier-jobs Edge Function (observability/debugging)
 -- 2) Index to speed up opgave_id-based upsert lookups in task_jobs
+-- 3) integration_config: service-role-only key/value store for the webhook
+--    secret (env var ZAPIER_WEBHOOK_SECRET takes precedence if set)
+
+CREATE TABLE IF NOT EXISTS public.integration_config (
+  key TEXT PRIMARY KEY,
+  value TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- No RLS policies → only the service role (Edge Function) can read/write.
+ALTER TABLE public.integration_config ENABLE ROW LEVEL SECURITY;
+GRANT ALL ON public.integration_config TO service_role;
+
 
 CREATE TABLE IF NOT EXISTS public.zapier_webhook_log (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
