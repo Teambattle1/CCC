@@ -1,57 +1,116 @@
-# Project: TeamBattle CrewCenter (CCC)
+# CLAUDE.md
 
-Internal crew hub for TeamBattle event company — guides, packing lists, scorecards, admin tools, and activity management for team-building activities (TeamLazer, TeamRace, TeamConstruct, TeamControl, etc.).
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project: TeamBattle CrewCenter (CCC / "CREW")
+
+Internal crew hub for the TeamBattle event company — a single-page dashboard that links out to all company apps and hosts per-activity guides, scorecards, gear lists, video grids, file managers, error reporting, and admin tools for the team-building activities (TeamLazer, TeamRace, TeamConstruct, TeamControl, TeamBox, etc.).
+
+- Folder is `CCC/`; it surfaces as **"CREW"** in the UI and in cross-project docs. The `package.json` name (`teambattle-occ`) and `deploy.sh`/`metadata.json` references to "OCC" are legacy artifacts — this is CrewCenter, not the OCC/FLOW task system (which it *reads from* — see Cross-project integration below).
+- Danish language throughout the UI (activity names, labels, descriptions).
 
 ## Stack
+
 - React 19 + TypeScript + Vite 5
-- Tailwind CSS (CDN, configured inline in `index.html`)
-- Supabase (auth + database via `@supabase/supabase-js`)
-- Google Gemini API (`@google/genai`) for AI assistant features
-- Google OAuth (`@react-oauth/google`)
-- Lucide React for icons
-- Netlify (hosting)
+- **Tailwind CSS v4 via the `@tailwindcss/vite` plugin** (NOT the CDN, NOT PostCSS). Theme lives in `app.css`: `@import "tailwindcss"` plus an `@theme` block defining the `battle-*` color palette (`battle-black #0a0a0a`, `battle-orange #ff6600`, …), `shadow-neon*` utilities, animations, and custom breakpoints. Full Tailwind v4 features (`@apply`, custom utilities) are available.
+- Supabase (`@supabase/supabase-js`) — auth + database, the **MAIN** instance.
+- `nuqs` — URL-backed view state (the app's "router"; see below).
+- Anthropic API (called directly over `fetch`) for the in-app AI assistant. `@google/genai` is a leftover dependency and is **not** imported anywhere.
+- `@react-oauth/google` (Google OAuth provider), `lucide-react` (icons).
+- Netlify hosting.
+
+## Commands
+
+```bash
+npm install            # repo is pnpm-locked (pnpm-lock.yaml); Netlify builds with `pnpm run build`
+npm run dev            # vite dev server (house rule: open localhost in a NEW browser window)
+npm run build          # tsc && vite build — typecheck + bundle. RUN THIS BEFORE ANY PUSH.
+npm run preview        # serve the production build locally
+```
+
+- **No test runner is configured** — there is no `test` script. (Playwright is in devDependencies but unused by any script.)
+- `tsc` is part of `build`; there is no separate `typecheck` script. Run `npm run build` to verify types — it must be green (errors block, warnings are fine) before pushing, because Netlify auto-deploys on push.
 
 ## Deployment
 
-Always deploy to **crew.eventday.dk** (Netlify site: crewcenter). Do not deploy to any other site.
+Deploy target is **crew.eventday.dk** (Netlify site `crewcenter`, id `d2ba717f-d545-4c64-9135-9326090c2457`). Do not deploy to any other site.
 
 ```bash
 netlify deploy --prod --site d2ba717f-d545-4c64-9135-9326090c2457
 ```
 
-## Key conventions
-- Always use `npx vite` with `server: { open: true }`
-- After completing work, always `git commit` automatically — but **never** `git push` or deploy unless explicitly told to
-- Source files live in project root (`App.tsx`, `index.tsx`, `constants.ts`, `types.ts`)
-- Components live in `components/` (58+ component files, no subdirectory nesting)
-- Tailwind is loaded via CDN `<script>` in `index.html` with inline config — not PostCSS
-- Danish language throughout the UI (activity names, labels, descriptions)
+⚠️ **`./deploy.sh` (and `npm run deploy`) does build → commit → `git push origin main` → `netlify deploy --prod` in one shot.** That violates the "never push or deploy without explicit acceptance" rule. Do not run it unless the user has explicitly approved a push *and* a prod deploy.
 
-## Active patterns
-- Hub-style navigation with categorized link groups defined in `constants.ts`
-- Per-activity components: guides, packing lists, scorecards, gear lists, video grids
-- Admin components for maintenance, reports, user management
-- `ActivityFileManager` for file/document management per activity
-- Supabase used for persistent state (shopping lists, gear, jobs, etc.)
+## Architecture (the big picture)
 
-## Known issues / gotchas
-- Tailwind is CDN-based (not build-step) — no `@apply` or PostCSS plugins available
-- `vite.config.ts` polyfills `process.env.API_KEY` for browser use
-- No `src/` directory — all `.tsx` files are in root or `components/`
+### One giant component + a URL-backed view router
+`App.tsx` is a single ~2700-line component. There is **no React Router**. Navigation is a `ViewState` string union with 100+ members (`'main' | 'crew_hub' | 'teamlazer' | 'fejlsogning_teambox' | …`) rendered by ~200 `currentView === '…'` conditional blocks. The active view is stored in the URL via `nuqs`:
 
-## Recent decisions
-- Added inbound Zapier integration: Edge Function `supabase/functions/zapier-jobs` receives job/booking webhooks (auth via `x-zapier-secret` header → `ZAPIER_WEBHOOK_SECRET`), whitelists + type-coerces fields (incl. Danish dd/mm/yyyy dates → Europe/Copenhagen), upserts `task_jobs` on `opgave_id`/`short_code`, logs each delivery to `zapier_webhook_log`. Incoming `source` is auto-registered as a lead in `ef_leads` (case-insensitive match, auto-create) and stamped on the job as `task_jobs.lead_source`. The `generate_short_code()` trigger was hardened to ignore non-numeric short_codes. Frontend: `lib/zapier.ts` + `components/ZapierIntegration.tsx` admin panel (Opgaver → Admin). Setup guide in the function's README. Edge Functions are excluded from frontend tsconfig (Deno code, built via Supabase CLI).
-- Added fullscreen intro animation with accessibility and click guard (82afe8c)
-- Synced TeamLazer with OCC for dansk descriptions + weapon support (8126562)
-- Added Vedligeholdelse admin section for cross-activity gear management (307c690)
-- Added persistent shopping list (Indkob) stored in Supabase (f7512de)
+```ts
+const [currentViewRaw, setCurrentViewRaw] = useQueryState('view', parseAsString.withDefault('main').withOptions({ history: 'push' }));
+```
+
+Consequences worth knowing before editing navigation:
+- Every view is **deep-linkable** (`?view=teamlazer`) and **browser back/forward** walks the in-app history (because `history: 'push'`). `setCurrentView('main')` clears the param.
+- Adding a screen = (1) add a literal to the `ViewState` union, (2) add a render branch in `App.tsx`, (3) usually add an entry to a `*_LINKS` array in `constants.ts` so a `HubButton` navigates to it.
+- `main` is the **instructor landing portal** (`components/InstructorLanding.tsx`) — app shortcuts as round logo tiles. The activity hub (the old 2×2 `HUB_LINKS` grid) lives at `crew_hub`, reached via the portal's CREWCONTROLCENTER tile. `handleBackClick` routes sub-views → `crew_hub` and `crew_hub` → `main`.
+
+### Content is data-driven from `constants.ts`
+The hub's link groups are exported arrays of `HubLink` (`HUB_LINKS`, `ACTIVITY_LINKS`, `OFFICE_LINKS`, `TEAMLAZER_LINKS`, …) plus `*_VIDEO_INDEX` maps. `HubButton` + the grid CSS render them. Per-activity content (guides, scorecards, gear lists, video grids, file managers) are individual flat components in `components/`. Editable guide content is **not** hardcoded — it lives in the `guide_sections` Supabase table and is edited in-app.
+
+### Auth & two permission layers (`contexts/AuthContext.tsx`)
+- Primary auth is Supabase **email/password**. A `GoogleOAuthProvider` also wraps the app (`VITE_GOOGLE_CLIENT_ID`).
+- **Role hierarchy:** `INSTRUCTOR (1) < GAMEMASTER (2) < ADMIN (3)`. Gate features with `hasPermission(role | role[])`.
+- On login the context sets an **optimistic fallback profile** (role `INSTRUCTOR`) immediately and fetches the real profile from the `users` table in the background (with a 5s timeout in `getUserProfile`) so the UI never blocks on the DB. Don't assume `profile.role` is final on first render.
+- **Second, finer-grained layer:** per-key booleans in the `ccc_permissions` table (`fetchCCCPermissions`), surfaced through `getPermissions` / `getUserActivityPermissions` exported from `components/UsersManagement.tsx`. Role checks and per-key checks coexist.
+
+### Data layer: `lib/supabase.ts` → MAIN instance
+- The Supabase URL + anon key for the **MAIN** project (`ilbjytyukicbssqftmma`) are **hardcoded** in `lib/supabase.ts`. The service-role key (`VITE_SUPABASE_SERVICE_ROLE_KEY`) is used **only** for admin password resets via the Auth Admin REST API.
+- `lib/supabase.ts` is the central data layer — almost every DB call (users, activity logs, scorecards, guide sections, jobs, vehicles, fejlrapporter, ideas, landing-sites catalog) is a typed helper here. Add new queries here rather than calling `supabase.from(...)` ad hoc in components.
+
+### Cross-project integration (CCC reads/writes shared MAIN tables)
+CCC is a consumer of data other TeamBattle projects own. Treat these tables as read-mostly:
+- **Task/job system (OCC/FLOW):** `task_jobs` (looked up by 4-digit `short_code`), `employees`, `job_crew_assignments`, `job_vehicle_assignments`, `activities`, `cars`, `trailers`. The `ACTIVITY_TO_VIEW` map in `lib/supabase.ts` and `lib/activityNames.ts` bridge OCC activity IDs (`A1`–`A12`) to CCC view states / display names.
+- **TODO:** error reports ("fejlrapporter") and idea-box submissions are inserted into the shared `todos` table, assigned to Maria (`emp_z4ftvagjq`). Urgent ("HASTER") reports also write rows to `notifications` for 3 admins and invoke the `send-fejlrapport-email` edge function.
+- **App catalog (APP/Toolbox):** the instructor portal reads the `landing_sites` table (public read where `active=true`) for app logos via `fetchLandingSites()` — same icons as app.eventday.dk. Read-only; APP/Toolbox own it.
+- **Inbound Zapier webhooks:** the `supabase/functions/zapier-jobs` edge function ingests external job/booking webhooks (auth via `x-zapier-secret` → `ZAPIER_WEBHOOK_SECRET`), coerces fields (incl. Danish `dd/mm/yyyy` → Europe/Copenhagen), upserts `task_jobs` on `opgave_id`/`short_code`, logs to `zapier_webhook_log`, and auto-registers the incoming `source` as an `ef_leads` lead (stamped on `task_jobs.lead_source`). Admin UI: `components/ZapierIntegration.tsx` (+ `lib/zapier.ts`), under Opgaver → Admin.
+- **Realtime:** `subscribeFejlsogningReports` listens on `fejlsogning_reports` to drive the unread-error badge.
+
+When a change touches these tables, remember other repos depend on their shape — coordinate, don't restructure.
+
+### Responsive system: 5 explicit device modes
+`hooks/useDeviceMode.ts` classifies the viewport into `mobile-portrait | mobile-landscape | tablet-portrait | tablet-landscape | desktop` and `getResponsiveClasses(mode)` returns Tailwind class strings per mode. `app.css` mirrors this with `.responsive-*` classes per breakpoint. `components/DevicePreview.tsx` provides an in-app toolbar to simulate devices. Prefer these helpers over ad-hoc `sm:`/`md:` when sizing the hub grid/buttons.
+
+### Intro animation
+`components/IntroAnimation.tsx` + `intro.css` play once per session, gated on `sessionStorage.getItem('introSeen')`.
+
+### `supabase/` directory
+Local Supabase CLI project: `config.toml`, RLS/storage SQL, `migrations/`, and `functions/` (edge functions — e.g. `zapier-jobs`). Edge functions are **Deno**, built/deployed via the Supabase CLI and **excluded from the frontend `tsconfig`** — `npm run build` does not typecheck them. Schema changes for CCC-owned tables go in `migrations/`.
+
+## Environment variables (all `VITE_`-prefixed except the legacy polyfill)
+
+| Var | Used for |
+|---|---|
+| `VITE_ANTHROPIC_API_KEY` | In-app AI assistant (`ClaudeAssistant.tsx`, `DistanceTool.tsx`) — direct `x-api-key` fetch to Anthropic |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth provider in `index.tsx` |
+| `VITE_SUPABASE_SERVICE_ROLE_KEY` | Admin password resets only |
+| `API_KEY` / `GEMINI_API_KEY` | Polyfilled in `vite.config.ts` (`process.env.API_KEY`) but effectively unused — legacy |
+
+`.env*` is gitignored. Never commit secrets; production keys live in Netlify env vars. Edge-function secrets (e.g. `ZAPIER_WEBHOOK_SECRET`) live in Supabase, not in the frontend `.env`.
+
+## Conventions
+
+- **No `src/` directory.** Entry files (`App.tsx`, `index.tsx`, `constants.ts`, `types.ts`) are in the project root; all components are flat in `components/` (no nesting). `lib/`, `hooks/`, `contexts/` hold the data layer, the device hook, and AuthContext respectively.
+- Comments: Danish for *why*, English for *what*.
+- **Icons:** always white, real SVG (Lucide) — never colored/black unless asked, and never emojis as UI icons (emojis in text content like notifications are fine).
+- **Git:** commit locally and freely; **never `git push` or deploy without explicit user acceptance.** Before any push, run `npm run build` and confirm it's green.
 
 ## Self-maintenance instructions
 
-After completing any significant task, automatically update this CLAUDE.md file if:
-- A new pattern, convention, or architectural decision was established
-- A recurring problem was solved in a way worth remembering
-- A new tool, library, or integration was added to the project
-- You discovered something about the codebase structure worth noting
+After completing any significant task, update this CLAUDE.md if:
+- A new pattern, convention, or architectural decision was established.
+- A recurring problem was solved in a way worth remembering.
+- A new tool, library, integration, or env var was added.
+- You discovered something about the structure worth noting.
 
-Keep entries concise. Remove outdated entries. Never ask for permission to update this file.
+Keep entries concise. Remove outdated entries. Never ask permission to update this file.
