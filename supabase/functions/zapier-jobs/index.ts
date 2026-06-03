@@ -26,6 +26,26 @@ const corsHeaders = {
 // ── Allowed task_jobs columns + their coercion type ────────────────
 type Coerce = 'text' | 'int' | 'numeric' | 'bool' | 'timestamptz' | 'text[]' | 'jsonb';
 
+// Parse a date value to an ISO timestamp. Danish/European wall-clock formats
+// like "07/06/2026 12:00" (dd/mm/yyyy) are interpreted as Europe/Copenhagen
+// time (DST-aware); anything else (e.g. ISO-8601 with an offset) is parsed
+// natively so its explicit timezone is respected.
+function parseDate(value: unknown): string | null {
+  const s = String(value).trim();
+  const m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if (m) {
+    const day = +m[1], month = +m[2], year = +m[3], hour = +(m[4] ?? 0), min = +(m[5] ?? 0);
+    // Treat the wall-clock as Europe/Copenhagen and convert to the UTC instant.
+    const wallAsUtc = Date.UTC(year, month - 1, day, hour, min);
+    const shownInCph = new Date(wallAsUtc).toLocaleString('en-US', { timeZone: 'Europe/Copenhagen' });
+    const offset = new Date(shownInCph).getTime() - wallAsUtc;
+    const real = new Date(wallAsUtc - offset);
+    return isNaN(real.getTime()) ? null : real.toISOString();
+  }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d.toISOString();
+}
+
 const ALLOWED: Record<string, Coerce> = {
   // Client
   client_name: 'text',
@@ -137,10 +157,8 @@ function coerce(type: Coerce, value: unknown): unknown {
       const s = String(value).trim().toLowerCase();
       return ['true', '1', 'yes', 'ja', 'on'].includes(s);
     }
-    case 'timestamptz': {
-      const d = new Date(String(value));
-      return isNaN(d.getTime()) ? null : d.toISOString();
-    }
+    case 'timestamptz':
+      return parseDate(value);
     case 'text[]': {
       if (Array.isArray(value)) return value.map(String);
       return String(value)
