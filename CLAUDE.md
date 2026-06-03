@@ -40,7 +40,7 @@ netlify deploy --prod --site d2ba717f-d545-4c64-9135-9326090c2457
 - No `src/` directory — all `.tsx` files are in root or `components/`
 
 ## Recent decisions
-- Added inbound Zapier integration: Edge Function `supabase/functions/zapier-jobs` receives job/booking webhooks (auth via `x-zapier-secret` header → `ZAPIER_WEBHOOK_SECRET`), whitelists + type-coerces fields, upserts `task_jobs` on `opgave_id`/`short_code`, logs each delivery to `zapier_webhook_log`. Frontend: `lib/zapier.ts` + `components/ZapierIntegration.tsx` admin panel (Opgaver → Admin). Setup guide in the function's README. Edge Functions are excluded from frontend tsconfig (Deno code, built via Supabase CLI).
+- Added inbound Zapier integration: Edge Function `supabase/functions/zapier-jobs` receives job/booking webhooks (auth via `x-zapier-secret` header → `ZAPIER_WEBHOOK_SECRET`), whitelists + type-coerces fields (incl. Danish dd/mm/yyyy dates → Europe/Copenhagen), upserts `task_jobs` on `opgave_id`/`short_code`, logs each delivery to `zapier_webhook_log`. Incoming `source` is auto-registered as a lead in `ef_leads` (case-insensitive match, auto-create) and stamped on the job as `task_jobs.lead_source`. The `generate_short_code()` trigger was hardened to ignore non-numeric short_codes. Frontend: `lib/zapier.ts` + `components/ZapierIntegration.tsx` admin panel (Opgaver → Admin). Setup guide in the function's README. Edge Functions are excluded from frontend tsconfig (Deno code, built via Supabase CLI).
 - Added fullscreen intro animation with accessibility and click guard (82afe8c)
 - Synced TeamLazer with OCC for dansk descriptions + weapon support (8126562)
 - Added Vedligeholdelse admin section for cross-activity gear management (307c690)

@@ -113,6 +113,19 @@ Nøgler kan være enten det rigtige `task_jobs`-kolonnenavn eller et alias:
 Den fulde liste findes i `ALLOWED` / `ALIASES` i `index.ts` og i
 `ZAPIER_FIELD_MAP` i `lib/zapier.ts`. Ukendte felter ignoreres (whitelisting).
 
+## Lead-kilde (`source`)
+
+Sender payloaden et `source`-felt (fx `evento.dk`), gør webhook'en to ting:
+
+1. **Auto-registrerer** kilden som lead i `public.ef_leads` (matcher
+   case-insensitivt, så `evento.dk` rammer et eksisterende `Evento.dk` uden
+   dublet; ukendte kilder oprettes med `type='website'`). Hvis `referer` er
+   med, bruges dens origin som website.
+2. **Markerer** jobbet med det kanoniske lead-navn i `task_jobs.lead_source`.
+
+`external_id` er valgfrit: udelades det, oprettes hvert job som nyt (med CCC's
+egne `id` + `short_code`) — det bruges kun til dedupering/opdatering.
+
 ## Dedupering
 
 - Har payloaden `opgave_id` → matches mod eksisterende job på `opgave_id`.

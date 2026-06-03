@@ -112,6 +112,7 @@ const ALLOWED: Record<string, Coerce> = {
   opgave_id: 'int',
   short_code: 'text',
   logistics: 'jsonb',
+  lead_source: 'text',
 };
 
 // Friendly aliases → canonical column names (so Zapier field names can be loose)
@@ -189,6 +190,43 @@ function errMessage(err: unknown): string {
       .join(' | ') || JSON.stringify(err);
   }
   return String(err);
+}
+
+// Resolve the incoming `source` (e.g. "evento.dk") to a canonical lead in
+// ef_leads. Matches existing leads case-insensitively (so "evento.dk" maps to
+// an existing "Evento.dk" without creating a duplicate) and auto-creates unseen
+// sources. Returns the canonical lead name to stamp onto the job, or null.
+// Best-effort: never breaks the job upsert.
+async function resolveLead(supabase: any, raw: Record<string, unknown>): Promise<string | null> {
+  const rawName = raw.source ?? raw.lead_source;
+  if (rawName == null) return null;
+  const name = String(rawName).trim();
+  if (!name) return null;
+  try {
+    const { data: existing } = await supabase
+      .from('ef_leads')
+      .select('name')
+      .ilike('name', name)
+      .limit(1)
+      .maybeSingle();
+    if (existing?.name) return existing.name;
+
+    const display = name.charAt(0).toUpperCase() + name.slice(1);
+    let website = '';
+    if (raw.referer) {
+      try {
+        website = new URL(String(raw.referer)).origin;
+      } catch {
+        /* ignore malformed referer */
+      }
+    }
+    if (!website && name.includes('.')) website = 'https://' + name.toLowerCase();
+    await supabase.from('ef_leads').insert({ name: display, type: 'website', website, active: true });
+    return display;
+  } catch (_) {
+    /* lead registration must not break the webhook */
+    return null;
+  }
 }
 
 // Map a raw incoming object → a clean, type-coerced task_jobs row
@@ -285,6 +323,10 @@ Deno.serve(async (req: Request) => {
   const results: Array<Record<string, unknown>> = [];
 
   for (const raw of jobs) {
+    // Register/resolve the lead from `source` (updates ef_leads) regardless of
+    // whether the rest of the payload is a usable job.
+    const leadName = await resolveLead(supabase, raw);
+
     const row = mapJob(raw);
 
     if (Object.keys(row).length === 0) {
@@ -292,6 +334,8 @@ Deno.serve(async (req: Request) => {
       results.push({ status: 'rejected', reason: 'no mappable fields' });
       continue;
     }
+
+    if (leadName) row.lead_source = leadName;
 
     // Determine dedupe key: opgave_id preferred, else short_code
     let existingId: string | null = null;

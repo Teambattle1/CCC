@@ -55,6 +55,7 @@ export const ZAPIER_FIELD_MAP: ZapierFieldMap[] = [
   { field: 'payment_method', aliases: [], type: 'tekst', description: 'Betalingsmetode' },
   { field: 'payment_amount', aliases: [], type: 'beløb', description: 'Beløb' },
   { field: 'short_code', aliases: [], type: 'tekst', description: 'Session-kode (alternativ match-nøgle)' },
+  { field: 'source', aliases: ['lead_source'], type: 'tekst', description: 'Lead-kilde (fx evento.dk) — auto-oprettes i ef_leads og gemmes på jobbet som lead_source.' },
 ];
 
 /** Fetch recent webhook deliveries for the admin panel. */
