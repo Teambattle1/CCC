@@ -160,6 +160,19 @@ function coerce(type: Coerce, value: unknown): unknown {
   }
 }
 
+// Extract a readable message from a thrown error or a Supabase/Postgrest error
+// object (which is a plain object with message/details/hint/code, not an Error).
+function errMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === 'object') {
+    const e = err as Record<string, unknown>;
+    return [e.message, e.details, e.hint, e.code ? `[${e.code}]` : null]
+      .filter(Boolean)
+      .join(' | ') || JSON.stringify(err);
+  }
+  return String(err);
+}
+
 // Map a raw incoming object → a clean, type-coerced task_jobs row
 function mapJob(raw: Record<string, unknown>): Record<string, unknown> {
   const row: Record<string, unknown> = {};
@@ -318,7 +331,7 @@ Deno.serve(async (req: Request) => {
         results.push({ status: 'inserted', id: data.id });
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
+      const message = errMessage(err);
       await log({
         status: 'failed',
         event_type: 'jobs',
