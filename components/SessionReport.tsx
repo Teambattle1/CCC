@@ -551,6 +551,7 @@ const SessionReport: React.FC<SessionReportProps> = ({ job, activities, onNaviga
             </div>
           )}
           <Row label="Bureau" value={job.agency} />
+          <Row label="Lead-kilde" value={job.lead_source} />
           <Row label="Kundenr." value={job.customer_number} />
           <Row label="Sprog" value={job.language} />
           <Row label="Firma info" value={job.firma_info} />
