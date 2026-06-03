@@ -1412,3 +1412,40 @@ export const submitFejlrapportAsTodo = async (
     return { success: false, error: 'Uventet fejl ved indsendelse' };
   }
 };
+
+// ─── Landing sites (delt app-katalog) ────────────────────────────────────────
+// Bruges af instruktør-forsiden til at vise app-ikoner (samme logoer som
+// app.eventday.dk). Tabellen ejes af APP/Toolbox — vi LÆSER kun. Offentlig
+// read via RLS (active=true).
+
+export interface LandingSite {
+  key: string;
+  name: string;
+  url: string;
+  color: string | null;
+  icon: string | null; // data-URL eller http-URL til logo-badge
+}
+
+// Hent app-katalog-rækker for et sæt keys, mappet som { key: LandingSite }
+export const fetchLandingSites = async (
+  keys: string[]
+): Promise<Record<string, LandingSite>> => {
+  try {
+    const { data, error } = await supabase
+      .from('landing_sites')
+      .select('key, name, url, color, icon')
+      .in('key', keys)
+      .eq('active', true);
+
+    if (error || !data) return {};
+
+    const map: Record<string, LandingSite> = {};
+    (data as LandingSite[]).forEach((s) => {
+      map[s.key] = s;
+    });
+    return map;
+  } catch (err) {
+    console.error('Failed to fetch landing sites:', err);
+    return {};
+  }
+};

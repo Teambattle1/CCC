@@ -92,6 +92,7 @@ import GooglePhotosView from './components/GooglePhotosView';
 import TeamLazerGearList from './components/TeamLazerGearList';
 import TopbarJobSearch from './components/TopbarJobSearch';
 import TodayJobsButton from './components/TodayJobsButton';
+import InstructorLanding from './components/InstructorLanding';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
 import { getUnreadFejlsogningCount, subscribeFejlsogningReports, TaskJob, ResolvedActivity } from './lib/supabase';
@@ -130,7 +131,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_guide' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_fejlsogning' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files' | 'google_photos' | 'teamlazer_gear' | 'livegps' | 'admin_oos' | 'admin_maintenance' | 'zapier_integration' | 'teamchallenge_gear' | 'teamrobin_gear' | 'teambox_gear' | 'teamconnect_gear' | 'teamplay_gear' | 'teamsegway_gear' | 'teamcontrol_gear' | 'teamconstruct_gear' | 'teamrace_gear' | 'teamtaste_gear' | 'teamaction_gear';
+type ViewState = 'main' | 'crew_hub' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_guide' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_fejlsogning' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files' | 'google_photos' | 'teamlazer_gear' | 'livegps' | 'admin_oos' | 'admin_maintenance' | 'zapier_integration' | 'teamchallenge_gear' | 'teamrobin_gear' | 'teambox_gear' | 'teamconnect_gear' | 'teamplay_gear' | 'teamsegway_gear' | 'teamcontrol_gear' | 'teamconstruct_gear' | 'teamrace_gear' | 'teamtaste_gear' | 'teamaction_gear';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -487,7 +488,9 @@ const App: React.FC = () => {
 
   const handleBackClick = () => {
     // Nested navigation logic
-    if (currentView === 'job_input') {
+    if (currentView === 'crew_hub') {
+      changeView('main');
+    } else if (currentView === 'job_input') {
       changeView('opgaver');
     } else if (currentView === 'session_report') {
       changeView('opgaver');
@@ -498,9 +501,9 @@ const App: React.FC = () => {
     } else if (currentView === 'job_overview') {
       changeView('instructor_select');
     } else if (currentView === 'opgaver' || currentView === 'games') {
-      changeView('main');
+      changeView('crew_hub');
     } else if (currentView === 'activities') {
-      changeView('main');
+      changeView('crew_hub');
     } else if (currentView === 'economy') {
       changeView('office');
     } else if (currentView === 'team_challenge') {
@@ -695,7 +698,7 @@ const App: React.FC = () => {
     } else if (currentView === 'teamrace_files') {
       changeView('teamrace');
     } else {
-      changeView('main');
+      changeView('crew_hub');
     }
   };
 
@@ -1421,6 +1424,14 @@ const App: React.FC = () => {
       viewSubtitle = 'TeamRace Troubleshooting';
       ViewIcon = Wrench;
       break;
+    case 'crew_hub':
+      // CREW-hub'en (de fire hovedkategorier). Flyttet hertil fra 'main', som
+      // nu viser instruktør-forsiden. Samme indhold/titel som den gamle forside.
+      currentLinks = filterLinksByRole(HUB_LINKS);
+      viewTitle = 'TEAMBATTLE';
+      viewSubtitle = 'Crew Command Center';
+      ViewIcon = ShieldCheck;
+      break;
     case 'main':
     default:
       // Main view: just 2 buttons (ControlCenter + Office), filtered by role
@@ -1435,7 +1446,7 @@ const App: React.FC = () => {
   // Default grid for sub-pages
   let gridClass = "grid grid-cols-2 mobile-landscape:grid-cols-4 tablet-portrait:grid-cols-3 tablet-landscape:grid-cols-4 desktop:grid-cols-4 gap-2 mobile-landscape:gap-2 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-6 justify-items-center max-w-5xl mx-auto responsive-activities-grid";
 
-  if (currentView === 'main') {
+  if (currentView === 'main' || currentView === 'crew_hub') {
     // Main view: 2x2 grid layout
     gridClass = "grid grid-cols-2 gap-3 mobile-landscape:gap-3 tablet-portrait:gap-6 tablet-landscape:gap-5 desktop:gap-8 max-w-md tablet-portrait:max-w-xl tablet-landscape:max-w-2xl desktop:max-w-3xl mx-auto justify-items-center";
   } else if (currentView === 'opgaver') {
@@ -2092,16 +2103,7 @@ const App: React.FC = () => {
               onNavigateActivity={(viewState) => changeView(viewState as ViewState)}
             />
           ) : currentView === 'main' ? (
-            <div className={gridClass}>
-              {currentLinks.map((link, index) => (
-                <HubButton
-                  key={link.id}
-                  link={link}
-                  index={index}
-                  onClick={handleLinkClick}
-                />
-              ))}
-            </div>
+            <InstructorLanding onOpenHub={() => changeView('crew_hub')} />
           ) : (currentView === 'games') ? (
             <div className="w-full max-w-4xl mx-auto px-1 mobile-landscape:px-2 tablet-portrait:px-4">
               <div className="grid grid-cols-1 tablet-portrait:grid-cols-2 gap-2 mobile-landscape:gap-1.5 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-4">
