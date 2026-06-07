@@ -1,18 +1,17 @@
 // Supabase Edge Function: zapier-jobs
-// Inbound webhook that receives job/booking data from Zapier and upserts it
-// into the public.task_jobs table.
+// Inbound webhook that receives booking inquiries from Zapier and creates them
+// as EventDay leads (ef_offers with status = 'lead' — the board's "Leads"
+// column, before Kladde/draft).
 //
-// Auth:   Zapier must send the shared secret in the `x-zapier-secret` header.
-//         The secret is read from the ZAPIER_WEBHOOK_SECRET function secret if
-//         set, otherwise from public.integration_config (key
-//         'zapier_webhook_secret').
-// Body:   A single job object, an array of jobs, or { jobs: [...] }.
-//         Keys may use task_jobs column names directly or the friendly aliases
-//         defined in ALIASES below.
-// Dedupe: Jobs are matched on `opgave_id` (preferred) or `short_code`. A match
-//         updates the existing row, otherwise a new row is inserted.
-//
-// Every delivery is logged to public.zapier_webhook_log for observability.
+// Auth:   x-zapier-secret header (ZAPIER_WEBHOOK_SECRET env, or the value in
+//         public.integration_config key 'zapier_webhook_secret').
+// Body:   A single inquiry object, an array, or { jobs: [...] }.
+// Per inquiry it:
+//   1. resolves/auto-creates the `source` as a lead in ef_leads,
+//   2. creates an ef_clients + ef_contacts record (best-effort),
+//   3. creates an ef_offers row with status 'lead' linked to the above,
+//   4. logs the delivery to public.zapier_webhook_log.
+// The EventDay board picks these up (realtime on ef_offers) as new lead cards.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -23,164 +22,62 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// ── Allowed task_jobs columns + their coercion type ────────────────
-type Coerce = 'text' | 'int' | 'numeric' | 'bool' | 'timestamptz' | 'text[]' | 'jsonb';
-
-// Parse a date value to an ISO timestamp. Danish/European wall-clock formats
-// like "07/06/2026 12:00" (dd/mm/yyyy) are interpreted as Europe/Copenhagen
-// time (DST-aware); anything else (e.g. ISO-8601 with an offset) is parsed
-// natively so its explicit timezone is respected.
-function parseDate(value: unknown): string | null {
-  const s = String(value).trim();
-  const m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
-  if (m) {
-    const day = +m[1], month = +m[2], year = +m[3], hour = +(m[4] ?? 0), min = +(m[5] ?? 0);
-    // Treat the wall-clock as Europe/Copenhagen and convert to the UTC instant.
-    const wallAsUtc = Date.UTC(year, month - 1, day, hour, min);
-    const shownInCph = new Date(wallAsUtc).toLocaleString('en-US', { timeZone: 'Europe/Copenhagen' });
-    const offset = new Date(shownInCph).getTime() - wallAsUtc;
-    const real = new Date(wallAsUtc - offset);
-    return isNaN(real.getTime()) ? null : real.toISOString();
+// First non-empty value among the given keys.
+function pick(raw: Record<string, unknown>, keys: string[]): string | null {
+  for (const k of keys) {
+    const v = raw[k];
+    if (v !== undefined && v !== null && String(v).trim() !== '') return String(v).trim();
   }
-  const d = new Date(s);
-  return isNaN(d.getTime()) ? null : d.toISOString();
+  return null;
 }
 
-const ALLOWED: Record<string, Coerce> = {
-  // Client
-  client_name: 'text',
-  client_contact_name: 'text',
-  client_contact_phone: 'text',
-  client_contact_email: 'text',
-  client_logo_url: 'text',
-  client_website: 'text',
-  agency: 'text',
-  customer_number: 'text',
-  customer_type: 'text',
-  language: 'text',
-  firma_info: 'text',
-  // Event
-  event_date: 'timestamptz',
-  event_end: 'timestamptz',
-  event_time: 'text',
-  duration_minutes: 'int',
-  guests_count: 'int',
-  instructors_count: 'int',
-  assistants_count: 'int',
-  activities: 'text[]',
-  activity_counts: 'jsonb',
-  activity_sessions: 'jsonb',
-  activity_pricing: 'jsonb',
-  // Location
-  location_name: 'text',
-  location_address: 'text',
-  location_city: 'text',
-  location_region: 'text',
-  location_id: 'text',
-  get_in_location: 'text',
-  get_in_time_storage: 'timestamptz',
-  get_in_time_location: 'timestamptz',
-  get_back_location: 'text',
-  post_session_destination: 'text',
-  // Notes
-  notes: 'text',
-  task_notes: 'text',
-  timing_note: 'text',
-  crew_note: 'text',
-  aktiviteter_note: 'text',
-  gear_note: 'text',
-  transport_note: 'text',
-  teamsize_note: 'text',
-  team_info_text: 'text',
-  // Flags
-  kun_tilbud: 'bool',
-  privat: 'bool',
-  skal_evalueres: 'bool',
-  drikkevarer: 'bool',
-  cafeborde: 'bool',
-  winner_ceremony: 'bool',
-  bil_tankes: 'bool',
-  bil_oplades: 'bool',
-  // Payment
-  payment_method: 'text',
-  payment_amount: 'numeric',
-  payment_card_fee: 'numeric',
-  payment_contact: 'text',
-  // Status / identity
-  status: 'text',
-  opgave_status: 'text',
-  opgave_id: 'int',
-  short_code: 'text',
-  logistics: 'jsonb',
-  lead_source: 'text',
-};
-
-// Friendly aliases → canonical column names (so Zapier field names can be loose)
-const ALIASES: Record<string, string> = {
-  external_id: 'opgave_id',
-  booking_id: 'opgave_id',
-  job_id: 'opgave_id',
-  company: 'client_name',
-  client: 'client_name',
-  customer: 'client_name',
-  contact_name: 'client_contact_name',
-  contact_phone: 'client_contact_phone',
-  phone: 'client_contact_phone',
-  contact_email: 'client_contact_email',
-  email: 'client_contact_email',
-  event_start: 'event_date',
-  start: 'event_date',
-  date: 'event_date',
-  end: 'event_end',
-  guests: 'guests_count',
-  participants: 'guests_count',
-  city: 'location_city',
-  address: 'location_address',
-  venue: 'location_name',
-};
-
-// ── Type coercion ──────────────────────────────────────────────────
-function coerce(type: Coerce, value: unknown): unknown {
-  if (value === null || value === undefined || value === '') return null;
-  switch (type) {
-    case 'text':
-      return String(value);
-    case 'int': {
-      const n = parseInt(String(value).replace(/[^\d-]/g, ''), 10);
-      return Number.isFinite(n) ? n : null;
-    }
-    case 'numeric': {
-      const n = parseFloat(String(value).replace(',', '.').replace(/[^\d.-]/g, ''));
-      return Number.isFinite(n) ? n : null;
-    }
-    case 'bool': {
-      if (typeof value === 'boolean') return value;
-      const s = String(value).trim().toLowerCase();
-      return ['true', '1', 'yes', 'ja', 'on'].includes(s);
-    }
-    case 'timestamptz':
-      return parseDate(value);
-    case 'text[]': {
-      if (Array.isArray(value)) return value.map(String);
-      return String(value)
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
-    }
-    case 'jsonb':
-      if (typeof value === 'string') {
-        try {
-          return JSON.parse(value);
-        } catch {
-          return null;
-        }
-      }
-      return value;
-  }
+function coerceInt(v: unknown): number | null {
+  if (v == null) return null;
+  const n = parseInt(String(v).replace(/[^0-9-]/g, ''), 10);
+  return Number.isFinite(n) ? n : null;
 }
 
-// Extract a readable message from a thrown error or a Supabase/Postgrest error
-// object (which is a plain object with message/details/hint/code, not an Error).
+// Parse a date into plain wall-clock parts for ef_offers.event_date (date) and
+// event_start_time (time). Handles Danish dd/mm/yyyy[ HH:MM] and ISO YYYY-MM-DD.
+function parseDateParts(value: unknown): { date: string | null; time: string | null } {
+  const s = value == null ? '' : String(value).trim();
+  if (!s) return { date: null, time: null };
+  const pad = (n: number) => String(n).padStart(2, '0');
+  let y = '', mo = '', d = '', hh: string | null = null, mi: string | null = null;
+
+  if (s.length >= 10 && s[4] === '-' && s[7] === '-') {
+    // ISO-ish: YYYY-MM-DD[ T HH:MM]
+    y = s.slice(0, 4); mo = s.slice(5, 7); d = s.slice(8, 10);
+    const t = s.slice(11);
+    if (t.length >= 5 && t[2] === ':') { hh = t.slice(0, 2); mi = t.slice(3, 5); }
+  } else {
+    // Danish/European: dd/mm/yyyy or dd-mm-yyyy or dd.mm.yyyy [ HH:MM]
+    const datePart = s.split(' ')[0].split('T')[0];
+    const sep = datePart.includes('/') ? '/' : datePart.includes('.') ? '.' : datePart.includes('-') ? '-' : '';
+    if (!sep) return { date: null, time: null };
+    const p = datePart.split(sep);
+    if (p.length !== 3 || p[2].length !== 4) return { date: null, time: null };
+    d = p[0]; mo = p[1]; y = p[2];
+    const rest = s.slice(datePart.length).trim();
+    if (rest.includes(':')) { const t = rest.split(':'); hh = t[0]; mi = (t[1] || '').slice(0, 2); }
+  }
+
+  const yi = +y, moi = +mo, di = +d;
+  if (!yi || !moi || !di) return { date: null, time: null };
+  const date = `${yi}-${pad(moi)}-${pad(di)}`;
+  const time = (hh !== null && mi !== null && Number.isFinite(+hh) && Number.isFinite(+mi))
+    ? `${pad(+hh)}:${pad(+mi)}` : null;
+  return { date, time };
+}
+
+// Unambiguous uppercase code (no 0/O/1/I) for ef_clients.access_code (UNIQUE).
+function genCode(len: number): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let out = '';
+  for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+
 function errMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
   if (err && typeof err === 'object') {
@@ -192,59 +89,32 @@ function errMessage(err: unknown): string {
   return String(err);
 }
 
-// Resolve the incoming `source` (e.g. "evento.dk") to a canonical lead in
-// ef_leads. Matches existing leads case-insensitively (so "evento.dk" maps to
-// an existing "Evento.dk" without creating a duplicate) and auto-creates unseen
-// sources. Returns the canonical lead name to stamp onto the job, or null.
-// Best-effort: never breaks the job upsert.
-async function resolveLead(supabase: any, raw: Record<string, unknown>): Promise<string | null> {
-  const rawName = raw.source ?? raw.lead_source;
-  if (rawName == null) return null;
-  const name = String(rawName).trim();
+// Resolve `source` to a canonical lead in ef_leads (case-insensitive match,
+// auto-create if unseen). Returns { id, name } or null. Best-effort.
+async function resolveLead(supabase: any, raw: Record<string, unknown>): Promise<{ id: string; name: string } | null> {
+  const name = pick(raw, ['source', 'lead_source']);
   if (!name) return null;
   try {
     const { data: existing } = await supabase
-      .from('ef_leads')
-      .select('name')
-      .ilike('name', name)
-      .limit(1)
-      .maybeSingle();
-    if (existing?.name) return existing.name;
+      .from('ef_leads').select('id, name').ilike('name', name).limit(1).maybeSingle();
+    if (existing?.id) return { id: existing.id, name: existing.name };
 
     const display = name.charAt(0).toUpperCase() + name.slice(1);
     let website = '';
-    if (raw.referer) {
-      try {
-        website = new URL(String(raw.referer)).origin;
-      } catch {
-        /* ignore malformed referer */
-      }
-    }
+    const referer = pick(raw, ['referer']);
+    if (referer) { try { website = new URL(referer).origin; } catch { /* ignore */ } }
     if (!website && name.includes('.')) website = 'https://' + name.toLowerCase();
-    await supabase.from('ef_leads').insert({ name: display, type: 'website', website, active: true });
-    return display;
+    const { data: created } = await supabase
+      .from('ef_leads').insert({ name: display, type: 'website', website, active: true })
+      .select('id, name').single();
+    return created ? { id: created.id, name: created.name } : null;
   } catch (_) {
-    /* lead registration must not break the webhook */
     return null;
   }
 }
 
-// Map a raw incoming object → a clean, type-coerced task_jobs row
-function mapJob(raw: Record<string, unknown>): Record<string, unknown> {
-  const row: Record<string, unknown> = {};
-  for (const [key, val] of Object.entries(raw)) {
-    const col = ALLOWED[key] ? key : ALIASES[key];
-    if (!col || !ALLOWED[col]) continue;
-    const coerced = coerce(ALLOWED[col], val);
-    if (coerced !== null) row[col] = coerced;
-  }
-  return row;
-}
-
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
@@ -252,155 +122,117 @@ Deno.serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  if (req.method !== 'POST') {
-    return json({ error: 'Method not allowed' }, 405);
-  }
+  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
   const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
-  const supabase = createClient(SUPABASE_URL, SERVICE_ROLE, {
-    auth: { persistSession: false },
-  });
-
-  // Best-effort delivery logger (never throws)
   const log = async (entry: Record<string, unknown>) => {
     try {
       await supabase.from('zapier_webhook_log').insert({ source: 'zapier', ...entry });
-    } catch (_) {
-      /* logging must not break the webhook */
-    }
+    } catch (_) { /* logging must not break the webhook */ }
   };
 
-  // Resolve the shared secret. Env var takes precedence; otherwise fall back to
-  // the integration_config table (so the secret can be managed without
-  // redeploying the function).
   const resolveSecret = async (): Promise<string | null> => {
     const fromEnv = Deno.env.get('ZAPIER_WEBHOOK_SECRET');
     if (fromEnv) return fromEnv;
     try {
       const { data } = await supabase
-        .from('integration_config')
-        .select('value')
-        .eq('key', 'zapier_webhook_secret')
-        .maybeSingle();
+        .from('integration_config').select('value').eq('key', 'zapier_webhook_secret').maybeSingle();
       return data?.value ?? null;
-    } catch (_) {
-      return null;
-    }
+    } catch (_) { return null; }
   };
 
-  // ── Auth ──
   const SECRET = await resolveSecret();
-  if (!SECRET) {
-    return json({ error: 'Webhook secret not configured' }, 500);
-  }
-  const provided = req.headers.get('x-zapier-secret');
-  if (provided !== SECRET) {
-    await log({ status: 'rejected', event_type: 'jobs', error: 'invalid secret' });
+  if (!SECRET) return json({ error: 'Webhook secret not configured' }, 500);
+  if (req.headers.get('x-zapier-secret') !== SECRET) {
+    await log({ status: 'rejected', event_type: 'lead', error: 'invalid secret' });
     return json({ error: 'Unauthorized' }, 401);
   }
 
-  // ── Parse ──
   let payload: unknown;
-  try {
-    payload = await req.json();
-  } catch {
-    return json({ error: 'Invalid JSON body' }, 400);
-  }
+  try { payload = await req.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
 
-  let jobs: Record<string, unknown>[];
-  if (Array.isArray(payload)) {
-    jobs = payload as Record<string, unknown>[];
-  } else if (payload && typeof payload === 'object' && Array.isArray((payload as any).jobs)) {
-    jobs = (payload as any).jobs;
-  } else if (payload && typeof payload === 'object') {
-    jobs = [payload as Record<string, unknown>];
-  } else {
-    return json({ error: 'Body must be a job object or an array of jobs' }, 400);
-  }
+  let inquiries: Record<string, unknown>[];
+  if (Array.isArray(payload)) inquiries = payload as Record<string, unknown>[];
+  else if (payload && typeof payload === 'object' && Array.isArray((payload as any).jobs)) inquiries = (payload as any).jobs;
+  else if (payload && typeof payload === 'object') inquiries = [payload as Record<string, unknown>];
+  else return json({ error: 'Body must be an inquiry object or an array' }, 400);
 
   const results: Array<Record<string, unknown>> = [];
 
-  for (const raw of jobs) {
-    // Register/resolve the lead from `source` (updates ef_leads) regardless of
-    // whether the rest of the payload is a usable job.
-    const leadName = await resolveLead(supabase, raw);
+  for (const raw of inquiries) {
+    const lead = await resolveLead(supabase, raw);
 
-    const row = mapJob(raw);
+    const company = pick(raw, ['company', 'client', 'customer', 'client_name']);
+    const contactName = pick(raw, ['contact_name', 'client_contact_name', 'name']);
+    const email = pick(raw, ['email', 'contact_email', 'client_contact_email']);
+    const phone = pick(raw, ['phone', 'contact_phone', 'client_contact_phone']);
+    const guests = coerceInt(pick(raw, ['guests', 'participants', 'guests_count']));
+    const location = pick(raw, ['venue', 'location_name', 'city', 'location_city']);
+    const activities = pick(raw, ['activities', 'activity']);
+    const notes = pick(raw, ['notes', 'note', 'comment']);
+    const parts = parseDateParts(pick(raw, ['event_start', 'event_date', 'date', 'start']));
 
-    if (Object.keys(row).length === 0) {
-      await log({ status: 'rejected', event_type: 'jobs', payload: raw, error: 'no mappable fields' });
-      results.push({ status: 'rejected', reason: 'no mappable fields' });
+    if (!company && !contactName && !email && !phone) {
+      await log({ status: 'rejected', event_type: 'lead', payload: raw, error: 'no usable fields' });
+      results.push({ status: 'rejected', reason: 'no usable fields' });
       continue;
     }
 
-    if (leadName) row.lead_source = leadName;
-
-    // Determine dedupe key: opgave_id preferred, else short_code
-    let existingId: string | null = null;
+    // Best-effort client + contact (the lead still lands if this fails).
+    let clientId: string | null = null;
+    let contactId: string | null = null;
     try {
-      if (row.opgave_id != null) {
-        const { data } = await supabase
-          .from('task_jobs')
-          .select('id')
-          .eq('opgave_id', row.opgave_id)
-          .is('deleted_at', null)
-          .limit(1)
-          .maybeSingle();
-        existingId = data?.id ?? null;
-      } else if (row.short_code) {
-        const { data } = await supabase
-          .from('task_jobs')
-          .select('id')
-          .eq('short_code', row.short_code)
-          .is('deleted_at', null)
-          .limit(1)
-          .maybeSingle();
-        existingId = data?.id ?? null;
-      }
-    } catch (_) {
-      /* fall through to insert */
-    }
+      const { data: c, error: ce } = await supabase.from('ef_clients').insert({
+        firma: company || contactName || 'Ukendt',
+        type: company ? 'virksomhed' : 'privat',
+        email, phone,
+        access_code: genCode(8),
+        note: 'Oprettet automatisk fra ' + (lead?.name ?? 'Zapier-lead'),
+      }).select('id').single();
+      if (ce) throw ce;
+      clientId = c.id;
+      const { data: ct } = await supabase.from('ef_contacts').insert({
+        client_id: clientId,
+        name: contactName || company || 'Ukendt',
+        email, phone, is_primary: true,
+      }).select('id').single();
+      contactId = ct?.id ?? null;
+    } catch (_) { /* CRM linking is best-effort */ }
+
+    const who = company || contactName || lead?.name || 'Lead';
+    const title = activities ? `${activities} – ${who}` : `Forespørgsel – ${who}`;
+
+    const noteParts: string[] = [];
+    if (notes) noteParts.push(notes);
+    if (contactName) noteParts.push('Kontakt: ' + contactName);
+    if (email) noteParts.push('Email: ' + email);
+    if (phone) noteParts.push('Tlf: ' + phone);
+    if (lead?.name) noteParts.push('Kilde: ' + lead.name);
 
     try {
-      if (existingId) {
-        row.updated_at = new Date().toISOString();
-        const { error } = await supabase.from('task_jobs').update(row).eq('id', existingId);
-        if (error) throw error;
-        await log({
-          status: 'updated',
-          event_type: 'jobs',
-          task_job_id: existingId,
-          opgave_id: row.opgave_id ?? null,
-          payload: raw,
-        });
-        results.push({ status: 'updated', id: existingId });
-      } else {
-        const { data, error } = await supabase
-          .from('task_jobs')
-          .insert(row)
-          .select('id')
-          .single();
-        if (error) throw error;
-        await log({
-          status: 'inserted',
-          event_type: 'jobs',
-          task_job_id: data.id,
-          opgave_id: row.opgave_id ?? null,
-          payload: raw,
-        });
-        results.push({ status: 'inserted', id: data.id });
-      }
+      const { data: o, error } = await supabase.from('ef_offers').insert({
+        title,
+        status: 'lead',
+        participants_count: guests ?? 0,
+        event_date: parts.date,
+        event_start_time: parts.time,
+        event_location: location,
+        client_id: clientId,
+        contact_id: contactId,
+        lead_id: lead?.id ?? null,
+        lead_source: lead?.name ?? pick(raw, ['source', 'lead_source']),
+        bureau_name: lead?.name ?? null,
+        internal_note: noteParts.length ? noteParts.join('\n') : null,
+      }).select('id, session_id').single();
+      if (error) throw error;
+      await log({ status: 'inserted', event_type: 'lead', ef_offer_id: o.id, payload: raw });
+      results.push({ status: 'inserted', offer_id: o.id, session_id: o.session_id });
     } catch (err) {
       const message = errMessage(err);
-      await log({
-        status: 'failed',
-        event_type: 'jobs',
-        opgave_id: row.opgave_id ?? null,
-        payload: raw,
-        error: message,
-      });
+      await log({ status: 'failed', event_type: 'lead', payload: raw, error: message });
       results.push({ status: 'failed', error: message });
     }
   }
@@ -410,6 +242,5 @@ Deno.serve(async (req: Request) => {
     const key = String(r.status);
     summary[key] = (summary[key] ?? 0) + 1;
   }
-
-  return json({ ok: true, count: jobs.length, summary, results });
+  return json({ ok: true, count: inquiries.length, summary, results });
 });
