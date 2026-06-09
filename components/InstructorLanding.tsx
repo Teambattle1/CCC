@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { DoorOpen } from 'lucide-react';
+import { DoorOpen, BookOpen } from 'lucide-react';
 import { fetchLandingSites, LandingSite } from '../lib/supabase';
 
 interface InstructorLandingProps {
   // Åbner den interne CREW-hub (de eksisterende aktivitets-knapper)
   onOpenHub: () => void;
+  // Åbner CREW GUIDE (medarbejderhåndbogen)
+  onOpenGuide: () => void;
 }
 
 // Én app-genvej på instruktør-forsiden.
@@ -13,25 +15,28 @@ interface AppTile {
   label: string;      // synligt label under cirklen
   href?: string;      // ekstern URL (åbnes i ny fane)
   internal?: boolean; // true = åbn CREW-hub i stedet for ekstern URL
+  guide?: boolean;    // true = åbn CREW GUIDE
 }
 
-// De 7 apps i den faste rækkefølge instruktører skal se dem i.
-// 'crew' er intern (CREWCONTROLCENTER → hub'en). 'welcome' findes endnu ikke i
-// landing_sites, så den får et fallback-ikon indtil appen er live.
+// Apps i den faste rækkefølge instruktører skal se dem i.
+// 'crew' og 'crew_guide' er interne. 'welcome'/'crew_guide' findes ikke i
+// landing_sites, så de får et fallback-ikon.
 const APP_TILES: AppTile[] = [
   { key: 'welcome', label: 'WELCOME', href: 'https://welcome.eventday.dk' },
   { key: 'media', label: 'MEDIA', href: 'https://media.eventday.dk' },
   { key: 'learn', label: 'LEARN', href: 'https://learn.eventday.dk' },
   { key: 'crew', label: 'CREWCONTROLCENTER', internal: true },
+  { key: 'crew_guide', label: 'CREW GUIDE', guide: true },
   { key: 'my', label: 'MY', href: 'https://my.eventday.dk' },
   { key: 'gear', label: 'GEAR', href: 'https://gear.eventday.dk' },
   { key: 'games', label: 'GAMES', href: 'https://games.eventday.dk' },
 ];
 
-// Keys vi henter logoer for (welcome har ingen katalog-række endnu).
-const CATALOG_KEYS = APP_TILES.map((t) => t.key).filter((k) => k !== 'welcome');
+// Keys vi henter logoer for (welcome + crew_guide har ingen katalog-række).
+const NO_CATALOG = ['welcome', 'crew_guide'];
+const CATALOG_KEYS = APP_TILES.map((t) => t.key).filter((k) => !NO_CATALOG.includes(k));
 
-const InstructorLanding: React.FC<InstructorLandingProps> = ({ onOpenHub }) => {
+const InstructorLanding: React.FC<InstructorLandingProps> = ({ onOpenHub, onOpenGuide }) => {
   const [sites, setSites] = useState<Record<string, LandingSite>>({});
 
   // Hent app-ikoner live fra det delte katalog (landing_sites).
@@ -46,7 +51,9 @@ const InstructorLanding: React.FC<InstructorLandingProps> = ({ onOpenHub }) => {
   }, []);
 
   const handleTileClick = (tile: AppTile) => {
-    if (tile.internal) {
+    if (tile.guide) {
+      onOpenGuide();
+    } else if (tile.internal) {
       onOpenHub();
     } else if (tile.href) {
       window.open(tile.href, '_blank', 'noopener,noreferrer');
@@ -79,12 +86,19 @@ const InstructorLanding: React.FC<InstructorLandingProps> = ({ onOpenHub }) => {
                     draggable={false}
                   />
                 ) : (
-                  // Fallback (fx WELCOME, indtil appen har sit eget logo)
+                  // Fallback-ikon (WELCOME / CREW GUIDE har ingen katalog-logo)
                   <div className="w-full h-full flex items-center justify-center bg-battle-orange">
-                    <DoorOpen
-                      className="w-8 h-8 tablet-portrait:w-11 tablet-portrait:h-11 desktop:w-14 desktop:h-14 text-white"
-                      strokeWidth={1.5}
-                    />
+                    {tile.guide ? (
+                      <BookOpen
+                        className="w-8 h-8 tablet-portrait:w-11 tablet-portrait:h-11 desktop:w-14 desktop:h-14 text-white"
+                        strokeWidth={1.5}
+                      />
+                    ) : (
+                      <DoorOpen
+                        className="w-8 h-8 tablet-portrait:w-11 tablet-portrait:h-11 desktop:w-14 desktop:h-14 text-white"
+                        strokeWidth={1.5}
+                      />
+                    )}
                   </div>
                 )}
               </div>

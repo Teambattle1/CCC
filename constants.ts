@@ -645,87 +645,7 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
 
 // TeamSegway Packing Submenu Links
 
-// TeamBox Submenu Links
-export const TEAMBOX_LINKS: HubLink[] = [
-  {
-    id: 'tb1',
-    title: 'GUIDE',
-    url: '#teambox_guide',
-    icon: Map,
-    description: 'Instruktioner',
-    color: 'blue'
-  },
-  {
-    id: 'tb2',
-    title: 'PAKKELISTER',
-    url: 'https://check.eventday.dk/pakkeliste/teambox',
-    icon: ListChecks,
-    description: 'Packing List',
-    color: 'green'
-  },
-  {
-    id: 'tb3',
-    title: 'NULSTIL BOX',
-    url: 'https://check.eventday.dk/pakkeliste/teambox/nulstil',
-    icon: Wrench,
-    description: 'Reset Box',
-    color: 'orange',
-    badge: 'new'
-  },
-  {
-    id: 'tb4',
-    title: 'FEJL & MANGLER',
-    url: '#fejlsogning_teambox',
-    icon: Wrench,
-    description: 'Rapporter fejl',
-    color: 'yellow'
-  },
-  {
-    id: 'tb5',
-    title: 'VIDEO',
-    url: '#teambox_video',
-    icon: Play,
-    description: 'Video Guides',
-    color: 'red',
-    badge: 'new'
-  },
-  {
-    id: 'tb6',
-    title: 'FILER',
-    url: '#teambox_files',
-    icon: FolderOpen,
-    description: 'Upload & Download',
-    color: 'purple'
-  },
-  {
-    id: 'tb7',
-    title: 'FEJLSØGNING',
-    url: '#teambox_fejlsogning',
-    icon: Wrench,
-    description: 'Troubleshooting Guides',
-    color: 'orange',
-    badge: 'new'
-  },
-  {
-    id: 'tb8',
-    title: 'SCORECARD',
-    url: '#',
-    icon: ListChecks,
-    description: 'Kommer snart',
-    color: 'red'
-  },
-  {
-    id: 'tb_gear',
-    title: 'GEAR OVERSIGT',
-    url: '#teambox_gear',
-    icon: ClipboardList,
-    description: 'Gear & Udstyr',
-    color: 'blue',
-    badge: 'new'
-  }
-];
-
-// TeamBox Packing Submenu Links
+// TeamBox Submenu Links — fjernet (TeamBox flyttet til GEAR + GAMES)
 
 // TeamConstruct Submenu Links
 export const TEAMCONSTRUCT_LINKS: HubLink[] = [
@@ -1449,7 +1369,6 @@ export const ACTIVITY_LINKS: HubLink[] = [
   
   // Group 3
   { id: 'a7', title: 'TEAMCONNECT', url: '#teamconnect', icon: CircleDot, description: 'Networking', color: 'purple' },
-  { id: 'a8', title: 'TEAMBOX', url: '#teambox', icon: Package, description: 'Portable Events', color: 'gray' },
   { id: 'a9', title: 'TEAMCONTROL', url: '#teamcontrol', icon: Gamepad2, description: 'Strategy', color: 'white' },
   
   // Group 4
@@ -1580,10 +1499,6 @@ export const TEAMCHALLENGE_FEJLSOGNING_VIDEO_INDEX = [
 ];
 
 export const TEAMCONNECT_FEJLSOGNING_VIDEO_INDEX = [
-  { title: 'Fejlsøgning - Kommer snart', index: 0 },
-];
-
-export const TEAMBOX_FEJLSOGNING_VIDEO_INDEX = [
   { title: 'Fejlsøgning - Kommer snart', index: 0 },
 ];
 

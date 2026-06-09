@@ -17,7 +17,6 @@ import {
   TEAMLAZER_FEJLSOGNING_LINKS,
   TEAMROBIN_LINKS,
   TEAMCONNECT_LINKS,
-  TEAMBOX_LINKS,
   TEAMSEGWAY_LINKS,
   TEAMCONTROL_LINKS,
   TEAMCONSTRUCT_LINKS,
@@ -37,7 +36,6 @@ import {
   TEAMTASTE_FEJLSOGNING_VIDEO_INDEX,
   TEAMCHALLENGE_FEJLSOGNING_VIDEO_INDEX,
   TEAMCONNECT_FEJLSOGNING_VIDEO_INDEX,
-  TEAMBOX_FEJLSOGNING_VIDEO_INDEX,
   TEAMCONTROL_FEJLSOGNING_VIDEO_INDEX,
   TEAMACTION_FEJLSOGNING_VIDEO_INDEX,
   TEAMCONSTRUCT_FEJLSOGNING_VIDEO_INDEX,
@@ -59,10 +57,7 @@ import VideoPlayer from './components/VideoPlayer';
 import LazerPointScoreboard from './components/LazerPointScoreboard';
 import IdeasModal from './components/IdeasModal';
 import TeamConstructGuide from './components/TeamConstructGuide';
-import TeamBoxVideoGrid from './components/TeamBoxVideoGrid';
 import TeamChallengeBoxVideos from './components/TeamChallengeBoxVideos';
-import TeamBoxGuide from './components/TeamBoxGuide';
-import TeamBoxDownloads from './components/TeamBoxDownloads';
 import TeamConstructScorecard from './components/TeamConstructScorecard';
 import TeamControlGuide from './components/TeamControlGuide';
 import FlybrixManual from './components/FlybrixManual';
@@ -93,6 +88,7 @@ import TeamLazerGearList from './components/TeamLazerGearList';
 import TopbarJobSearch from './components/TopbarJobSearch';
 import TodayJobsButton from './components/TodayJobsButton';
 import InstructorLanding from './components/InstructorLanding';
+import CrewGuide from './components/CrewGuide';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
 import { getUnreadFejlsogningCount, subscribeFejlsogningReports, TaskJob, ResolvedActivity } from './lib/supabase';
@@ -123,6 +119,7 @@ import {
   Map,
   Car,
   Users,
+  BookOpen,
   Utensils,
   FolderOpen,
   Printer,
@@ -131,7 +128,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'crew_hub' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_guide' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_fejlsogning' | 'teamaction_fejlsogning' | 'teambox_fejlsogning' | 'teamcontrol_fejlsogning' | 'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teambox_files' | 'teamcontrol_files' | 'teamaction_files' | 'teamconstruct_files' | 'teamrace_files' | 'google_photos' | 'teamlazer_gear' | 'livegps' | 'admin_oos' | 'admin_maintenance' | 'zapier_integration' | 'teamchallenge_gear' | 'teamrobin_gear' | 'teambox_gear' | 'teamconnect_gear' | 'teamplay_gear' | 'teamsegway_gear' | 'teamcontrol_gear' | 'teamconstruct_gear' | 'teamrace_gear' | 'teamtaste_gear' | 'teamaction_gear';
+type ViewState = 'main' | 'crew_hub' | 'crew_guide' | 'opgaver' | 'games' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teamsegway' |'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_musik' | 'teamlazer_video' |'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teamaction' |'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide' | 'teamplay_guide' | 'teamplay_video' | 'teamplay_fejlsogning' | 'fejlsogning_teamplay' | 'teamtaste_guide' | 'teamtaste_video' | 'teamtaste_fejlsogning' | 'fejlsogning_teamtaste' | 'teamchallenge_fejlsogning' | 'teamconnect_video' | 'teamconnect_fejlsogning' | 'teamaction_fejlsogning' | 'teamcontrol_fejlsogning' |'teamconstruct_fejlsogning' | 'teamrace_fejlsogning' | 'job_input' | 'instructor_select' | 'job_overview' | 'session_report' | 'my_jobs' | 'teamplay_files' | 'teamtaste_files' | 'teamchallenge_files' | 'teamlazer_files' | 'teamrobin_files' | 'teamsegway_files' | 'teamconnect_files' | 'teamcontrol_files' |'teamaction_files' | 'teamconstruct_files' | 'teamrace_files' | 'google_photos' | 'teamlazer_gear' | 'livegps' | 'admin_oos' | 'admin_maintenance' | 'zapier_integration' | 'teamchallenge_gear' | 'teamrobin_gear' | 'teamconnect_gear' |'teamplay_gear' | 'teamsegway_gear' | 'teamcontrol_gear' | 'teamconstruct_gear' | 'teamrace_gear' | 'teamtaste_gear' | 'teamaction_gear';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -375,9 +372,7 @@ const App: React.FC = () => {
     else if (link.title === 'TEAMACTION') changeView('teamaction');
     else if (link.title === 'TEAMLAZER') changeView('teamlazer');
     else if (link.title === 'TEAMROBIN') changeView('teamrobin');
-    else if (link.title === 'TEAMCONNECT') changeView('teamconnect');
-    else if (link.title === 'TEAMBOX') changeView('teambox');
-    else if (link.title === 'TEAMSEGWAY') changeView('teamsegway');
+    else if (link.title === 'TEAMCONNECT') changeView('teamconnect');    else if (link.title === 'TEAMSEGWAY') changeView('teamsegway');
     else if (link.title === 'TEAMCONTROL') changeView('teamcontrol');
     else if (link.title === 'TEAMCONSTRUCT') changeView('teamconstruct');
     else if (link.title === 'TEAMRACE') changeView('teamrace');
@@ -400,11 +395,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamcontrol_guide') changeView('teamcontrol_guide');
     else if (link.url === '#teamcontrol_flybrix') changeView('teamcontrol_flybrix');
     else if (link.url === '#teamcontrol_flybrix_manual') changeView('teamcontrol_flybrix_manual');
-    else if (link.url === '#teamcontrol_musik') changeView('teamcontrol_musik');
-    else if (link.url === '#teambox_video') changeView('teambox_video');
-    else if (link.url === '#teambox_guide') changeView('teambox_guide');
-    else if (link.url === '#teambox_downloads') changeView('teambox_downloads');
-    else if (link.url === '#teamlazer_video') changeView('teamlazer_video');
+    else if (link.url === '#teamcontrol_musik') changeView('teamcontrol_musik');    else if (link.url === '#teamlazer_video') changeView('teamlazer_video');
     else if (link.url === '#teamlazer_scorecard') changeView('teamlazer_scorecard');
     else if (link.url === '#teamlazer_fejlsogning') changeView('teamlazer_fejlsogning');
     else if (link.url === '#teamlazer_frekvenser') changeView('teamlazer_frekvenser');
@@ -416,9 +407,7 @@ const App: React.FC = () => {
     else if (link.url === '#fejlsogning_teamsegway') changeView('fejlsogning_teamsegway');
     else if (link.url === '#fejlsogning_teamcontrol') changeView('fejlsogning_teamcontrol');
     else if (link.url === '#fejlsogning_teamconstruct') changeView('fejlsogning_teamconstruct');
-    else if (link.url === '#fejlsogning_teamconnect') changeView('fejlsogning_teamconnect');
-    else if (link.url === '#fejlsogning_teambox') changeView('fejlsogning_teambox');
-    else if (link.url === '#fejlsogning_teamaction') changeView('fejlsogning_teamaction');
+    else if (link.url === '#fejlsogning_teamconnect') changeView('fejlsogning_teamconnect');    else if (link.url === '#fejlsogning_teamaction') changeView('fejlsogning_teamaction');
     else if (link.url === '#fejlsogning_teamchallenge') changeView('fejlsogning_teamchallenge');
     else if (link.url === '#fejlsogning_loquiz') changeView('fejlsogning_loquiz');
     else if (link.url === '#teamrace_scorecard') changeView('teamrace_scorecard');
@@ -444,9 +433,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamconnect_fejlsogning') changeView('teamconnect_fejlsogning');
     // TeamAction new views
     else if (link.url === '#teamaction_fejlsogning') changeView('teamaction_fejlsogning');
-    // New fejlsogning views
-    else if (link.url === '#teambox_fejlsogning') changeView('teambox_fejlsogning');
-    else if (link.url === '#teamcontrol_fejlsogning') changeView('teamcontrol_fejlsogning');
+    // New fejlsogning views    else if (link.url === '#teamcontrol_fejlsogning') changeView('teamcontrol_fejlsogning');
     else if (link.url === '#teamconstruct_fejlsogning') changeView('teamconstruct_fejlsogning');
     else if (link.url === '#teamrace_fejlsogning') changeView('teamrace_fejlsogning');
     // Activity file manager views
@@ -456,9 +443,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamlazer_files') changeView('teamlazer_files');
     else if (link.url === '#teamrobin_files') changeView('teamrobin_files');
     else if (link.url === '#teamsegway_files') changeView('teamsegway_files');
-    else if (link.url === '#teamconnect_files') changeView('teamconnect_files');
-    else if (link.url === '#teambox_files') changeView('teambox_files');
-    else if (link.url === '#teamcontrol_files') changeView('teamcontrol_files');
+    else if (link.url === '#teamconnect_files') changeView('teamconnect_files');    else if (link.url === '#teamcontrol_files') changeView('teamcontrol_files');
     else if (link.url === '#teamaction_files') changeView('teamaction_files');
     else if (link.url === '#teamconstruct_files') changeView('teamconstruct_files');
     else if (link.url === '#teamrace_files') changeView('teamrace_files');
@@ -471,9 +456,7 @@ const App: React.FC = () => {
     else if (link.url === '#admin_maintenance') changeView('admin_maintenance');
     else if (link.url === '#zapier_integration') changeView('zapier_integration');
     else if (link.url === '#teamchallenge_gear') changeView('teamchallenge_gear');
-    else if (link.url === '#teamrobin_gear') changeView('teamrobin_gear');
-    else if (link.url === '#teambox_gear') changeView('teambox_gear');
-    else if (link.url === '#teamconnect_gear') changeView('teamconnect_gear');
+    else if (link.url === '#teamrobin_gear') changeView('teamrobin_gear');    else if (link.url === '#teamconnect_gear') changeView('teamconnect_gear');
     else if (link.url === '#teamplay_gear') changeView('teamplay_gear');
     else if (link.url === '#teamsegway_gear') changeView('teamsegway_gear');
     else if (link.url === '#teamcontrol_gear') changeView('teamcontrol_gear');
@@ -489,6 +472,8 @@ const App: React.FC = () => {
   const handleBackClick = () => {
     // Nested navigation logic
     if (currentView === 'crew_hub') {
+      changeView('main');
+    } else if (currentView === 'crew_guide') {
       changeView('main');
     } else if (currentView === 'job_input') {
       changeView('opgaver');
@@ -517,8 +502,6 @@ const App: React.FC = () => {
     } else if (currentView === 'teamrobin') {
       changeView('activities');
     } else if (currentView === 'teamconnect') {
-      changeView('activities');
-    } else if (currentView === 'teambox') {
       changeView('activities');
     } else if (currentView === 'teamsegway') {
       changeView('activities');
@@ -552,8 +535,6 @@ const App: React.FC = () => {
       changeView('team_challenge');
     } else if (currentView === 'teamrobin_gear') {
       changeView('teamrobin');
-    } else if (currentView === 'teambox_gear') {
-      changeView('teambox');
     } else if (currentView === 'teamconnect_gear') {
       changeView('teamconnect');
     } else if (currentView === 'teamplay_gear') {
@@ -606,12 +587,6 @@ const App: React.FC = () => {
       changeView('teamcontrol_flybrix');
     } else if (currentView === 'teamcontrol_musik') {
       changeView('teamcontrol');
-    } else if (currentView === 'teambox_video') {
-      changeView('teambox');
-    } else if (currentView === 'teambox_guide') {
-      changeView('teambox');
-    } else if (currentView === 'teambox_downloads') {
-      changeView('teambox');
     } else if (currentView === 'teamlazer_video') {
       changeView('teamlazer');
     } else if (currentView === 'teamlazer_guide') {
@@ -640,8 +615,6 @@ const App: React.FC = () => {
       changeView('teamconstruct');
     } else if (currentView === 'fejlsogning_teamconnect') {
       changeView('teamconnect');
-    } else if (currentView === 'fejlsogning_teambox') {
-      changeView('teambox');
     } else if (currentView === 'fejlsogning_teamaction') {
       changeView('teamaction');
     } else if (currentView === 'fejlsogning_teamchallenge') {
@@ -664,8 +637,6 @@ const App: React.FC = () => {
     } else if (currentView === 'teamaction_fejlsogning') {
       changeView('teamaction');
     // New fejlsogning back navigation
-    } else if (currentView === 'teambox_fejlsogning') {
-      changeView('teambox');
     } else if (currentView === 'teamcontrol_fejlsogning') {
       changeView('teamcontrol');
     } else if (currentView === 'teamconstruct_fejlsogning') {
@@ -687,8 +658,6 @@ const App: React.FC = () => {
       changeView('teamsegway');
     } else if (currentView === 'teamconnect_files') {
       changeView('teamconnect');
-    } else if (currentView === 'teambox_files') {
-      changeView('teambox');
     } else if (currentView === 'teamcontrol_files') {
       changeView('teamcontrol');
     } else if (currentView === 'teamaction_files') {
@@ -796,12 +765,6 @@ const App: React.FC = () => {
     case 'teamrobin_gear':
       currentLinks = [];
       viewTitle = 'TEAMROBIN GEAR';
-      viewSubtitle = 'Gear & Udstyr';
-      ViewIcon = ClipboardList;
-      break;
-    case 'teambox_gear':
-      currentLinks = [];
-      viewTitle = 'TEAMBOX GEAR';
       viewSubtitle = 'Gear & Udstyr';
       ViewIcon = ClipboardList;
       break;
@@ -925,24 +888,6 @@ const App: React.FC = () => {
       viewSubtitle = '';
       ViewIcon = CircleDot;
       break;
-    case 'teambox':
-      currentLinks = TEAMBOX_LINKS;
-      viewTitle = 'TEAMBOX';
-      viewSubtitle = '';
-      ViewIcon = Briefcase;
-      break;
-    case 'teambox_guide':
-      currentLinks = [];
-      viewTitle = 'INSTRUKTØRGUIDE';
-      viewSubtitle = 'TeamBox';
-      ViewIcon = Map;
-      break;
-    case 'teambox_downloads':
-      currentLinks = [];
-      viewTitle = 'DOWNLOADS';
-      viewSubtitle = 'TeamBox Filer';
-      ViewIcon = Package;
-      break;
     // Activity File Manager views
     case 'teamplay_files':
       currentLinks = [];
@@ -984,12 +929,6 @@ const App: React.FC = () => {
       currentLinks = [];
       viewTitle = 'FILER';
       viewSubtitle = 'TeamConnect';
-      ViewIcon = FolderOpen;
-      break;
-    case 'teambox_files':
-      currentLinks = [];
-      viewTitle = 'FILER';
-      viewSubtitle = 'TeamBox';
       ViewIcon = FolderOpen;
       break;
     case 'teamcontrol_files':
@@ -1208,12 +1147,6 @@ const App: React.FC = () => {
       viewSubtitle = 'Top Gun Anthem';
       ViewIcon = Gamepad2;
       break;
-    case 'teambox_video':
-      currentLinks = [];
-      viewTitle = 'VIDEO';
-      viewSubtitle = 'TeamBox Guides';
-      ViewIcon = Briefcase;
-      break;
     case 'teamlazer_video':
       currentLinks = [];
       viewTitle = 'VIDEO';
@@ -1260,12 +1193,6 @@ const App: React.FC = () => {
       currentLinks = [];
       viewTitle = 'FEJLRAPPORT';
       viewSubtitle = 'TeamConnect';
-      ViewIcon = Wrench;
-      break;
-    case 'fejlsogning_teambox':
-      currentLinks = [];
-      viewTitle = 'FEJLRAPPORT';
-      viewSubtitle = 'TeamBox';
       ViewIcon = Wrench;
       break;
     case 'fejlsogning_teamaction':
@@ -1400,12 +1327,6 @@ const App: React.FC = () => {
       ViewIcon = Wrench;
       break;
     // New fejlsogning views
-    case 'teambox_fejlsogning':
-      currentLinks = [];
-      viewTitle = 'FEJLSØGNING';
-      viewSubtitle = 'TeamBox Troubleshooting';
-      ViewIcon = Wrench;
-      break;
     case 'teamcontrol_fejlsogning':
       currentLinks = [];
       viewTitle = 'FEJLSØGNING';
@@ -1431,6 +1352,12 @@ const App: React.FC = () => {
       viewTitle = 'TEAMBATTLE';
       viewSubtitle = 'Crew Command Center';
       ViewIcon = ShieldCheck;
+      break;
+    case 'crew_guide':
+      // Medarbejderhåndbogen — samme knapper som WELCOME's "Du er klar"-trin.
+      viewTitle = 'CREW GUIDE';
+      viewSubtitle = 'Medarbejderhåndbog';
+      ViewIcon = BookOpen;
       break;
     case 'main':
     default:
@@ -1721,12 +1648,6 @@ const App: React.FC = () => {
                 </div>
               </div>
             </div>
-          ) : currentView === 'teambox_video' ? (
-            <TeamBoxVideoGrid onBack={() => changeView('teambox')} />
-          ) : currentView === 'teambox_guide' ? (
-            <ActivityGuide activity="teambox" onNavigate={(view) => changeView(view as ViewState)} />
-          ) : currentView === 'teambox_downloads' ? (
-            <TeamBoxDownloads onBack={() => changeView('teambox')} />
           ) : currentView === 'teamlazer_video' ? (
             <VideoPlayer
               title="TeamLazer Video Guides"
@@ -1895,8 +1816,6 @@ const App: React.FC = () => {
             <FejlsogningReport activity="teamconstruct" />
           ) : currentView === 'fejlsogning_teamconnect' ? (
             <FejlsogningReport activity="teamconnect" />
-          ) : currentView === 'fejlsogning_teambox' ? (
-            <FejlsogningReport activity="teambox" />
           ) : currentView === 'fejlsogning_teamaction' ? (
             <FejlsogningReport activity="teamaction" />
           ) : currentView === 'fejlsogning_teamchallenge' ? (
@@ -1983,11 +1902,6 @@ const App: React.FC = () => {
               title="TeamAction Fejlsøgning"
               videoIndex={TEAMACTION_FEJLSOGNING_VIDEO_INDEX}
             />
-          ) : currentView === 'teambox_fejlsogning' ? (
-            <VideoPlayer
-              title="TeamBox Fejlsøgning"
-              videoIndex={TEAMBOX_FEJLSOGNING_VIDEO_INDEX}
-            />
           ) : currentView === 'teamcontrol_fejlsogning' ? (
             <VideoPlayer
               title="TeamControl Fejlsøgning"
@@ -2017,8 +1931,6 @@ const App: React.FC = () => {
             <ActivityFileManager activity="teamsegway" onBack={() => changeView('teamsegway')} />
           ) : currentView === 'teamconnect_files' ? (
             <ActivityFileManager activity="teamconnect" onBack={() => changeView('teamconnect')} />
-          ) : currentView === 'teambox_files' ? (
-            <ActivityFileManager activity="teambox" onBack={() => changeView('teambox')} />
           ) : currentView === 'teamcontrol_files' ? (
             <ActivityFileManager activity="teamcontrol" onBack={() => changeView('teamcontrol')} />
           ) : currentView === 'teamaction_files' ? (
@@ -2045,8 +1957,6 @@ const App: React.FC = () => {
             <ActivityGearList activitySlug="A1" activityName="TeamChallenge" />
           ) : currentView === 'teamrobin_gear' ? (
             <ActivityGearList activitySlug="A3" activityName="TeamRobin" />
-          ) : currentView === 'teambox_gear' ? (
-            <ActivityGearList activitySlug="A4" activityName="TeamBox" />
           ) : currentView === 'teamconnect_gear' ? (
             <ActivityGearList activitySlug="A5" activityName="TeamConnect" />
           ) : currentView === 'teamplay_gear' ? (
@@ -2102,8 +2012,13 @@ const App: React.FC = () => {
               activities={activeJobActivities}
               onNavigateActivity={(viewState) => changeView(viewState as ViewState)}
             />
+          ) : currentView === 'crew_guide' ? (
+            <CrewGuide />
           ) : currentView === 'main' ? (
-            <InstructorLanding onOpenHub={() => changeView('crew_hub')} />
+            <InstructorLanding
+              onOpenHub={() => changeView('crew_hub')}
+              onOpenGuide={() => changeView('crew_guide')}
+            />
           ) : (currentView === 'games') ? (
             <div className="w-full max-w-4xl mx-auto px-1 mobile-landscape:px-2 tablet-portrait:px-4">
               <div className="grid grid-cols-1 tablet-portrait:grid-cols-2 gap-2 mobile-landscape:gap-1.5 tablet-portrait:gap-4 tablet-landscape:gap-3 desktop:gap-4">

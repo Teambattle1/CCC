@@ -1449,3 +1449,31 @@ export const fetchLandingSites = async (
     return {};
   }
 };
+
+// ── WELCOME-håndbog (delt) ──────────────────────────────────────────────
+// CREW GUIDE viser de samme knapper som WELCOME's "Du er klar"-trin
+// (welcome_step_buttons hvor step_id='klar'). Tabellen ejes af WELCOME — vi
+// LÆSER kun, så admin redigerer håndbogen ét sted (i WELCOME's trin-editor).
+export interface WelcomeGuideButton {
+  position: number;
+  title: string;
+  body: string;
+  image: string | null;
+}
+
+export const fetchWelcomeGuideButtons = async (): Promise<WelcomeGuideButton[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('welcome_step_buttons')
+      .select('position, title, body, image')
+      .eq('step_id', 'klar')
+      .order('position');
+
+    if (error || !data) return [];
+    // Spring tomme pladser over (kun knapper med titel eller billede)
+    return (data as WelcomeGuideButton[]).filter((b) => b.title || b.image);
+  } catch (err) {
+    console.error('Failed to fetch welcome guide buttons:', err);
+    return [];
+  }
+};

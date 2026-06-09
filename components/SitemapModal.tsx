@@ -37,7 +37,6 @@ const ACTIVITY_COLORS: Record<string, string> = {
   teamrobin: '#86efac',
   teamsegway: '#ef4444',
   teamconnect: '#a855f7',
-  teambox: '#9ca3af',
   teamcontrol: '#ffffff',
   teamaction: '#67e8f9',
   teamconstruct: '#facc15',
@@ -135,9 +134,6 @@ const buildSiteTree = (): TreeNode[] => [
           buildActivityNode('teamrobin', 'TEAMROBIN', Target, [], false),
           buildActivityNode('teamsegway', 'TEAMSEGWAY', Navigation, [], false),
           buildActivityNode('teamconnect', 'TEAMCONNECT', CircleDot, [], false),
-          buildActivityNode('teambox', 'TEAMBOX', Package, [
-            { id: 'tb_checklist', label: 'NULSTIL BOX', view: 'teambox_checklist', icon: Wrench },
-          ], false),
           buildActivityNode('teamcontrol', 'TEAMCONTROL', Gamepad2, [
             { id: 'tctrl_musik', label: 'MUSIK', view: 'teamcontrol_musik', icon: Play },
             { id: 'tctrl_flybrix', label: 'FLYBRIX', view: 'teamcontrol_flybrix', icon: Gamepad2, children: [
