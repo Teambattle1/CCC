@@ -54,3 +54,6 @@ supabase/.branches/
 
 # === Misc ===
 *.local
+
+# === Local debug/crawl artifacts ===
+crawl-*
