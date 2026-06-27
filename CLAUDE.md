@@ -44,7 +44,7 @@ netlify deploy --prod --site d2ba717f-d545-4c64-9135-9326090c2457
 ## Architecture (the big picture)
 
 ### One giant component + a URL-backed view router
-`App.tsx` is a single ~2700-line component. There is **no React Router**. Navigation is a `ViewState` string union with 100+ members (`'main' | 'crew_hub' | 'teamlazer' | 'fejlsogning_teambox' | …`) rendered by ~200 `currentView === '…'` conditional blocks. The active view is stored in the URL via `nuqs`:
+`App.tsx` is a single ~2,050-line component. There is **no React Router**. Navigation is a `ViewState` string union with 100+ members (`'main' | 'crew_hub' | 'teamlazer' | 'fejlsogning_teambox' | …`) rendered by ~200 `currentView === '…'` conditional blocks. The active view is stored in the URL via `nuqs`:
 
 ```ts
 const [currentViewRaw, setCurrentViewRaw] = useQueryState('view', parseAsString.withDefault('main').withOptions({ history: 'push' }));
@@ -67,6 +67,11 @@ The hub's link groups are exported arrays of `HubLink` (`HUB_LINKS`, `ACTIVITY_L
 ### Data layer: `lib/supabase.ts` → MAIN instance
 - The Supabase URL + anon key for the **MAIN** project (`ilbjytyukicbssqftmma`) are **hardcoded** in `lib/supabase.ts`. The service-role key (`VITE_SUPABASE_SERVICE_ROLE_KEY`) is used **only** for admin password resets via the Auth Admin REST API.
 - `lib/supabase.ts` is the central data layer — almost every DB call (users, activity logs, scorecards, guide sections, jobs, vehicles, fejlrapporter, ideas, landing-sites catalog) is a typed helper here. Add new queries here rather than calling `supabase.from(...)` ad hoc in components.
+- Other `lib/` modules are external-service clients, each kept out of `supabase.ts`: `activityNames.ts` (OCC activity-id ↔ name bridge), `zapier.ts` (Zapier admin/log helpers), plus the two integrations below.
+
+### External integrations: Google Photos & LiveGPS
+- **Google Photos** (`lib/googlePhotos.ts`): direct `fetch` to `photoslibrary.googleapis.com/v1` with a `Bearer` **OAuth access token** (from the `@react-oauth/google` flow, Photos Library scope) — not the Supabase session. Surfaced by `GooglePhotosView` / `AlbumGrid` / `PhotoGrid` / `PhotoUpload`.
+- **LiveGPS** (`lib/livegps.ts`): real-time vehicle/device tracking. The client does **not** call the GPS provider directly — it goes through a **`livegps-proxy` Supabase edge function** (`{SUPABASE_URL}/functions/v1/livegps-proxy`) that holds the upstream credentials. Used by `LiveGPSPanel` and `TeamLazerGearList`. ⚠️ `livegps-proxy` is **deployed but not in this repo** — only `zapier-jobs` lives in `supabase/functions/`. Edit it via the Supabase dashboard/CLI, not here.
 
 ### Cross-project integration (CCC reads/writes shared MAIN tables)
 CCC is a consumer of data other TeamBattle projects own. Treat these tables as read-mostly:
@@ -86,7 +91,9 @@ When a change touches these tables, remember other repos depend on their shape �
 `components/IntroAnimation.tsx` + `intro.css` play once per session, gated on `sessionStorage.getItem('introSeen')`.
 
 ### `supabase/` directory
-Local Supabase CLI project: `config.toml`, RLS/storage SQL, `migrations/`, and `functions/` (edge functions — e.g. `zapier-jobs`). Edge functions are **Deno**, built/deployed via the Supabase CLI and **excluded from the frontend `tsconfig`** — `npm run build` does not typecheck them. Schema changes for CCC-owned tables go in `migrations/`.
+Local Supabase CLI project: `config.toml`, RLS/storage SQL, `migrations/`, and `functions/` (edge functions). Only `zapier-jobs` is checked in here; other deployed functions (e.g. `livegps-proxy`) live only on Supabase. Edge functions are **Deno**, built/deployed via the Supabase CLI and **excluded from the frontend `tsconfig`** — `npm run build` does not typecheck them. Schema changes for CCC-owned tables go in `migrations/`.
+
+`scripts/` holds one-off helpers (`setup-supabase.sql`, `start-claude-dev.sh`) — not part of the app build.
 
 ## Environment variables (all `VITE_`-prefixed except the legacy polyfill)
 
