@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://ilbjytyukicbssqftmma.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYmp5dHl1a2ljYnNzcWZ0bW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4MzA0NjEsImV4cCI6MjA3MDQwNjQ2MX0.I_PWByMPcOYhWgeq9MxXgOo-NCZYfEuzYmo35XnBFAY';
-const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -260,32 +259,24 @@ export const deleteUser = async (
   }
 };
 
-// Update user password (admin only) - requires service role key
-// For this to work, you need to create a Supabase Edge Function or use service role
+// Update user password (admin only) — går via edge-funktionen
+// ccc-admin-reset-password, som selv verificerer at kalderen er ADMIN og holder
+// service-role-nøglen server-side. Nøglen må aldrig findes i frontend-koden.
 export const updateUserPassword = async (
   userId: string,
   newPassword: string
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    // Use the admin API - this requires service role key
-    // We'll use a workaround: call the Supabase Auth Admin API directly
-    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': supabaseServiceKey,
-        'Authorization': `Bearer ${supabaseServiceKey}`
-      },
-      body: JSON.stringify({
-        password: newPassword
-      })
+    const { data, error } = await supabase.functions.invoke('ccc-admin-reset-password', {
+      body: { userId, newPassword },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      return { success: false, error: errorData.message || 'Failed to update password' };
+    if (error) {
+      return { success: false, error: error.message || 'Failed to update password' };
     }
-
+    if (data?.error) {
+      return { success: false, error: data.error };
+    }
     return { success: true };
   } catch (err) {
     console.error('Failed to update password:', err);

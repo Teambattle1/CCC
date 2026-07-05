@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, Trash2, Loader2 } from 'lucide-react';
+import { askClaude } from '../lib/aiProxy';
 
 interface ClaudeAssistantProps {
   isOpen: boolean;
@@ -17,9 +18,6 @@ const ClaudeAssistant: React.FC<ClaudeAssistantProps> = ({ isOpen, onClose }) =>
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  // Anthropic API key - set in environment or replace with your key
-  const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY || '';
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -40,45 +38,15 @@ const ClaudeAssistant: React.FC<ClaudeAssistantProps> = ({ isOpen, onClose }) =>
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          messages: [...messages, { role: 'user', content: userMessage }].map(m => ({
-            role: m.role,
-            content: m.content
-          }))
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => '');
-        let errorMsg = `HTTP ${response.status}`;
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMsg = errorData.error?.message || errorMsg;
-        } catch {
-          if (errorText) errorMsg += `: ${errorText.substring(0, 100)}`;
-        }
-        throw new Error(errorMsg);
-      }
-
-      const data = await response.json();
-      const assistantMessage = data.content[0]?.text || 'Ingen svar modtaget';
+      const answer = await askClaude([...messages, { role: 'user', content: userMessage }]);
+      const assistantMessage = answer || 'Ingen svar modtaget';
 
       setMessages(prev => [...prev, { role: 'assistant', content: assistantMessage }]);
     } catch (error: any) {
       console.error('Claude API error:', error);
       let errorMessage = 'Ukendt fejl';
       if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
-        errorMessage = 'CORS fejl - API nøglen skal have "browser access" aktiveret i Anthropic Console';
+        errorMessage = 'Netværksfejl — tjek forbindelsen og prøv igen';
       } else {
         errorMessage = error.message || 'Ukendt fejl';
       }
