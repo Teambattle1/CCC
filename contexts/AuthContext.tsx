@@ -110,45 +110,41 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    // Bevidst UDEN at røre den globale isLoading: den styrer App'ens fuldskærms-
+    // loader, og hvis vi togglede den her, ville LoginScreen blive unmountet og
+    // remountet ved fejl — så den lokale fejlbesked forsvandt. LoginScreen har
+    // sin egen knap-loader. Ved succes overtager onAuthStateChange profil-hentning.
     try {
-      setIsLoading(true);
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        setIsLoading(false);
-        return { success: false, error: error.message };
+        // Oversæt Supabase' engelske standardbesked til noget crew forstår
+        const msg = /invalid login credentials/i.test(error.message)
+          ? 'Forkert email eller adgangskode.'
+          : error.message;
+        return { success: false, error: msg };
       }
 
       if (data.user) {
-        // Create immediate fallback profile - don't wait for DB
-        const fallbackProfile: OCCUser = {
+        // Sæt straks en fallback-profil så UI ikke venter på DB
+        setProfile({
           id: data.user.id,
           email: data.user.email || email,
-          role: 'INSTRUCTOR' as UserRole, // Default to ADMIN for now
+          role: 'INSTRUCTOR' as UserRole,
           created_at: new Date().toISOString()
-        };
-        setProfile(fallbackProfile);
-        setIsLoading(false);
-
-        // Try to get real profile in background (non-blocking)
+        });
         getUserProfile(data.user.id).then(dbProfile => {
-          if (dbProfile) {
-            setProfile(dbProfile);
-          }
+          if (dbProfile) setProfile(dbProfile);
         }).catch(console.error);
-      } else {
-        setIsLoading(false);
       }
 
       return { success: true };
     } catch (err) {
       console.error('Login error:', err);
-      setIsLoading(false);
-      return { success: false, error: 'Login failed' };
+      return { success: false, error: 'Login mislykkedes — tjek din forbindelse.' };
     }
   };
 

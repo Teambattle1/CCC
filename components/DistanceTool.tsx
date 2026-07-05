@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Navigation, MapPin, Loader2, ChevronDown, Clock } from 'lucide-react';
+import { askClaude } from '../lib/aiProxy';
 
 const PREDEFINED_LOCATIONS = [
   { id: 'my_location', name: 'MY LOCATION', address: '', region: 'unknown' },
@@ -31,9 +32,6 @@ const DistanceTool: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLDivElement>(null);
-
-  // Claude API key - set in environment or replace with your key
-  const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY || '';
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -158,34 +156,9 @@ Regler:
 - Beregn ankomsttid ved at lægge køretid til ${timeStr}`;
       }
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 500,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errMsg = errorData.error?.message || `HTTP ${response.status}`;
-        if (response.status === 401) {
-          throw new Error('Ugyldig API nøgle - opdater VITE_ANTHROPIC_API_KEY i .env');
-        } else if (response.status === 403) {
-          throw new Error('API nøgle har ikke adgang - tjek at nøglen er aktiv');
-        }
-        throw new Error(`API fejl: ${errMsg}`);
-      }
-
-      const data = await response.json();
-      const assistantMessage = data.content[0]?.text || 'Ingen svar modtaget';
+      const assistantMessage =
+        (await askClaude([{ role: 'user', content: prompt }], { max_tokens: 500 })) ||
+        'Ingen svar modtaget';
       setResult(assistantMessage);
 
       // Add Google Maps link

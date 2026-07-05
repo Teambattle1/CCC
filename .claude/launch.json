@@ -12,6 +12,18 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["node_modules/vite/bin/vite.js", "preview"],
       "port": 4173
+    },
+    {
+      "name": "check-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "../CHECK", "run", "dev", "--", "--port", "5174"],
+      "port": 5174
+    },
+    {
+      "name": "gear-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "../GEAR", "run", "dev", "--", "--port", "5175"],
+      "port": 5175
     }
   ]
 }
