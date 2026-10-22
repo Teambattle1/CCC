@@ -6,13 +6,13 @@ import {
   openPackageOf, packageToMarkdown, patchCmItem, phaseOf, pickTarget, progressOf, redactUrl, removeCmItem, removeCmPackage,
   resolveScreen, sectionsOf, setCmConfig, setCmEnabled, setCmFabPos, startLine, subscribeCm,
   type CmApp, type CmElement, type CmItem, type CmKind, type CmPackage, type CmScreen, type CmScreenDef, type CmState,
-} from './cmCore';
+} from '../lib/cmCore';
 import {
   captureMarked, deleteCloudItem, deleteCloudPackage, deleteShots, fetchCloudPackages, fetchHandledSince, fetchThumb, getShot,
   pendingCount, putShot, refreshStatuses, scheduleSync, sendCloud, setCmSupabase, startSyncLoop, syncCm,
   type CloudPackage, type CmShot,
-} from './cmCloud';
-import { injectCmStyles } from './cmStyles';
+} from '../lib/cmCloud';
+import { injectCmStyles } from '../lib/cmStyles';
 
 /**
  * Checklist mode — LAGET over hele appen (porteret fra TeamTrack).
