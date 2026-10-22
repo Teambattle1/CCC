@@ -11,10 +11,11 @@ der skal rettes. Hvert fund ligger i databasen med skærmbillede, skærm → fil
 det trykkede element, rute, enhed, version og de seneste konsolfejl. **Bed
 ikke om skærmbilleder eller «hvor i appen» — det står i pakken.**
 
-Samme funktion findes i TeamTrack (Track), FLOW, CREW og EventDay. De tre
-sidste deler tabellerne `cm_packages` + `cm_items` i Supabase **MAIN**
-(`ilbjytyukicbssqftmma`), skilt ad af kolonnen `app` — her er det
-**`app = 'crew'`**. Filtrér ALTID på den.
+Funktionen kommer fra Checklist-kittet (`teambattle-workspace/checklist-kit`).
+Alle apps med kittet deler tabellerne `cm_packages` + `cm_items` i Supabase
+**MAIN** (`ilbjytyukicbssqftmma`), skilt ad af kolonnen `app` — her er det
+**`app = 'crew'`**. Filtrér ALTID på den. (TeamTrack har sin egen udgave
+på TRACK-db med tabellerne `checklist_*` — ikke disse.)
 
 ## Fase 1 — hent pakken (Supabase-MCP, virker fra enhver session)
 

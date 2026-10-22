@@ -7,11 +7,13 @@
  * version og seneste konsolfejl. Pakken sendes til Claude Code med
  * `/checklist dd/mm-A` (skillen i `.claude/skills/checklist/`).
  *
- * Samme modul bor i FLOW, CREW og EventDay — kun `app`-nøglen og
- * skærm-registret er forskellige. Ret det samme sted i alle tre.
+ * Kilden bor i Checklist-kittet (teambattle-workspace/checklist-kit) og er
+ * kopieret ind i hver app — kun `app`-nøglen, skærm-registret og den lille
+ * indgangs-komponent er forskellige. Ret i kittet, og kopiér videre.
  */
 
-export type CmApp = 'flow' | 'crew' | 'eventday';
+/** App-nøglen i databasen (`cm_packages.app`): små bogstaver/tal/-/_, 2-40 tegn, fx 'flow', 'crew', 'eventday', 'music'. */
+export type CmApp = string;
 export type CmKind = 'bug' | 'text' | 'design' | 'idea';
 export type CmItemStatus = 'open' | 'sent' | 'in_progress' | 'fixed' | 'declined';
 export const CM_KINDS: CmKind[] = ['bug', 'text', 'design', 'idea'];
