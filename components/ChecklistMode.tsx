@@ -1,18 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  CM_KINDS, CM_LAYER_ATTR, CM_PANEL_EVENT, openChecklistPanel, KIND_LABEL, PHASE_LABEL, addCmItem, buildContext, byNewest, countOnScreen, describeElement, elementSummary,
+  CM_KINDS, CM_LAYER_ATTR, visibleArea, CM_PANEL_EVENT, openChecklistPanel, takePendingPanelOpen, KIND_LABEL, PHASE_LABEL, addCmItem, buildContext, byNewest, countOnScreen, describeElement, elementSummary,
   ensureCmPackage, finishPackage, getCmConfig, getCmState, getRecentErrors, installErrorBuffer, isLive, markPackageSent, nextSeq,
   openPackageOf, packageToMarkdown, patchCmItem, phaseOf, pickTarget, progressOf, redactUrl, removeCmItem, removeCmPackage,
   resolveScreen, sectionsOf, setCmConfig, setCmEnabled, setCmFabPos, startLine, subscribeCm,
   type CmApp, type CmElement, type CmItem, type CmKind, type CmPackage, type CmScreen, type CmScreenDef, type CmState,
-} from '../lib/cmCore';
+} from './cmCore';
 import {
   captureMarked, deleteCloudItem, deleteCloudPackage, deleteShots, fetchCloudPackages, fetchHandledSince, fetchThumb, getShot,
   pendingCount, putShot, refreshStatuses, scheduleSync, sendCloud, setCmSupabase, startSyncLoop, syncCm,
   type CloudPackage, type CmShot,
-} from '../lib/cmCloud';
-import { injectCmStyles } from '../lib/cmStyles';
+} from './cmCloud';
+import { injectCmStyles } from './cmStyles';
 
 /**
  * Checklist mode — LAGET over hele appen (porteret fra TeamTrack).
@@ -70,13 +70,22 @@ const I = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const speechCtor = (): any => (typeof window === 'undefined' ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
 
+const micAllowed = (): boolean => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pp = (document as any).permissionsPolicy || (document as any).featurePolicy;
+    return pp && typeof pp.allowsFeature === 'function' ? !!pp.allowsFeature('microphone') : true;
+  } catch { return true; }
+};
+
 const useDictation = (onText: (t: string) => void) => {
   const [listening, setListening] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rec = useRef<any>(null);
   const want = useRef(false);
   const base = useRef('');
-  const supported = !!speechCtor();
+  // Appens Permissions-Policy kan forbyde mikrofonen (fx SMS: `microphone=()`) — så ingen død knap.
+  const supported = !!speechCtor() && micAllowed();
   const stop = useCallback(() => { want.current = false; try { rec.current?.stop(); } catch { /* ignore */ } setListening(false); }, []);
   const start = useCallback((from: string) => {
     const Ctor = speechCtor();
@@ -108,12 +117,25 @@ const useDictation = (onText: (t: string) => void) => {
   return { supported, listening, start, stop };
 };
 
-/** Laget følger den VISUELLE viewport, så arket står over tastaturet på en telefon. */
-const useVisualViewport = () => {
-  const [vv, setVv] = useState<{ top: number; height: number }>(() => ({ top: 0, height: typeof window === 'undefined' ? 0 : window.innerHeight }));
+/** Laget følger den VISUELLE viewport, så arket står over tastaturet på en telefon —
+ *  også når siden er bredere end skærmen (så er innerWidth/innerHeight større end det synlige). */
+type Vv = { top: number; left: number; width: number; height: number; keyboard: boolean };
+const useVisualViewport = (): Vv => {
+  const read = (): Omit<Vv, 'keyboard'> => {
+    const v = typeof window === 'undefined' ? null : window.visualViewport;
+    if (v) return { top: v.offsetTop, left: v.offsetLeft, width: v.width, height: v.height };
+    return { top: 0, left: 0, width: typeof window === 'undefined' ? 0 : window.innerWidth, height: typeof window === 'undefined' ? 0 : window.innerHeight };
+  };
+  const [vv, setVv] = useState<Vv>(() => ({ ...read(), keyboard: false }));
   useEffect(() => {
     const v = window.visualViewport;
-    const upd = () => setVv({ top: v ? v.offsetTop : 0, height: v ? v.height : window.innerHeight });
+    // Tastaturet = den synlige højde er faldet markant i forhold til den højeste, vi har set ved samme bredde.
+    let base = { width: 0, height: 0 };
+    const upd = () => {
+      const r = read();
+      if (Math.abs(r.width - base.width) > 1 || r.height > base.height) base = { width: r.width, height: r.height };
+      setVv({ ...r, keyboard: base.height - r.height > 120 });
+    };
     upd();
     v?.addEventListener('resize', upd); v?.addEventListener('scroll', upd); window.addEventListener('resize', upd);
     return () => { v?.removeEventListener('resize', upd); v?.removeEventListener('scroll', upd); window.removeEventListener('resize', upd); };
@@ -121,13 +143,16 @@ const useVisualViewport = () => {
   return vv;
 };
 
+const visibleW = (): number => (typeof window === 'undefined' ? 0 : Math.round(window.visualViewport?.width || document.documentElement.clientWidth || window.innerWidth));
+const visibleH = (): number => (typeof window === 'undefined' ? 0 : Math.round(window.visualViewport?.height || document.documentElement.clientHeight || window.innerHeight));
+
 // ── Knappen ───────────────────────────────────────────────────────────
 const Fab: React.FC<{ count: number; aiming: boolean; pos: { x: number; y: number }; onTap: () => void; onPanel: () => void }> = ({ count, aiming, pos, onTap, onPanel }) => {
   const drag = useRef<{ sx: number; sy: number; moved: boolean; id: number } | null>(null);
   const [live, setLive] = useState<{ x: number; y: number } | null>(null);
   const p = live || pos;
   return (
-    <div {...layer} style={{ position: 'fixed', left: `${p.x}%`, top: `${p.y}%`, zIndex: 2147483610 }}>
+    <div {...layer} style={{ position: 'fixed', left: `min(${p.x}%, calc(${visibleW()}px - 44px))`, top: `min(${p.y}%, calc(${visibleH()}px - 52px))`, zIndex: 2147483610 }}>
       <button
         type="button"
         className="cm-btn cm-fab"
@@ -141,7 +166,7 @@ const Fab: React.FC<{ count: number; aiming: boolean; pos: { x: number; y: numbe
           if (!d) return;
           if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 8) return;
           d.moved = true;
-          setLive({ x: (e.clientX / window.innerWidth) * 100, y: (e.clientY / window.innerHeight) * 100 });
+          setLive({ x: (e.clientX / visibleW()) * 100, y: (e.clientY / visibleH()) * 100 });
         }}
         onPointerUp={() => {
           const d = drag.current;
@@ -215,7 +240,7 @@ const Sheet: React.FC<{ draft: Draft; onSave: (k: CmKind, c: string) => void; on
   const dict = useDictation(setText);
   const vv = useVisualViewport();
   const downOnBackdrop = useRef(false);
-  const keyboard = typeof window !== 'undefined' && vv.height < window.innerHeight - 120;
+  const keyboard = vv.keyboard;
   useEffect(() => { const t = setTimeout(() => area.current?.focus(), 50); return () => clearTimeout(t); }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
@@ -227,7 +252,7 @@ const Sheet: React.FC<{ draft: Draft; onSave: (k: CmKind, c: string) => void; on
     <div
       {...layer}
       className="cm-backdrop"
-      style={{ top: vv.top, height: vv.height }}
+      style={{ top: vv.top, height: vv.height, left: vv.left, width: vv.width, right: 'auto' }}
       onPointerDown={e => { downOnBackdrop.current = e.target === e.currentTarget; }}
       onClick={e => { if (e.target === e.currentTarget && downOnBackdrop.current) onCancel(); }}
     >
@@ -349,6 +374,8 @@ const Panel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     await refreshStatuses();
     setCloud(await fetchCloudPackages());
   }, []);
+  // Hent skyen én gang, når panelet åbner (react-hooks v7 klager over setState i effekten — bevidst).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { void reload(); }, [reload]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !zoom) onClose(); };
@@ -553,8 +580,10 @@ const ChecklistMode: React.FC<ChecklistModeProps> = ({ app, appName, version = '
   useEffect(() => { if (!isAdmin && getCmState().enabled) setCmEnabled(false); }, [isAdmin]);
 
   useEffect(() => {
-    const open = () => setPanel(true);
+    const open = () => { takePendingPanelOpen(); setPanel(true); };
     window.addEventListener(CM_PANEL_EVENT, open);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (takePendingPanelOpen()) setPanel(true);
     return () => window.removeEventListener(CM_PANEL_EVENT, open);
   }, []);
 
@@ -589,7 +618,7 @@ const ChecklistMode: React.FC<ChecklistModeProps> = ({ app, appName, version = '
     setAiming(false);
     const pkg = ensureCmPackage();
     const n = nextSeq(pkg);
-    const element = el ? describeElement(el, { w: window.innerWidth, h: window.innerHeight }) : null;
+    const element = el ? describeElement(el, visibleArea()) : null;
     const picked = resolveScreen(el, document);
     setDraft({ n, screen: picked, element, shot: null, shotState: 'taking' });
     // Billedet tages NU — før arket maler (laget er ignoreret uanset).
