@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   LayoutDashboard,
+  ClipboardCheck,
   Gamepad2,
   MapPin,
   QrCode,
@@ -85,6 +86,14 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
     icon: Users,
     description: 'User Management',
     color: 'red'
+  },
+  {
+    id: 'cm1',
+    title: 'CHECKLIST MODE',
+    url: '#checklist',
+    icon: ClipboardCheck,
+    description: 'Peg på fejl → pakke til Claude Code',
+    color: 'hotpink'
   },
   {
     id: 'ar1',
