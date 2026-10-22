@@ -89,11 +89,13 @@ import TopbarJobSearch from './components/TopbarJobSearch';
 import TodayJobsButton from './components/TodayJobsButton';
 import InstructorLanding from './components/InstructorLanding';
 import CrewGuide from './components/CrewGuide';
+import { openChecklistPanel } from './lib/cmCore';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
 import { getUnreadFejlsogningCount, subscribeFejlsogningReports, TaskJob, ResolvedActivity } from './lib/supabase';
 import {
   ShieldCheck,
+  ClipboardCheck,
   House,
   Calendar,
   Wallet,
@@ -451,6 +453,7 @@ const App: React.FC = () => {
     else if (link.url === '#my_jobs') changeView('my_jobs');
     else if (link.url === '#code') changeView('code');
     else if (link.url === '#admin_reports') changeView('admin_reports');
+    else if (link.url === '#checklist') { openChecklistPanel(); return; }
     else if (link.url === '#livegps') changeView('livegps');
     else if (link.url === '#admin_oos') changeView('admin_oos');
     else if (link.url === '#admin_maintenance') changeView('admin_maintenance');
@@ -1485,6 +1488,18 @@ const App: React.FC = () => {
             title="Admin"
           >
             <Settings className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-red-400 group-active:text-red-300 transition-colors" />
+          </button>
+        )}
+
+        {/* Checklist mode - Admin Only (laget + pakkerne til Claude Code) */}
+        {profile?.role === 'ADMIN' && (
+          <button
+            onClick={openChecklistPanel}
+            data-testid="cm-open"
+            className="group hidden tablet-portrait:flex items-center justify-center w-9 h-9 mobile-landscape:w-8 mobile-landscape:h-8 tablet-portrait:w-11 tablet-portrait:h-11 tablet-landscape:w-10 tablet-landscape:h-10 desktop:w-14 desktop:h-14 bg-battle-grey/50 hover:bg-fuchsia-500/20 active:bg-fuchsia-500/30 border border-white/10 hover:border-fuchsia-500 text-white rounded-full transition-all duration-200 touch-manipulation touch-target"
+            title="Checklist mode"
+          >
+            <ClipboardCheck className="w-4 h-4 mobile-landscape:w-4 mobile-landscape:h-4 tablet-portrait:w-5 tablet-portrait:h-5 tablet-landscape:w-5 tablet-landscape:h-5 desktop:w-7 desktop:h-7 group-hover:text-fuchsia-300 group-active:text-fuchsia-200 transition-colors" />
           </button>
         )}
 

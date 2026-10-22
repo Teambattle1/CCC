@@ -137,6 +137,9 @@ When a change touches these tables, remember other repos depend on their shape �
 ### Responsive system: 5 explicit device modes
 `hooks/useDeviceMode.ts` classifies the viewport into `mobile-portrait | mobile-landscape | tablet-portrait | tablet-landscape | desktop` and `getResponsiveClasses(mode)` returns Tailwind class strings per mode. `app.css` mirrors this with `.responsive-*` classes per breakpoint. `components/DevicePreview.tsx` provides an in-app toolbar to simulate devices. Prefer these helpers over ad-hoc `sm:`/`md:` when sizing the hub grid/buttons.
 
+### Checklist mode (admin-lag → pakke → Claude Code, porteret fra TeamTrack 2026-10-22)
+`components/ChecklistMode.tsx` + `lib/cm*.ts` — samme modul som i FLOW og EventDay (ret det samme sted i alle tre). Mountes fra `index.tsx` som `<CrewChecklist />` (inde i AuthProvider, ved siden af App, så det ligger over alle visninger); kun `profile.role === 'ADMIN'`. Åbnes fra flisen CHECKLIST MODE under ADMIN (`TASK_CONTROL_LINKS`, url `#checklist`), den runde fuchsia knap i topbaren fra tablet og op (`data-testid="cm-open"`; telefonens topbar er fuld) eller `?checklist=1`. Knap → sigte → tryk → skærmbillede (html2canvas-pro, forstår Tailwind v4's oklch) med rød nummereret ramme → «Hvad skal rettes?» (diktat + kategori) → dagens pakke `dd/mm · A`. Lokalt først (localStorage `cm_state_v1:crew` + IndexedDB), så Supabase MAIN `cm_packages`/`cm_items` med `app='crew'` (migration `20261022100000_create_checklist_mode.sql`, allerede kørt). Skærmen = `?view=`; `lib/cmScreens.ts` slår visningen op → komponentfil (ny ViewState = én række). Claude retter en pakke med `/checklist dd/mm-A` (`.claude/skills/checklist/SKILL.md`).
+
 ### Intro animation
 `components/IntroAnimation.tsx` + `intro.css` play once per session, gated on `sessionStorage.getItem('introSeen')`.
 

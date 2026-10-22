@@ -6,6 +6,7 @@ import { NuqsAdapter } from 'nuqs/adapters/react';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AuthProvider } from './contexts/AuthContext';
+import CrewChecklist from './components/CrewChecklist';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -20,6 +21,7 @@ root.render(
         <NuqsAdapter>
           <AuthProvider>
             <App />
+            <CrewChecklist />
           </AuthProvider>
         </NuqsAdapter>
       </ErrorBoundary>
