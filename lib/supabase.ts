@@ -146,51 +146,22 @@ export const createUser = async (
   role: UserRole,
   name?: string
 ): Promise<{ success: boolean; error?: string }> => {
+  // Går via edge-funktionen ccc-admin-create-user (tjekker at kalderen er ADMIN og opretter
+  // auth-bruger + profil med service role). Før lavede browseren selv signUp + profil med valgfri
+  // rolle — så kunne enhver oprette sig selv som ADMIN.
   try {
-    // First check if user already exists in users table
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .single();
-
-    if (existingUser) {
-      return { success: false, error: 'EMAIL_EXISTS' };
-    }
-
-    // Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
+    const { data, error } = await supabase.functions.invoke('ccc-admin-create-user', {
+      body: { email, password, role, name },
     });
-
-    if (authError) {
-      // User might exist in auth but not in users table
-      if (authError.message.includes('User already registered')) {
-        return { success: false, error: 'EMAIL_EXISTS' };
-      }
-      return { success: false, error: authError.message };
+    if (data?.error) return { success: false, error: data.error };
+    if (error) {
+      // Non-2xx: læs fejlkoden fra svaret (fx EMAIL_EXISTS)
+      try {
+        const body = await (error as { context?: Response }).context?.json();
+        if (body?.error) return { success: false, error: body.error };
+      } catch { /* intet JSON-svar */ }
+      return { success: false, error: error.message || 'Failed to create user' };
     }
-
-    if (!authData.user) {
-      return { success: false, error: 'Failed to create user' };
-    }
-
-    // Create user profile with role (use upsert to handle edge cases)
-    const { error: profileError } = await supabase
-      .from('users')
-      .upsert({
-        id: authData.user.id,
-        email,
-        role,
-        name,
-        created_at: new Date().toISOString()
-      }, { onConflict: 'id' });
-
-    if (profileError) {
-      return { success: false, error: profileError.message };
-    }
-
     return { success: true };
   } catch (err) {
     return { success: false, error: 'Failed to create user' };
