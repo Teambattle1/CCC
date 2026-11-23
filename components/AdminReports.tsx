@@ -34,6 +34,32 @@ const ACTIVITY_COLORS: Record<string, string> = {
   teamtaste: 'gold'
 };
 
+// Fælles «Fejl & mangler» (tabel fejl_mangler, 2026-11-23) → visningens gamle form
+const ID_TO_SLUG: Record<string, string> = {
+  A1: 'teamchallenge', A2: 'teamlazer', A3: 'teamrobin', A4: 'teambox', A5: 'teamconnect', A6: 'teamplay',
+  A7: 'teamtaste', A8: 'teamsegway', A9: 'teamcontrol', A10: 'teamconstruct', A11: 'teamaction', A12: 'teamrace',
+};
+interface FejlManglerRow {
+  id: string; created_at: string; reporter_name: string; job_date: string | null; activity_id: string | null;
+  activity_name: string | null; component: string | null; description: string; status: string;
+  media: { url: string; type: string }[] | null; resolved_by: string | null; resolved_at: string | null;
+}
+const toReport = (r: FejlManglerRow): FejlReport => ({
+  id: r.id,
+  activity: (r.activity_id && ID_TO_SLUG[r.activity_id]) || (r.activity_name || 'andet').toLowerCase(),
+  activity_name: r.activity_name || 'Andet',
+  date: r.job_date || r.created_at,
+  gear: r.component || '—',
+  description: r.description,
+  image_url: r.media?.find(m => m.type === 'image')?.url ?? null,
+  reported_by: r.reporter_name,
+  reported_by_name: r.reporter_name,
+  created_at: r.created_at,
+  resolved: r.status === 'loest',
+  resolved_by: r.resolved_by || undefined,
+  resolved_at: r.resolved_at || undefined,
+});
+
 const AdminReports: React.FC = () => {
   const { profile } = useAuth();
   const [reports, setReports] = useState<FejlReport[]>([]);
@@ -50,8 +76,8 @@ const AdminReports: React.FC = () => {
 
     try {
       const { data, error: fetchError } = await supabase
-        .from('fejlsogning_reports')
-        .select('*')
+        .from('fejl_mangler')
+        .select('id,created_at,reporter_name,job_date,activity_id,activity_name,component,description,status,media,resolved_by,resolved_at')
         .order('created_at', { ascending: false });
 
       if (fetchError) {
@@ -59,7 +85,7 @@ const AdminReports: React.FC = () => {
         return;
       }
 
-      setReports(data || []);
+      setReports(((data || []) as FejlManglerRow[]).map(toReport));
     } catch (err) {
       setError('Fejl ved hentning af rapporter');
       console.error(err);
@@ -76,9 +102,9 @@ const AdminReports: React.FC = () => {
     try {
       const newResolved = !report.resolved;
       const { error: updateError } = await supabase
-        .from('fejlsogning_reports')
+        .from('fejl_mangler')
         .update({
-          resolved: newResolved,
+          status: newResolved ? 'loest' : 'i_gang',
           resolved_by: newResolved ? profile?.name || profile?.email : null,
           resolved_at: newResolved ? new Date().toISOString() : null
         })
@@ -109,7 +135,7 @@ const AdminReports: React.FC = () => {
 
     try {
       const { error: deleteError } = await supabase
-        .from('fejlsogning_reports')
+        .from('fejl_mangler')
         .delete()
         .eq('id', report.id);
 

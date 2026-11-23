@@ -823,14 +823,11 @@ export const deleteTeamRaceSession = async (
 // Get count of unread fejlsogning reports (reports from last 24 hours or unresolved)
 export const getUnreadFejlsogningCount = async (): Promise<{ count: number; error?: string }> => {
   try {
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-
+    // Fælles «Fejl & mangler» (2026-11-23): nye, ikke-sete fejlmeldinger
     const { count, error } = await supabase
-      .from('fejlsogning_reports')
-      .select('*', { count: 'exact', head: true })
-      .or(`resolved.is.null,resolved.eq.false`)
-      .gte('created_at', oneDayAgo.toISOString());
+      .from('fejl_mangler')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'ny');
 
     if (error) throw error;
     return { count: count || 0 };
@@ -851,7 +848,7 @@ export const subscribeFejlsogningReports = (
       {
         event: 'INSERT',
         schema: 'public',
-        table: 'fejlsogning_reports'
+        table: 'fejl_mangler'
       },
       async () => {
         // Get updated count when new report is inserted
@@ -864,7 +861,7 @@ export const subscribeFejlsogningReports = (
       {
         event: 'UPDATE',
         schema: 'public',
-        table: 'fejlsogning_reports'
+        table: 'fejl_mangler'
       },
       async () => {
         // Get updated count when report is updated (e.g., resolved)
@@ -1256,8 +1253,6 @@ export const fetchIdeas = async (): Promise<IdeaTodo[]> => {
 
 // ─── FEJLRAPPORTER → TODO Integration ────────────────────────────────────────
 
-// Admin employee IDs for notifications
-const ADMIN_EMPLOYEE_IDS = ['emp_z4ftvagjq', 'emp_0yyp87nsx', 'emp_g441rvbk5']; // Maria, Thomas, Kim
 
 export interface FejlrapportData {
   activity: string;
@@ -1271,104 +1266,40 @@ export interface FejlrapportData {
   haster: boolean;
 }
 
+// CREW-slug → activities.id (fælles med todo.eventday.dk/fejl)
+const FEJL_ACTIVITY_IDS: Record<string, string> = {
+  teamchallenge: 'A1', teamlazer: 'A2', teamrobin: 'A3', teambox: 'A4', teamconnect: 'A5', teamplay: 'A6',
+  teamtaste: 'A7', teamsegway: 'A8', teamcontrol: 'A9', teamconstruct: 'A10', teamaction: 'A11', teamrace: 'A12',
+};
+
+/**
+ * Fejlrapport fra CREW → det fælles «Fejl & mangler»-system (2026-11-23).
+ * RPC fm_submit gemmer i fejl_mangler, laver opgaven i TODO til Maria, sender
+ * notifikation (HASTER → også Thomas) og mailer booking@teambattle.dk — samme vej
+ * som QR-siden todo.eventday.dk/fejl. Billeder skal ligge i bucket fejl-media.
+ */
 export const submitFejlrapportAsTodo = async (
   data: FejlrapportData
 ): Promise<{ success: boolean; todoId?: string; error?: string }> => {
   try {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('da-DK', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-    // 1. Save to fejlsogning_reports table
-    const { data: report, error: reportError } = await supabase
-      .from('fejlsogning_reports')
-      .insert({
-        activity: data.activity,
+    const { data: res, error } = await supabase.rpc('fm_submit', {
+      p: {
+        reporter_name: data.reporterName,
+        reporter_phone: '',
+        job_date: data.date,
+        activity_id: FEJL_ACTIVITY_IDS[data.activity] || null,
         activity_name: data.activityName,
-        date: data.date,
-        gear: data.gear,
+        component: data.gear,
         description: data.description,
-        image_url: data.imageUrls.length > 0 ? data.imageUrls[0] : null,
-        image_urls: data.imageUrls,
+        media: data.imageUrls.map(url => ({ url, type: 'image' })),
         haster: data.haster,
-        reported_by: data.reporterEmail,
-        reported_by_name: data.reporterName,
-        created_at: now.toISOString()
-      })
-      .select('id')
-      .single();
-
-    if (reportError) {
-      console.error('fejlrapport insert error:', reportError);
+      },
+    });
+    if (error) {
+      console.error('fm_submit error:', error);
+      return { success: false, error: error.message };
     }
-
-    // 2. Build image HTML for todo description
-    const imageHtml = data.imageUrls.length > 0
-      ? data.imageUrls.map(url =>
-          `<img class="max-w-full h-auto rounded-lg border shadow-sm my-2" src="${url}" />`
-        ).join('')
-      : '';
-
-    // 3. Create TODO assigned to Maria
-    const { data: todo, error: todoError } = await supabase
-      .from('todos')
-      .insert({
-        title: `⚠️ FEJLRAPPORT: ${data.activityName} — ${data.gear}`,
-        description: `<p><strong>Aktivitet:</strong> ${data.activityName}</p><p><strong>Gear:</strong> ${data.gear}</p><p><strong>Dato:</strong> ${data.date}</p><p><strong>Rapporteret af:</strong> ${data.reporterName} (${data.reporterEmail})</p><p><strong>Tidspunkt:</strong> ${dateStr}</p><hr><p><strong>Beskrivelse:</strong></p><p>${data.description}</p>${imageHtml}`,
-        assigned_to: MARIA_EMPLOYEE_ID,
-        priority: data.haster ? 'HASTER' : 'Normal',
-        category: 'FEJLRAPPORT',
-        is_error: true,
-        resolved: false,
-      })
-      .select('id')
-      .single();
-
-    if (todoError) {
-      console.error('todo insert error:', todoError);
-      return { success: false, error: todoError.message };
-    }
-
-    const todoId = todo?.id;
-
-    // 4. Create notifications for admins
-    const notifyRecipients = data.haster ? ADMIN_EMPLOYEE_IDS : [MARIA_EMPLOYEE_ID];
-    const urgencyPrefix = data.haster ? '🚨 HASTER: ' : '';
-
-    for (const recipientId of notifyRecipients) {
-      await supabase.from('notifications').insert({
-        recipient: recipientId,
-        message: `${urgencyPrefix}Ny fejlrapport: ${data.activityName} — ${data.gear} |||todo_id:${todoId}`,
-        type: data.haster ? 'urgent_issue' : 'todo',
-        is_read: false,
-        created_at: now.toISOString(),
-      });
-    }
-
-    // 5. If HASTER — send email to maria@teambattle.dk via edge function
-    if (data.haster) {
-      try {
-        const { error: emailError } = await supabase.functions.invoke('send-fejlrapport-email', {
-          body: {
-            activity: data.activity,
-            activityName: data.activityName,
-            gear: data.gear,
-            date: data.date,
-            description: data.description,
-            imageUrls: data.imageUrls,
-            reporterName: data.reporterName,
-            reporterEmail: data.reporterEmail,
-            haster: true,
-          }
-        });
-        if (emailError) {
-          console.warn('HASTER email failed (non-blocking):', emailError);
-        }
-      } catch (emailErr) {
-        console.warn('HASTER email error (non-blocking):', emailErr);
-      }
-    }
-
-    return { success: true, todoId };
+    return { success: true, todoId: (res as { id?: string } | null)?.id };
   } catch (err) {
     console.error('submitFejlrapportAsTodo exception:', err);
     return { success: false, error: 'Uventet fejl ved indsendelse' };

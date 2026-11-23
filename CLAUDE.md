@@ -219,3 +219,6 @@ Tommelfinger: én kilde til data (query-laget), tydelige tilstande, mindst mulig
   completed as each fix lands — so the user can always see current status.
 - When the user adds new requests mid-session, add them to the list
   immediately; never leave the list stale.
+
+## Fejl & mangler (2026-11-23)
+- `submitFejlrapportAsTodo` kalder nu RPC `fm_submit` (fælles system i TODO-repoet, `todo.eventday.dk/fejl`); billeder uploades til bucket `fejl-media`. `AdminReports` og ulæst-tælleren læser `fejl_mangler` (gamle `fejlsogning_reports` bruges ikke længere).

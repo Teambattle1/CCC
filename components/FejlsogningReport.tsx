@@ -69,10 +69,11 @@ const FejlsogningReport: React.FC<FejlsogningReportProps> = ({ activity }) => {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileExt = file.name.split('.').pop();
-        const fileName = `fejlsogning/${activity}-${Date.now()}-${i}.${fileExt}`;
+        const month = new Date().toISOString().slice(0, 7);
+        const fileName = `${month}/${activity}-${crypto.randomUUID()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('guide-images')
+          .from('fejl-media')
           .upload(fileName, file, { upsert: true });
 
         if (uploadError) {
@@ -81,7 +82,7 @@ const FejlsogningReport: React.FC<FejlsogningReportProps> = ({ activity }) => {
         }
 
         const { data: { publicUrl } } = supabase.storage
-          .from('guide-images')
+          .from('fejl-media')
           .getPublicUrl(fileName);
 
         newUrls.push(publicUrl);
